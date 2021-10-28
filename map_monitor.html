@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ADS-B Receiver Monitor with FD mockup</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+		crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
+
+	<style>
+		body { background-color: #000000; font: Tahoma, sans-serif, arial;}
+		h3 { color: #e0e2e3; }
+		#main { text-align: center; vertical-align: middle; }
+		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: middle; }
+		.leaflet-tooltip { 
+			color: #e0ef00; 
+			background: rgba(155,155,155,0); 
+			font-size: 0.8em; 
+			font-variant: small-caps; 
+			text-align: left; 
+			border: none !important;
+			box-shadow: none !important;
+		}
+		.leafleft-popup-tip-container { 
+			display: none;
+			width: 0px;
+			height: 0px;
+		}
+		.leafleft-tooltip-right:before { 
+			background: transparent;
+			border: none;
+			box-shadow: none;
+		}
+
+		div.info-div { text-align: right; vertical-align: top; color: #ffffff;}
+		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; }
+		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #303091 groove; margin-bottom: 10px;}
+		table.ac-list th { text-align: center; background: #9090E1; color: #000000; }
+		table.stats-list th { text-align: center; background: #90E0E1; color: #000000; }
+
+		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
+			position: absolute; z-index: 10000; top: 100px;
+		}
+		canvas.fd-canvas-style { display: none; z-index: 10001; }
+
+	</style>
+
+</head>
+<body>
+
+<div id="main">
+		<h3>ADS-B Receiver Monitor with FD</h3>
+
+	<table><tr>
+		<td>
+			<div class="flight-director" id="fd">
+				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
+			</div>
+			<div id="mapid"></div>
+		</td>
+		<td style="padding-left: 25px; padding-top: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left; border: 1px solid #303004;">
+			<span style="padding-left: 5px;">FL</span> <span style="padding-left: 30px;">Alt</span> &nbsp; <span style="">Flight</span><br/>
+			<canvas id="alti-bar" height="500" width="150"></canvas>
+		</td>
+		<td style="vertical-align: top">
+			<div id="info" class="info-div">
+        			<table id="stats" class="stats-list" cellspacing="0"></table>
+        			<table id="aircrafts" class="ac-list" cellspacing="0"></table>
+			</div>
+		</td>
+	</tr><table>
+</div>
+
+<script>
+	// Originally written by Juho Einiö 2021
+	// Just enter your own receiver domain, location and MapBox (public) access token
+	// Known issues (among lots of others; this UI has been done a very quick and very dirty):
+	// 2021 Oct 26th 	- FD pitch calculation unfinished & wrong
+	//					- Clicking callsign / locking FD to one aircraft freezees FD
+	//					- FD altitude "roller" doesn't work correctly yet
+	//					- if receiving many aircrafts, the scrolling is not working correctly yet
+
+
+	var receiver_domain = "192.168.11.9"; // change to ADS-B receiver host IP or domainname
+	var receiver_lat = 60.0, receiver_lon = 25.0; // change this to your receiver location
+	var mapbox_accessToken = "<insert_you_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
+	var aircraft_refresh_rate = 1000; // Aircraft json fetch frequency - 1000ms
+	var stats_refresh_rate = 3000; // Dumnp1090 statistics
+
+	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    		maxZoom: 18,
+    		id: 'mapbox/dark-v8', /* mapbox/streets-v11 */
+    		tileSize: 512,
+    		zoomOffset: -1,
+    		accessToken: mapbox_accessToken
+	}).addTo(mymap);
+
+	function drawLine(ctx,begin,end,stroke='white',width=1){
+		if(stroke) ctx.strokeStyle=stroke;
+		if(width) ctx.lineWidth=width;
+		ctx.beginPath();
+		ctx.moveTo(...begin);
+		ctx.lineTo(...end);
+		ctx.closePath();
+		ctx.stroke();
+	}
+    const canvas = document.querySelector("#alti-bar");
+	function drawAltiBox(){
+        	if(canvas.getContext){
+			const ctx = canvas.getContext("2d");
+			// draw altimeter box
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			drawLine(ctx,[55,0],[55,500],'yellow',1);
+			drawLine(ctx,[55,500],[70,500],'yellow',1);
+			drawLine(ctx,[70,500],[70,0],'yellow',1);
+			drawLine(ctx,[70,0],[55,0],'yellow',1);
+			ctx.fillStyle = "#303072";
+			ctx.fillRect(56,474,13,24);
+			ctx.strokeText("3000",0,475);
+			ctx.strokeText("FL100",0,405);
+			ctx.strokeText("FL200",0,305);
+			ctx.strokeText("FL300",0,205);
+			ctx.strokeText("FL400",0,105);
+       		}
+	}
+
+	function deg2rad(degrees){ return( degrees * (Math.PI/180)); }
+
+	function getDistanceFromLatLonInKm(latitude1,longitude1,latitude2,longitude2,units) {
+  		var earthRadius = 6371; // Radius of the earth in km
+  		var dLat = deg2rad(latitude2-latitude1);  // deg2rad below
+  		var dLon = deg2rad(longitude2-longitude1); 
+  		var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(latitude1)) * Math.cos(deg2rad(latitude2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+  		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  		var d = earthRadius * c; 
+  		var miles = d / 1.609344; 
+
+		if ( units == 'km' ) {  
+			return d; 
+		} else {
+			return miles; 
+		}
+	}
+	
+	function toRad(angle) { return angle * Math.PI / 180; }
+	function toDeg(angle) { return angle * 180 / Math.PI; }
+
+	var nextpoint_lat = 0, nextpoint_lon = 0;
+	function calcNextPoint(lat, lon, brng, dist){
+  		dist = dist / 6371;  
+   		brng = toRad(brng);  
+
+   		var lat1 = toRad(lat), lon1 = toRad(lon);
+
+   		var lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) + Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
+
+   		var lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) *Math.cos(lat1), Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
+
+   		if (isNaN(lat2) || isNaN(lon2)) return false;
+
+   		nextpoint_lat = toDeg(lat2);
+   		nextpoint_lon = toDeg(lon2);
+   		return true;
+	}
+
+	function sortTable() {
+	}
+
+	var FDtimer;
+	var FD_flight = "", FD_effective_flight = "";
+	var FD_locked_flight = "";
+	var FD_altitude=-1, FD_rate=0, FD_track=-1, FD_tas=-1, FD_gs=-1, FD_mach =-1;
+	var FD_roll = 0, FD_yaw = 0, FD_nav_altitude = 0, FD_nav_heading = 0, FD_nav_qnh = 0;
+
+	function showFD(flight){
+		if(!FD_locked_flight)FD_flight = flight;		
+		if(FD_flight=="")return;
+		document.getElementById("fd").style.display = "block";
+		document.getElementById("fd-canvas").style.display = "inline-block";
+		drawFD();
+		FDtimer = setInterval(drawFD, 1000);
+	}
+
+    const fd_canvas = document.querySelector("#fd-canvas");
+    fd_canvas.addEventListener("click", onclickFD, false);
+
+	function drawFD(){
+		if(FD_flight=="")return;
+		// draw template
+		const fd_ctx = fd_canvas.getContext("2d");
+		// -- erase canvas
+		fd_ctx.clearRect(0,0,fd_canvas.width,fd_canvas.height);
+		// -- draw flight callsign
+		fd_ctx.strokeStyle = "blue";
+		fd_ctx.font = "small-caps normal 10px sans-serif";
+        fd_ctx.strokeText(FD_effective_flight,1,10);
+
+        // -- close button
+        if( FD_locked_flight ){
+			fd_ctx.strokeStyle = "lightgray";
+			fd_ctx.rect(440,5,10,10);
+			fd_ctx.stroke();
+			fd_ctx.strokeStyle = "white";
+			fd_ctx.beginPath();
+			fd_ctx.moveTo(441,6); fd_ctx.lineTo(449,14);
+			fd_ctx.moveTo(449,6); fd_ctx.lineTo(441,14);
+			fd_ctx.closePath();
+			fd_ctx.stroke();
+		}
+
+        // -- draw FD artificial horizon
+		fd_ctx.fillStyle = "#AFAFFF";
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.beginPath();
+		fd_ctx.moveTo(60,80);
+		fd_ctx.quadraticCurveTo(60,40,100,40);
+    	fd_ctx.lineTo(300,40);
+		fd_ctx.quadraticCurveTo(340,40,340,80);
+		fd_ctx.lineTo(340,320);
+		fd_ctx.quadraticCurveTo(340,360,300,360);
+		fd_ctx.lineTo(100,360);
+		fd_ctx.quadraticCurveTo(60,360,60,320);
+		fd_ctx.lineTo(60,80);
+		fd_ctx.closePath();
+		fd_ctx.fill();
+
+		// -- roll & pitch
+		fd_ctx.fillStyle = "#D2691E";
+		fd_ctx.strokeStyle = "#A52A2A";
+		fd_ctx.beginPath();
+		// define x1 and x2, calc x2 and y2
+		const center_x1 = 60, center_y1 = 210, center_len = (340-60);
+		//var calc_x2 = center_x1 + Math.cos(Math.PI * FD_roll / 180) * center_len;
+		var calc_y2 = center_y1 + Math.sin(Math.PI * FD_roll / 180) * center_len; 
+		//var actual_x1 = center_x1 + ((calc_x2-center_x1)/2);
+		var actual_y1 = center_y1 + ((calc_y2-center_y1)/2);
+		var actual_y2 = center_y1 - ((calc_y2-center_y1)/2);
+
+		// pitch factors to y
+		// angle = rate by distance in feet / minute 
+		var pitch_angle_rad = 0, pitch_angle_deg = 0, pitch_factor_y = 0;
+		var distance_in_feet = -FD_gs * 101.269; // feet per minute = knots * 101.269
+		if(FD_rate != "0")pitch_angle_rad = Math.atan(FD_rate/distance_in_feet);
+		/*
+		if(pitch_angle_rad > 0)pitch_angle_deg = 90-pitch_angle_rad * (180 / Math.PI);
+		if(pitch_angle_rad < 0)pitch_angle_deg = pitch_angle_rad * (180 / Math.PI)-90;
+		*/
+		pitch_angle_deg = pitch_angle_rad * (180 / Math.PI);
+		console.log("pitch angle (deg): " + (-pitch_angle_deg));
+		pitch_factor_y = pitch_angle_rad*20;
+
+		fd_ctx.moveTo(center_x1,(actual_y1+pitch_factor_y));
+		fd_ctx.lineTo(center_x1+center_len,(actual_y2+pitch_factor_y));
+
+		fd_ctx.lineTo(340,320);
+		fd_ctx.quadraticCurveTo(340,360,300,360);
+		fd_ctx.lineTo(100,360);
+		fd_ctx.quadraticCurveTo(60,360,60,320);
+		fd_ctx.lineTo(60,actual_y1);
+
+		fd_ctx.closePath();
+		fd_ctx.fill();
+
+		drawLine(fd_ctx,[center_x1,(actual_y1+pitch_factor_y)],[center_x1+center_len,(actual_y2+pitch_factor_y)],"white",1);
+
+		// -- "crosshairs"
+		fd_ctx.fillStyle = "#000000";
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.strokeRect(center_x1+20,center_y1-5,((center_len/2)-60),10);
+		fd_ctx.strokeRect((center_x1+(center_len/2)+40),center_y1-5,((center_len/2)-60),10);
+		fd_ctx.strokeRect((center_x1+(center_len/2)+40),center_y1-5,10,30);
+		fd_ctx.strokeRect(center_x1+20+((center_len/2)-70),center_y1-5,10,30);
+		fd_ctx.fillRect(center_x1+20,center_y1-5,((center_len/2)-60),10);
+		fd_ctx.fillRect((center_x1+(center_len/2)+40),center_y1-5,((center_len/2)-60),10);
+		fd_ctx.fillRect((center_x1+(center_len/2)+40),center_y1-5,10,30);
+		fd_ctx.fillRect(center_x1+20+((center_len/2)-70),center_y1-5,10,30);
+
+		// -- speed indicator
+		fd_ctx.fillStyle = "#303032";
+		fd_ctx.fillRect(2,40,35,320);
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "white";
+		fd_ctx.font = "small-caps normal 10px sans-serif";
+		// scale
+		for(sdown=-40; sdown<=40; sdown++){
+			if((FD_tas-sdown)<0)continue;
+			if(((FD_tas-sdown)%10)==0){
+				fd_ctx.beginPath();
+				fd_ctx.moveTo(35,center_y1+sdown*3);
+				fd_ctx.lineTo(32,center_y1+sdown*3);
+				fd_ctx.closePath();
+				fd_ctx.stroke();
+				if((sdown%2)==0) fd_ctx.fillText(FD_tas-sdown, 10,center_y1+(sdown*3)+4);
+			}
+		}
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "#000000";
+		fd_ctx.fillRect(3,195,32,20);		
+		fd_ctx.strokeRect(3,195,32,20);		
+		fd_ctx.font = "small-caps normal 14px sans-serif";
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "white";
+        if(FD_tas > 0)fd_ctx.fillText(FD_tas,5,210);
+        //fd.ctx.rect(3,180,32,200);
+        //fd.ctx.stroke();
+		fd_ctx.font = "small-caps normal 12px sans-serif";
+
+		// -- ground speed
+        if(FD_gs > 0)fd_ctx.fillText("GS " + Math.floor(FD_gs),5,380);
+
+        // -- altimeter
+		fd_ctx.fillStyle = "#303032";
+		fd_ctx.fillRect(360,40,45,320);
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "white";
+		fd_ctx.font = "small-caps normal 10px sans-serif";
+		// scale
+		for(sdown=-150; sdown<=140; sdown++){
+			if((Math.floor(FD_altitude/10)+sdown)<0)continue;
+			if(((Math.floor(FD_altitude/10)+sdown)%20)==0){
+				fd_ctx.beginPath();
+				fd_ctx.moveTo(361,center_y1+sdown);
+				fd_ctx.lineTo(365,center_y1+sdown);
+				fd_ctx.closePath();
+				fd_ctx.stroke();
+			}
+			if(((FD_altitude-sdown)%100)==0) fd_ctx.fillText(FD_altitude-sdown, 367,center_y1+sdown+4);
+		}
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "#000000";
+		fd_ctx.fillRect(355,195,55,20);		
+		fd_ctx.strokeRect(355,195,55,20);		
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "white";
+		fd_ctx.font = "small-caps normal 14px sans-serif";
+        if(FD_altitude > 0)fd_ctx.fillText(FD_altitude,362,210);
+
+        // -- climb / descent rate
+		fd_ctx.fillStyle = "#303032";
+        fd_ctx.beginPath();
+		fd_ctx.moveTo(410,120);
+		fd_ctx.lineTo(440,120);
+		fd_ctx.quadraticCurveTo(455,120,455,140);
+		fd_ctx.lineTo(455,280);
+		fd_ctx.quadraticCurveTo(455,290,440,290);
+		fd_ctx.lineTo(410,290);
+        fd_ctx.closePath();
+        fd_ctx.fill();  
+		//drawLine(fd_ctx,[210,455],[210,455+(FD_rate/100)],"white",3);   
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.lineWidth = 2;
+		fd_ctx.beginPath();
+		fd_ctx.moveTo(455,210);
+		fd_ctx.lineTo(415,210-((FD_rate/100)*1.1)); 
+        fd_ctx.closePath();
+        fd_ctx.stroke();
+		fd_ctx.lineWidth = 1;
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.font = "small-caps normal 9px sans-serif";
+        if(FD_rate > 0)fd_ctx.strokeText("+" + FD_rate,412,340); else fd_ctx.strokeText(FD_rate,412,340);
+
+        // -- heading
+		fd_ctx.fillStyle = "#303032";
+		fd_ctx.font = "small-caps normal 16px sans-serif";
+        fd_ctx.beginPath();
+		fd_ctx.moveTo(60,400);
+		fd_ctx.quadraticCurveTo(200,335,340,400);
+        fd_ctx.closePath();
+        fd_ctx.fill();
+
+		fd_ctx.strokeStyle = "white";
+		fd_ctx.fillStyle = "white";
+        if(FD_track >= 0 )fd_ctx.fillText(FD_track,190,390);
+
+        // -- mach
+		fd_ctx.strokeStyle = "green";
+		fd_ctx.font = "small-caps normal 14px sans-serif";
+        if(FD_mach > 0.5)fd_ctx.strokeText(FD_mach,5,395);
+
+        // -- autopilot enabled
+		fd_ctx.strokeStyle = "lightgreen";
+		fd_ctx.fillStyle = "lightgreen";
+		fd_ctx.font = "small-caps normal 18px sans-serif";
+		if(FD_nav_heading!=-1 && FD_nav_altitude >0)fd_ctx.fillText("A/P",190,30);
+
+        // -- autopilot altitude
+		fd_ctx.strokeStyle = "magenta";
+		fd_ctx.fillStyle = "magenta";
+		fd_ctx.font = "small-caps normal 16px sans-serif";
+        if(FD_nav_altitude > 0)fd_ctx.fillText(FD_nav_altitude,362,30);
+
+        // -- autopilot QNH
+		fd_ctx.strokeStyle = "cyan";
+		fd_ctx.font = "small-caps normal 10px sans-serif";
+        if(FD_nav_qnh > 0)fd_ctx.strokeText("QNH " + FD_nav_qnh,362,380);
+
+
+        // -- autopilot heading 
+        /*
+		fd_ctx.strokeStyle = "cyan";
+		fd_ctx.font = "small-caps normal 14px sans-serif";
+        if(FD_nav_heading > 0)fd_ctx.strokeText(FD_nav_heading,190,368);
+		*/
+        /*
+        drawLine(fd_ctx,[55,0],[55,50],'yellow',1);
+		fd_ctx.fillRect(56,474,13,24);
+		*/
+		return;
+	}
+
+	function hideFD(){
+		if(FD_locked_flight)return;
+		clearInterval(FDtimer);
+		document.getElementById("fd").style.display = "none";
+		document.getElementById("fd-canvas").style.display = "none";
+	}
+
+	function clickOpenFD(flight){
+		if(FD_locked_flight){ FD_flight = flight; FD_locked_flight = flight; hideFD(); return; }
+		showFD();
+		FD_locked_flight = flight;
+	}
+
+	function clickCloseFD(){
+		FD_locked_flight = "";
+		hideFD();
+	}
+
+	function onclickFD(e){
+		var clickX, clickY;
+		if(e.pageX || e.pageY){ clickX=e.pageX; clickY=e.pageY } else {
+			clickX = e.clientX + document.body.scrollLeft + ddocument.documentElement.scrollLeft;
+			clickY = e.clientY + document.body.scrollTop + ddocument.documentElement.scrollTop;
+		}
+		clickX -= fd_canvas.offsetLeft + 115; // had to calibrate manually..
+		clickY -= fd_canvas.offsetTop + 105;
+ 		// close button click?
+		if( clickX >= 438 && clickX <= 454 && clickY >= 0 && clickY <=20 )clickCloseFD();
+		//console.log("Mouse click: " + clickX + "," + clickY);
+	}
+
+	/* Mark receiver location */
+	var circle = L.circle([receiver_lat, receiver_lon], {
+    		color: 'blue',
+    		fillColor: '#00f',
+    		fillOpacity: 0.5,
+    		radius: 2000
+	}).addTo(mymap);
+
+    var getJSON = function(url, callback) {
+    	var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType='json';
+            xhr.onload = function() {
+            	var status=xhr.status;
+                    if(status==200) callback(null, xhr.response);
+                    	else callback(status, xhr.response);
+            };
+            xhr.send();
+    }
+	
+	var layerGroup = L.layerGroup().addTo(mymap);
+	
+	function refreshAircrafts(){
+		getJSON("http://" + receiver_domain + "/dump1090-fa/data/aircraft.json",
+        	function(err,data){
+            	if(err==null){
+					layerGroup.clearLayers();
+					drawAltiBox();
+					var al = document.getElementById("aircrafts");
+					al.innerHTML="<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Altitude</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th>";
+					for(var key in data.aircraft)
+					{
+						var lat=0, lon=0, altitude=-1, rate=0, track=-1, tas=-1, gs=-1, squawk="", seen=-1, rssi=0.0, msgs=0, cat="";
+						var roll = 0, nav_altitude = 0, nav_heading = 0, nav_qnh = 0, mach = 0;
+						var flight="", icao="";
+
+						var aci = data.aircraft[key];
+						if(aci.flight)flight = aci.flight;
+						if(aci.squawk)squawk = aci.squawk;
+						lat = aci.lat;
+						lon = aci.lon;
+						if(aci.alt_baro)altitude = aci.alt_baro;
+						if(aci.baro_rate)rate = aci.baro_rate;
+						if(aci.track)track = Math.floor(aci.track);
+						if(aci.tas)tas = aci.tas;
+						if(aci.gs)gs = aci.gs;
+						if(aci.rssi)rssi = aci.rssi;
+						if(aci.seen_pos)seen = aci.seen_pos;
+						if(aci.messages)msgs = aci.messages;
+						if(aci.category)cat = aci.category;
+
+						if(aci.roll)roll = aci.roll;
+						if(aci.nav_altitude_mcp)nav_altitude = aci.nav_altitude_mcp;
+						if(aci.nav_heading)nav_heading = aci.nav_heading;
+						if(aci.nav_qnh)nav_qnh = aci.nav_qnh;
+						if(aci.mach)mach = aci.mach;
+
+						if(track<0)track="";
+						if(altitude<0)altitude="";
+						if(tas<0)tas="";
+						if(gs<0)gs="";
+						if(seen<0)seen="";
+
+						// FD update
+						if(flight == FD_flight){
+							FD_tas = -1; FD_gs = -1; FD_altitude = -1; FD_rate = 0; FD_track = 0; FD_roll = 0; FD_mach = -1; FD_nav_altitude = -1; FD_nav_heading = -1;
+							FD_effective_flight = FD_flight;
+							FD_tas = tas;
+							FD_gs = gs;
+							FD_altitude = altitude;
+							FD_rate = rate;
+							FD_roll = roll;
+							FD_mach = mach;
+							FD_track = track;
+							FD_nav_altitude = nav_altitude;
+							FD_nav_heading = nav_heading;
+							FD_nav_qnh = nav_qnh;
+						}
+
+						var distance = -1;
+						if( lat && lon ) distance = getDistanceFromLatLonInKm(receiver_lat,receiver_lon,lat,lon,'km');
+
+						//console.log(flight + " " + lat + "," + lon + " " + altitude);
+						al.innerHTML += "<tr>";
+						/* 
+						if(seen<0) { al.innerHTML += "<tr style='color: #505050;'>"; } 
+						else { al.innerHTML += "<tr style='background: #050640;'>"; }
+						*/
+						var flight_style = " text-align: left;";
+						var pos_style = "background: #101050;";
+						if( !lat && !lon ) pos_style = "color: #8080A2;";
+						var seen_style = "";
+						if( seen > 15.0 ) seen_style = " color: #F07072";  
+						var rssi_style = "";
+						if( rssi >= -3.0 ) rssi_style = " color: #FFFFFF; background: #901010; ";
+						var distance_style = "";
+						if( distance < 50 ) distance_style = " color: #F07072";
+						if( distance < 0 ) { distance = " "; distance_style = " color: #000000:"; }
+						var squawk_style = "";
+						if( squawk == "7700" || squawk == "7600" || squawk == "7500" ) squawk_style = " background: #FF0000; color: #FFFFFF; font-weight: bold;";
+
+						var cat_explanation = "";
+						switch(cat){
+							case "A1" : { cat_explanation = "Class A1: Light"; break; }
+							case "A2" : { cat_explanation = "Class A2: Small"; break; }
+							case "A3" : { cat_explanation = "Class A3: Large"; break; }
+							case "A4" : { cat_explanation = "Class A4: High vortext"; break; }
+							case "A5" : { cat_explanation = "Class A5: Heavy"; break; }
+							case "A6" : { cat_explanation = "Class A6: High Performance"; break; }
+							case "A7" : { cat_explanation = "Class A7: Helicopter"; break; }
+						}
+
+						var more_info = "Roll: " + roll + "\nSet heading: " + nav_heading + "\nSet altitude: " + nav_altitude + "\nSet QNH: " + nav_qnh;
+
+						al.innerHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td>";  
+
+
+						al.innerHTML += "</tr>";
+
+						// refresh altimeter graph
+						if( altitude > 0 ){
+    						if(canvas.getContext){
+         						const ctx = canvas.getContext("2d");
+								if(flight)
+                                	drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'red',1);
+								else
+                                	drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'darkyellow',1);
+								var rate_prefix = " ";
+								if(rate>70) {
+									rate_prefix = "↑";
+                                    ctx.strokeStyle = "green";
+								} else if (rate<-70) {
+									rate_prefix = "↓";
+									ctx.strokeStyle = "red";
+                                } else { 
+									ctx.strokeStyle = "blue";
+								}
+								ctx.font = "small-caps normal 10px sans-serif";
+								if( seen < 20 ){
+									ctx.strokeText(rate_prefix + " " + flight,74,500-(altitude/100)+5);
+									ctx.strokeText((Math.floor(altitude/100)),31,500-(altitude/100)+5);
+								}	
+							}
+						}
+
+						if( lat!=null && lon!=null )
+						{
+							// add position marker
+                            var ac = L.rectangle([[lat-0.01, lon-0.02], [lat+0.01,lon+0.02]], {
+                                    color: '#00FF00',
+                                    fillColor: '#000',
+                                    fillOpacity: 0.9,
+                                    radius: 2300
+                            }).addTo(layerGroup);
+                            // add heading line, variable by ground speed
+                            var speed_km = gs *1.852;
+                            var headline_len = speed_km / 60;                           
+                            nextpoint_lat = 0; nextpoint_lon = 0;
+                            if( track )calcNextPoint(lat,lon,track,headline_len); // indicator with km distance calculated from gs
+                            if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
+                            	var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+                            }
+                            // add tooltip text
+							var st_track = "-";
+							if( track )st_track = Math.floor(track);
+							var	st_alt = "FL" + Math.floor(altitude/100),
+								st_rate = "-",
+								st_squawk = "[<span style='color: #9092e0;'>" + squawk + "</span>]";
+							if( !aci.squawk )st_squawk = ""; 
+							if( (squawk == "7700") || (squawk == "7600") || (squawk == "7500") )
+                                st_squawk = "<span style='color: #ff0000; font-size: 1.2em;'><b> EM </b> [" + squawk + "]</span>";
+							if( altitude < 5000 ) st_alt = altitude;
+							if( rate > 0 ) st_rate = "&uarr;<span style='color:#40c041;'>" + rate + "</span>";
+							if( rate < 0 ) st_rate = "&darr;<span style='color:#c04041;'>" + (-rate) + "</span>";
+							if( !flight && !squawk )
+								ac.bindTooltip(" " + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
+							else
+								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
+						}
+					}
+				}
+			}
+		);
+	}
+	
+	refreshAircrafts();
+	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
+
+	function refreshStats(){
+        	getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
+                	function(err,data){
+                        	if(err==null){
+								var st = document.getElementById("stats");
+								var hrate_style = "background: #F0F081; text-align: center;";
+								var h5_style = "background: #80F081; text-align: center;";
+								var h15_style = " text-align: center;";
+								st.innerHTML="<th style='"+hrate_style+"'>Rate</th><th style='"+h5_style+"'>5:Peak</th><th style='"+h5_style+"'>Sig</th><th style='"+h5_style+"'>Noise</th><th style='"+h5_style+"'>Msgs</th><th style='"+h5_style+"'>Pos</th><th style='"+h15_style+"'>15:Peak</th><th style='"+h15_style+"'>Sig</th><th style='"+h15_style+"'>Noise</th><th style='"+h15_style+"'>Msgs</th><th style='"+h15_style+"'>Pos</th>";
+								//for(var key in data)
+								{
+									var msgs = 0.0, msgrate = 0.0; 
+									var noise5 = 0.0, peak5 = 0.0, sig5 = 0.0, msgs5 = 0, pos5 = 0, ok5 = 0;
+									var noise15 = 0.0, peak15 = 0.0, sig15 = 0.0, msgs15 = 0, pos15 = 0, ok15 = 0;
+
+									if(data.last1min.messages) msgs = data.last1min.messages;
+									msgrate = (msgs / 60).toFixed(1);
+
+									if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
+									if(data.last5min.local.signal) sig5 = data.last5min.local.signal;
+									if(data.last5min.local.peak_signal) peak5 = data.last5min.local.peak_signal;
+									if(data.last5min.cpr.local_ok) ok5 = data.last5min.cpr.local_ok;									
+									if(data.last5min.cpr.airborne) pos5 = data.last5min.cpr.airborne;
+									if(data.last5min.messages) msgs5 = data.last5min.messages;
+
+									if(data.last15min.local.noise) noise15 = data.last15min.local.noise;
+									if(data.last15min.local.signal) sig15 = data.last15min.local.signal;
+									if(data.last15min.local.peak_signal) peak15 = data.last15min.local.peak_signal;
+									if(data.last15min.cpr.local_ok) ok15 = data.last15min.cpr.local_ok;
+									if(data.last15min.cpr.airborne) pos15 = data.last15min.cpr.airborne;
+									if(data.last15min.messages) msgs15 = data.last15min.messages;
+
+									var stat_style = " text-align: center;";
+
+									var rate_style = " color: #80FF81;";
+									if(msgrate < 2) rate_style = " color: #FF1011;";
+									if(msgrate > 50) rate_style = " color: #B0B0FF;";
+
+									var sig5_style = "";
+									if(sig5 > -3.0) sig5_style = " color: #FF1011;";
+
+									var sig15_style = "";
+									if(sig15 > -3.0) sig15_style = " color: #FF1011;";
+
+									st.innerHTML += "<tr>";
+
+									st.innerHTML += "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+
+									st.innerHTML += "</tr>";
+								}
+							}
+						}
+					);
+    }
+
+    refreshStats();
+	var refreshStatsInterval = setInterval(refreshStats, stats_refresh_rate);
+
+</script>
+</body>
+</html>
+
+
