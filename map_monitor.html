@@ -41,13 +41,16 @@
 			border: 1px solid #303004; padding-left: 5px; padding-right: 5px; height: 518px;
 		}
 
-		div.info-div { text-align: right; vertical-align: top; color: #ffffff; overflow-y: scroll; }
+		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; }
 		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #303091 groove; margin-bottom: 10px;}
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; }
 		.stats-list-body { }
+		span.filters { font-size: 0.8em; }
 		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; }
+		.ac-list-head th { text-align: center; background: #201081; color: #FFFFFF; }
 
-		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; position: absolute; z-index: 10000; top: 100px;
+		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
+			position: absolute; z-index: 10000; top: 100px;
 		}
 		canvas.fd-canvas-style { display: none; z-index: 10001; }
 
@@ -76,6 +79,9 @@
         				<thead id="stats-head" class="stats-list-head"></thead>
         				<tbody id="stats-body" class="stats-list-body"></tbody>
         			</table>
+        			<span class="filters">
+						<input type="checkbox" id="cb-filter-map" onClick="checkFilters()"> Filter by visible only on map (<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi) 
+					</span>
         			<table id="aircrafts" class="ac-list" cellspacing="0">
         				<thead id="aircrafts-head" class="ac-list-head"></thead>
         				<tbody id="aircrafts-body" class="ac-list-body"></tbody>
@@ -96,6 +102,7 @@
 	//					- scroll of the aircraft table needs to be done - if the list is growing bigger, every update returns to top
 	// 2021 Oct 30th	- Cleaned up the aircraft table a bit, still some work to do with it. Might help with the scrolling also.
 	//					- Also cleaned up a bit the ali-bar graph.
+	//					- Added feature: filtering by the visible map (using lateral distance of map)
 
 	var receiver_domain = "192.168.11.9"; // change to ADS-B receiver host IP or domainname
 	var receiver_lat = 60.0, receiver_lon = 25.0; // change this to your receiver location
@@ -112,6 +119,13 @@
     		zoomOffset: -1,
     		accessToken: mapbox_accessToken
 	}).addTo(mymap);
+
+	mymap.on('zoomend', function() {
+		filters_map_center = mymap.getCenter();
+		filters_map_distance = Math.floor(filters_map_center.distanceTo(L.latLng(filters_map_center.lat, mymap.getBounds().getEast()))/1000);  
+		document.getElementById("cb-filter-map-distance").innerHTML = filters_map_distance;
+		document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
+	});
 
 	function drawLine(ctx,begin,end,stroke='white',width=1){
 		if(stroke) ctx.strokeStyle=stroke;
@@ -180,6 +194,22 @@
    		nextpoint_lat = toDeg(lat2);
    		nextpoint_lon = toDeg(lon2);
    		return true;
+	}
+
+	var filters_map_checked = false;
+	var filters_map_center;
+	var filters_map_distance = -1; // in meters (center to eastest part of the map)
+	function checkFilters(){
+		if( document.getElementById("cb-filter-map").checked ){
+			filters_map_center = mymap.getCenter();
+			filters_map_distance = Math.floor(filters_map_center.distanceTo(L.latLng(filters_map_center.lat, mymap.getBounds().getEast()))/1000);
+			document.getElementById("cb-filter-map-distance").innerHTML = filters_map_distance; // kilometers
+			document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
+			filters_map_checked = true; 
+		} else {
+			document.getElementById("cb-filter-map-distance").innerHTML = "---";
+			filters_map_checked = false;	
+		}
 	}
 
 	function sortTable() {
@@ -277,7 +307,7 @@
 		if(pitch_angle_rad < 0)pitch_angle_deg = pitch_angle_rad * (180 / Math.PI)-90;
 		*/
 		pitch_angle_deg = pitch_angle_rad * (180 / Math.PI);
-		console.log("pitch angle (deg): " + (-pitch_angle_deg));
+		//console.log("pitch angle (deg): " + (-pitch_angle_deg));
 		pitch_factor_y = pitch_angle_rad*20;
 
 		fd_ctx.moveTo(center_x1,(actual_y1+pitch_factor_y));
@@ -539,7 +569,7 @@
 
 						// FD update
 						if(flight == FD_flight){
-							FD_tas = -1; FD_gs = -1; FD_altitude = -1; FD_rate = 0; FD_track = 0; FD_roll = 0; FD_mach = -1; FD_nav_altitude = -1; FD_nav_heading = -1;
+		 					FD_tas = -1; FD_gs = -1; FD_altitude = -1; FD_rate = 0; FD_track = 0; FD_roll = 0; FD_mach = -1; FD_nav_altitude = -1; FD_nav_heading = -1;
 							FD_effective_flight = FD_flight;
 							FD_tas = tas;
 							FD_gs = gs;
@@ -555,6 +585,15 @@
 
 						var distance = -1;
 						if( lat && lon ) distance = getDistanceFromLatLonInKm(receiver_lat,receiver_lon,lat,lon,'km');
+
+						if( filters_map_checked ){
+							if( lat && lon ){
+								var map_center = mymap.getCenter();
+								var ac_distance_to_center = getDistanceFromLatLonInKm(map_center.lat,map_center.lng,lat,lon,'km');
+								// console.log("AC distance to center [" + map_center.lat + "," + map_center.lng +"]: " + ac_distance_to_center);
+								if( ac_distance_to_center > filters_map_distance ) continue;
+							} else continue;
+						}
 
 						//console.log(flight + " " + lat + "," + lon + " " + altitude);
 						outHTML += "<tr>";
