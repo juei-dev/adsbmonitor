@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>ADS-B Receiver Monitor with FD mockup</title>
+	<title>ADS-B Receiver Monitor</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -15,8 +15,8 @@
 	<style>
 		body { background-color: #000000; font: Tahoma, sans-serif, arial;}
 		h3 { color: #e0e2e3; }
-		#main { text-align: center; vertical-align: middle; }
-		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: middle; }
+		#main { text-align: center; vertical-align: top; }
+		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 
 			background: rgba(155,155,155,0); 
@@ -37,14 +37,17 @@
 			box-shadow: none;
 		}
 
-		div.info-div { text-align: right; vertical-align: top; color: #ffffff;}
-		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; }
-		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #303091 groove; margin-bottom: 10px;}
-		table.ac-list th { text-align: center; background: #9090E1; color: #000000; }
-		table.stats-list th { text-align: center; background: #90E0E1; color: #000000; }
+		#alti-bar {
+			border: 1px solid #303004; padding-left: 5px; padding-right: 5px; height: 518px;
+		}
 
-		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
-			position: absolute; z-index: 10000; top: 100px;
+		div.info-div { text-align: right; vertical-align: top; color: #ffffff; overflow-y: scroll; }
+		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #303091 groove; margin-bottom: 10px;}
+		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; }
+		.stats-list-body { }
+		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; }
+
+		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; position: absolute; z-index: 10000; top: 100px;
 		}
 		canvas.fd-canvas-style { display: none; z-index: 10001; }
 
@@ -54,26 +57,33 @@
 <body>
 
 <div id="main">
-		<h3>ADS-B Receiver Monitor with FD</h3>
+	<h3>ADS-B Receiver Monitor</h3>
 
 	<table><tr>
-		<td>
+		<td style="vertical-align: top;">
 			<div class="flight-director" id="fd">
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
 			</div>
 			<div id="mapid"></div>
 		</td>
-		<td style="padding-left: 25px; padding-top: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left; border: 1px solid #303004;">
-			<span style="padding-left: 5px;">FL</span> <span style="padding-left: 30px;">Alt</span> &nbsp; <span style="">Flight</span><br/>
-			<canvas id="alti-bar" height="500" width="150"></canvas>
+		<td style="padding-left: 5px; padding-top: 1px; padding-right: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left;">
+			<span style="padding-left: 10px;">FL</span> <span style="padding-left: 33px;">Alt</span> &nbsp; <span style="padding-left: 4px;">Flight</span><br/>
+			<canvas id="alti-bar" height="500" width="150" class="alti-bar"></canvas>
 		</td>
-		<td style="vertical-align: top">
+		<td style="vertical-align: top; overflow-y: scroll; display: block;">
 			<div id="info" class="info-div">
-        			<table id="stats" class="stats-list" cellspacing="0"></table>
-        			<table id="aircrafts" class="ac-list" cellspacing="0"></table>
+        			<table id="stats" class="stats-list" cellspacing="0">
+        				<thead id="stats-head" class="stats-list-head"></thead>
+        				<tbody id="stats-body" class="stats-list-body"></tbody>
+        			</table>
+        			<table id="aircrafts" class="ac-list" cellspacing="0">
+        				<thead id="aircrafts-head" class="ac-list-head"></thead>
+        				<tbody id="aircrafts-body" class="ac-list-body"></tbody>
+        			</table>
 			</div>
 		</td>
-	</tr><table>
+	</tr></table>
+
 </div>
 
 <script>
@@ -83,8 +93,9 @@
 	// 2021 Oct 26th 	- FD pitch calculation unfinished & wrong
 	//					- Clicking callsign / locking FD to one aircraft freezees FD
 	//					- FD altitude "roller" doesn't work correctly yet
-	//					- if receiving many aircrafts, the scrolling is not working correctly yet
-
+	//					- scroll of the aircraft table needs to be done - if the list is growing bigger, every update returns to top
+	// 2021 Oct 30th	- Cleaned up the aircraft table a bit, still some work to do with it. Might help with the scrolling also.
+	//					- Also cleaned up a bit the ali-bar graph.
 
 	var receiver_domain = "192.168.11.9"; // change to ADS-B receiver host IP or domainname
 	var receiver_lat = 60.0, receiver_lon = 25.0; // change this to your receiver location
@@ -114,20 +125,21 @@
     const canvas = document.querySelector("#alti-bar");
 	function drawAltiBox(){
         	if(canvas.getContext){
-			const ctx = canvas.getContext("2d");
-			// draw altimeter box
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			drawLine(ctx,[55,0],[55,500],'yellow',1);
-			drawLine(ctx,[55,500],[70,500],'yellow',1);
-			drawLine(ctx,[70,500],[70,0],'yellow',1);
-			drawLine(ctx,[70,0],[55,0],'yellow',1);
-			ctx.fillStyle = "#303072";
-			ctx.fillRect(56,474,13,24);
-			ctx.strokeText("3000",0,475);
-			ctx.strokeText("FL100",0,405);
-			ctx.strokeText("FL200",0,305);
-			ctx.strokeText("FL300",0,205);
-			ctx.strokeText("FL400",0,105);
+				const ctx = canvas.getContext("2d");
+				// draw altimeter box
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				drawLine(ctx,[55,0],[55,500],'yellow',1);
+				drawLine(ctx,[55,500],[70,500],'yellow',1);
+				drawLine(ctx,[70,500],[70,0],'yellow',1);
+				drawLine(ctx,[70,0],[55,0],'yellow',1);
+				ctx.fillStyle = "#303072";
+				ctx.font = "small-caps normal 9px sans-serif";
+				ctx.fillRect(56,474,13,24);
+				ctx.strokeText("3000",0,474);
+				ctx.strokeText("FL100",0,405);
+				ctx.strokeText("FL200",0,304);
+				ctx.strokeText("FL300",0,204);
+				ctx.strokeText("FL400",0,104);
        		}
 	}
 
@@ -171,6 +183,18 @@
 	}
 
 	function sortTable() {
+	}
+
+	function debugTable() {
+		var al = document.getElementById("aircrafts-body");
+		var outHTML = "";
+		for(i=0; i<60; i++) {
+			// just add empty lines to aircraft list for scroll issues resolving
+			outHTML += "<tr>";
+			outHTML += "<td>testA." + i + "</td>" + "<td colspan='10'>T" + i + "</td>";
+			outHTML += "</tr>";
+		}
+		al.innerHTML += outHTML;
 	}
 
 	var FDtimer;
@@ -474,8 +498,12 @@
             	if(err==null){
 					layerGroup.clearLayers();
 					drawAltiBox();
-					var al = document.getElementById("aircrafts");
-					al.innerHTML="<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Altitude</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th>";
+					var ah = document.getElementById("aircrafts-head");
+					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th>";
+					ah.innerHTML = headHTML;
+					var al = document.getElementById("aircrafts-body");
+					//al.innerHTML = "";
+					var outHTML = "";
 					for(var key in data.aircraft)
 					{
 						var lat=0, lon=0, altitude=-1, rate=0, track=-1, tas=-1, gs=-1, squawk="", seen=-1, rssi=0.0, msgs=0, cat="";
@@ -490,10 +518,10 @@
 						if(aci.alt_baro)altitude = aci.alt_baro;
 						if(aci.baro_rate)rate = aci.baro_rate;
 						if(aci.track)track = Math.floor(aci.track);
-						if(aci.tas)tas = aci.tas;
+                                               	if(aci.tas)tas = aci.tas;
 						if(aci.gs)gs = aci.gs;
 						if(aci.rssi)rssi = aci.rssi;
-						if(aci.seen_pos)seen = aci.seen_pos;
+                                                if(aci.seen_pos)seen = aci.seen_pos;
 						if(aci.messages)msgs = aci.messages;
 						if(aci.category)cat = aci.category;
 
@@ -529,11 +557,7 @@
 						if( lat && lon ) distance = getDistanceFromLatLonInKm(receiver_lat,receiver_lon,lat,lon,'km');
 
 						//console.log(flight + " " + lat + "," + lon + " " + altitude);
-						al.innerHTML += "<tr>";
-						/* 
-						if(seen<0) { al.innerHTML += "<tr style='color: #505050;'>"; } 
-						else { al.innerHTML += "<tr style='background: #050640;'>"; }
-						*/
+						outHTML += "<tr>";
 						var flight_style = " text-align: left;";
 						var pos_style = "background: #101050;";
 						if( !lat && !lon ) pos_style = "color: #8080A2;";
@@ -555,15 +579,15 @@
 							case "A4" : { cat_explanation = "Class A4: High vortext"; break; }
 							case "A5" : { cat_explanation = "Class A5: Heavy"; break; }
 							case "A6" : { cat_explanation = "Class A6: High Performance"; break; }
-							case "A7" : { cat_explanation = "Class A7: Helicopter"; break; }
+							case "A7" : { cat_explanation = "Class A7: Helicopter"; break; } 
+							default: { break; }
 						}
 
 						var more_info = "Roll: " + roll + "\nSet heading: " + nav_heading + "\nSet altitude: " + nav_altitude + "\nSet QNH: " + nav_qnh;
+						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td>"; 
 
-						al.innerHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td>";  
-
-
-						al.innerHTML += "</tr>";
+						outHTML += "</tr>";
+						//console.log( "|" + al.innerHTML + "|" );
 
 						// refresh altimeter graph
 						if( altitude > 0 ){
@@ -583,15 +607,16 @@
                                 } else { 
 									ctx.strokeStyle = "blue";
 								}
-								ctx.font = "small-caps normal 10px sans-serif";
+								ctx.font = "small-caps normal 9px sans-serif";
 								if( seen < 20 ){
-									ctx.strokeText(rate_prefix + " " + flight,74,500-(altitude/100)+5);
-									ctx.strokeText((Math.floor(altitude/100)),31,500-(altitude/100)+5);
+									ctx.strokeText(rate_prefix + " " + flight,74,500-(altitude/100)+4);
+									ctx.strokeText((Math.floor(altitude/100)),31,500-(altitude/100)+4);
 								}	
 							}
 						}
 
-						if( lat!=null && lon!=null )
+						// update map
+						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
                             var ac = L.rectangle([[lat-0.01, lon-0.02], [lat+0.01,lon+0.02]], {
@@ -600,7 +625,7 @@
                                     fillOpacity: 0.9,
                                     radius: 2300
                             }).addTo(layerGroup);
-                            // add heading line, variable by ground speed
+                            // add heading line, variable by ground speed - indicating the ac position in the next 1 min if speed and heading are preserved
                             var speed_km = gs *1.852;
                             var headline_len = speed_km / 60;                           
                             nextpoint_lat = 0; nextpoint_lon = 0;
@@ -626,6 +651,8 @@
 								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
 						}
 					}
+					al.innerHTML = outHTML;
+					//debugTable();
 				}
 			}
 		);
@@ -638,11 +665,14 @@
         	getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
                 	function(err,data){
                         	if(err==null){
-								var st = document.getElementById("stats");
+
+								var sh = document.getElementById("stats-head");
 								var hrate_style = "background: #F0F081; text-align: center;";
 								var h5_style = "background: #80F081; text-align: center;";
 								var h15_style = " text-align: center;";
-								st.innerHTML="<th style='"+hrate_style+"'>Rate</th><th style='"+h5_style+"'>5:Peak</th><th style='"+h5_style+"'>Sig</th><th style='"+h5_style+"'>Noise</th><th style='"+h5_style+"'>Msgs</th><th style='"+h5_style+"'>Pos</th><th style='"+h15_style+"'>15:Peak</th><th style='"+h15_style+"'>Sig</th><th style='"+h15_style+"'>Noise</th><th style='"+h15_style+"'>Msgs</th><th style='"+h15_style+"'>Pos</th>";
+								sh.innerHTML="<th style='"+hrate_style+"'>Rate</th><th style='"+h5_style+"'>5:Peak</th><th style='"+h5_style+"'>Sig</th><th style='"+h5_style+"'>Noise</th><th style='"+h5_style+"'>Msgs</th><th style='"+h5_style+"'>Pos</th><th style='"+h15_style+"'>15:Peak</th><th style='"+h15_style+"'>Sig</th><th style='"+h15_style+"'>Noise</th><th style='"+h15_style+"'>Msgs</th><th style='"+h15_style+"'>Pos</th>";
+								var st = document.getElementById("stats-body");
+								var outHTML = "";
 								//for(var key in data)
 								{
 									var msgs = 0.0, msgrate = 0.0; 
@@ -678,12 +708,13 @@
 									var sig15_style = "";
 									if(sig15 > -3.0) sig15_style = " color: #FF1011;";
 
-									st.innerHTML += "<tr>";
+									outHTML += "<tr>";
 
-									st.innerHTML += "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+									outHTML += "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
-									st.innerHTML += "</tr>";
+									outHTML += "</tr>";
 								}
+								st.innerHTML = outHTML;
 							}
 						}
 					);
