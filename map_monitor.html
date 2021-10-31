@@ -43,11 +43,11 @@
 
 		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; }
 		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #303091 groove; margin-bottom: 10px;}
-		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; }
+		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
 		span.filters { font-size: 0.8em; }
 		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; }
-		.ac-list-head th { text-align: center; background: #201081; color: #FFFFFF; }
+		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; }
 
 		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
 			position: absolute; z-index: 10000; top: 100px;
@@ -103,12 +103,19 @@
 	// 2021 Oct 30th	- Cleaned up the aircraft table a bit, still some work to do with it. Might help with the scrolling also.
 	//					- Also cleaned up a bit the ali-bar graph.
 	//					- Added feature: filtering by the visible map (using lateral distance of map)
+	// 2021 Oct 31st	- Added feature: secondary supplementary receiver appends information the primary receiver has
+	//					- still to be done: secondary receiver only aircraft are not displayed
 
-	var receiver_domain = "192.168.11.9"; // change to ADS-B receiver host IP or domainname
-	var receiver_lat = 60.0, receiver_lon = 25.0; // change this to your receiver location
+	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
+	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
+	var receiver_label = "W";// change to primary ADS-B receiver label (one character works best)
+	var second_receiver_enabled = true; // change this to false, if only one receiver is used
+	var second_receiver_domain = "192.168.11.18"; // change to supplementary ADS-B receiver host IP or domainname
+	var second_receiver_lat = 61.1, second_receiver_lon = 26.1; // change to supplementary ADS-B receiver location
+	var second_receiver_label = "E"; // change to supplementary ADS-B receiver label (one character works best)
 	var mapbox_accessToken = "<insert_you_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
 	var aircraft_refresh_rate = 1000; // Aircraft json fetch frequency - 1000ms
-	var stats_refresh_rate = 3000; // Dumnp1090 statistics
+	var stats_refresh_rate = 3000; // dump1090-fa statistics refresh rate0
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -520,37 +527,64 @@
     }
 	
 	var layerGroup = L.layerGroup().addTo(mymap);
+
+	const primary_icaos = []; // primary receiver icaos
+	var second_ac_data = null; // supplementary / secondary receiver aircraft json - null if error
+	var second_stat_data = null; // supplementary / secondary receiver statistics json - null if error
 	
 	function refreshAircrafts(){
 		getJSON("http://" + receiver_domain + "/dump1090-fa/data/aircraft.json",
-        	function(err,data){
-            	if(err==null){
+			function(err,data){
+				if(err==null){
+					// fetch secondary receiver data json, if enabled
+					if( second_receiver_enabled ){
+						getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/aircraft.json",
+							function(err,data){
+								second_ac_data = null;
+								if(err==null) second_ac_data = data;
+								});
+					}
+					// begin update by clearing all the map data and redrawing the alti-bar box
 					layerGroup.clearLayers();
 					drawAltiBox();
 					var ah = document.getElementById("aircrafts-head");
-					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th>";
+					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th><th>Recvd</th>";
 					ah.innerHTML = headHTML;
 					var al = document.getElementById("aircrafts-body");
 					//al.innerHTML = "";
 					var outHTML = "";
+					// parse through all the primary receiver aircrafts
 					for(var key in data.aircraft)
 					{
+						primary_icaos.push(key);
 						var lat=0, lon=0, altitude=-1, rate=0, track=-1, tas=-1, gs=-1, squawk="", seen=-1, rssi=0.0, msgs=0, cat="";
 						var roll = 0, nav_altitude = 0, nav_heading = 0, nav_qnh = 0, mach = 0;
-						var flight="", icao="";
+						var flight="", icao=key;
+
+						var position_received = ""; // which receiver had the position
+
+						var second_aci = null;
+						// check secondary receiver data if this ac is in there
+						if( second_ac_data )
+							for( var k2 in second_ac_data.aircraft ){
+								if( k2 == key ){ second_aci = second_ac_data.aircraft[key]; break }
+							}
 
 						var aci = data.aircraft[key];
-						if(aci.flight)flight = aci.flight;
-						if(aci.squawk)squawk = aci.squawk;
+						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
+						if(aci.squawk)squawk = aci.squawk; else if(second_aci) if(second_aci.squawk) squawk = second_aci.squawk;
 						lat = aci.lat;
 						lon = aci.lon;
-						if(aci.alt_baro)altitude = aci.alt_baro;
-						if(aci.baro_rate)rate = aci.baro_rate;
-						if(aci.track)track = Math.floor(aci.track);
-                                               	if(aci.tas)tas = aci.tas;
-						if(aci.gs)gs = aci.gs;
+						if(lat&&lon) position_received = receiver_label;
+						if(!lat && second_aci) { if(second_aci.lat){ lat = second_aci.lat; position_received = second_receiver_label; } }
+						if(!lon && second_aci) { if(second_aci.lon){ lon = second_aci.lon; position_received = second_receiver_label; } }
+						if(aci.alt_baro)altitude = aci.alt_baro; else if(second_aci) if(second_aci.alt_baro) altitude = second_aci.alt_baro;
+						if(aci.baro_rate)rate = aci.baro_rate; else if(second_aci) if(second_aci.baro_rate) rate = second_aci.baro_rate;
+						if(aci.track)track = Math.floor(aci.track); else if(second_aci) if(second_aci.track) track = Math.floor(second_aci.track);
+						if(aci.tas)tas = aci.tas; else if(second_aci) if(second_aci.tas) tas = second_aci.tas;
+						if(aci.gs)gs = aci.gs; else if(second_aci) if(second_aci.gs) gs = second_aci.gs;
 						if(aci.rssi)rssi = aci.rssi;
-                                                if(aci.seen_pos)seen = aci.seen_pos;
+						if(aci.seen_pos)seen = aci.seen_pos;
 						if(aci.messages)msgs = aci.messages;
 						if(aci.category)cat = aci.category;
 
@@ -583,7 +617,12 @@
 						}
 
 						var distance = -1;
-						if( lat && lon ) distance = getDistanceFromLatLonInKm(receiver_lat,receiver_lon,lat,lon,'km');
+						if( lat && lon ) 
+							if( position_received == receiver_label) {
+								distance = getDistanceFromLatLonInKm(receiver_lat,receiver_lon,lat,lon,'km');
+							} else {
+								distance = getDistanceFromLatLonInKm(second_receiver_lat,second_receiver_lon,lat,lon,'km');								
+							}
 
 						if( filters_map_checked ){
 							if( lat && lon ){
@@ -598,6 +637,7 @@
 						outHTML += "<tr>";
 						var flight_style = " text-align: left;";
 						var pos_style = "background: #101050;";
+						if( position_received == second_receiver_label ) pos_style = "background: #101090;"; 
 						if( !lat && !lon ) pos_style = "color: #8080A2;";
 						var seen_style = "";
 						if( seen > 15.0 ) seen_style = " color: #F07072";  
@@ -622,7 +662,13 @@
 						}
 
 						var more_info = "Roll: " + roll + "\nSet heading: " + nav_heading + "\nSet altitude: " + nav_altitude + "\nSet QNH: " + nav_qnh;
-						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td>"; 
+
+						var avail = receiver_label;
+						if(position_received==receiver_label) avail = "<span style='color: #80FF81; font-weight: bold;'>" + receiver_label + "</span>";
+						if(second_aci && position_received!=second_receiver_label) avail += "+" + second_receiver_label;
+						else if(second_aci && position_received==second_receiver_label) avail += "+<span style='color: #50FF51; font-weight: bold;'>" + second_receiver_label + "</span>";
+
+						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
 
 						outHTML += "</tr>";
 						//console.log( "|" + al.innerHTML + "|" );
@@ -703,12 +749,12 @@
         	getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
                 	function(err,data){
                         	if(err==null){
-
 								var sh = document.getElementById("stats-head");
+								var label_style = "background: #80F081; text-align: center;";
 								var hrate_style = "background: #F0F081; text-align: center;";
 								var h5_style = "background: #80F081; text-align: center;";
 								var h15_style = " text-align: center;";
-								sh.innerHTML="<th style='"+hrate_style+"'>Rate</th><th style='"+h5_style+"'>5:Peak</th><th style='"+h5_style+"'>Sig</th><th style='"+h5_style+"'>Noise</th><th style='"+h5_style+"'>Msgs</th><th style='"+h5_style+"'>Pos</th><th style='"+h15_style+"'>15:Peak</th><th style='"+h15_style+"'>Sig</th><th style='"+h15_style+"'>Noise</th><th style='"+h15_style+"'>Msgs</th><th style='"+h15_style+"'>Pos</th>";
+								sh.innerHTML="<th style='"+label_style+"'><br/>#</th><th style='"+hrate_style+"'>Msg<br/>Rate</th><th style='"+h5_style+"'>5 min<br/>Peak</th><th style='"+h5_style+"'><br/>Sig</th><th style='"+h5_style+"'><br/>Noise</th><th style='"+h5_style+"'><br/>Msgs</th><th style='"+h5_style+"'><br/>Pos</th><th style='"+h15_style+"'>15 min<br/>Peak</th><th style='"+h15_style+"'><br/>Sig</th><th style='"+h15_style+"'><br/>Noise</th><th style='"+h15_style+"'><br/>Msgs</th><th style='"+h15_style+"'><br/>Pos</th>";
 								var st = document.getElementById("stats-body");
 								var outHTML = "";
 								//for(var key in data)
@@ -748,10 +794,62 @@
 
 									outHTML += "<tr>";
 
-									outHTML += "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+									outHTML += "<td style='" + stat_style + "'>" + receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
 									outHTML += "</tr>";
 								}
+                        		// fetch secondary receiver data json, if enabled
+                        		if( second_receiver_enabled ){
+						        	getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
+						                	function(err,data){
+						                		second_stat_data = null;
+                        						if(err==null) second_stat_data = data;
+						                	});
+                        		}
+                        		if( second_stat_data )
+								{
+									msgs = 0.0; msgrate = 0.0; 
+									noise5 = 0.0; peak5 = 0.0; sig5 = 0.0; msgs5 = 0; pos5 = 0; ok5 = 0;
+									noise15 = 0.0; peak15 = 0.0; sig15 = 0.0; msgs15 = 0; pos15 = 0; ok15 = 0;
+
+									if(second_stat_data.last1min.messages) msgs = second_stat_data.last1min.messages;
+									msgrate = (msgs / 60).toFixed(1);
+
+									if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
+									if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
+									if(second_stat_data.last5min.local.peak_signal) peak5 = second_stat_data.last5min.local.peak_signal;
+									if(second_stat_data.last5min.cpr.local_ok) ok5 = second_stat_data.last5min.cpr.local_ok;									
+									if(second_stat_data.last5min.cpr.airborne) pos5 = second_stat_data.last5min.cpr.airborne;
+									if(second_stat_data.last5min.messages) msgs5 = second_stat_data.last5min.messages;
+
+									if(second_stat_data.last15min.local.noise) noise15 = second_stat_data.last15min.local.noise;
+									if(second_stat_data.last15min.local.signal) sig15 = second_stat_data.last15min.local.signal;
+									if(second_stat_data.last15min.local.peak_signal) peak15 = second_stat_data.last15min.local.peak_signal;
+									if(second_stat_data.last15min.cpr.local_ok) ok15 = second_stat_data.last15min.cpr.local_ok;
+									if(second_stat_data.last15min.cpr.airborne) pos15 = second_stat_data.last15min.cpr.airborne;
+									if(second_stat_data.last15min.messages) msgs15 = second_stat_data.last15min.messages;
+
+									stat_style = " text-align: center; background: #202021;";
+
+									rate_style = " color: #80FF81;";
+									if(msgrate < 2) rate_style = " color: #FF1011;";
+									if(msgrate > 50) rate_style = " color: #B0B0FF;";
+
+									var sig5_style = "";
+									if(sig5 > -3.0) sig5_style = " color: #FF1011;";
+
+									var sig15_style = "";
+									if(sig15 > -3.0) sig15_style = " color: #FF1011;";
+
+									outHTML += "<tr>";
+
+									outHTML += "<td style='" + stat_style + "'>" + second_receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+
+									outHTML += "</tr>";
+								}
+                        			
+                        		
+								
 								st.innerHTML = outHTML;
 							}
 						}
