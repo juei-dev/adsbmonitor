@@ -19,7 +19,11 @@ Oct 28, 2021: The initial version containing quite lot of bugs and unfinished fe
 
 Oct 30, 2021: Rewrote part of the table code & bug fixes. Added a feature which allows filter/limit infomation on the alti-bar and aircraft table to the visible on the map only 
 
-Oct 31, 2021: Added feature: support for supplementary / secondary receiver. If primary receiver lacks some information, the supplementary receiver data is used if available. Also applies to the position. Additionally, the stats of the supplementary receiver are displayed. And added total row to stats for number of aircrafts, aircrafts with position, max. distance at the time and max. distance of the session (resets on refresh).  
+Oct 31, 2021: Added features: 
+  - support for supplementary / secondary receiver. If primary receiver lacks some information, the supplementary receiver data is used if available. Also applies to the position.
+  - the stats of the supplementary receiver are displayed
+  - total row to stats for number of aircrafts, aircrafts with position, max. distance at the time and max. distance of the session (resets on refresh) 
+  - secondary receiver red circle and ac seen older than 1 min with red overstrike
 
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time ;-)
