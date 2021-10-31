@@ -109,6 +109,7 @@
 	//					- Added feature: filtering by the visible map (using lateral distance of map)
 	// 2021 Oct 31st	- Added feature: secondary supplementary receiver appends information the primary receiver has
 	//					- still to be done: secondary receiver only aircraft are not displayed
+	//					- Added totals to stats, secondary receiver red circle and ac seen older than 1 min with red overstrike
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -510,13 +511,22 @@
 		//console.log("Mouse click: " + clickX + "," + clickY);
 	}
 
-	/* Mark receiver location */
+	/* Mark main receiver location */
 	var circle = L.circle([receiver_lat, receiver_lon], {
     		color: 'blue',
     		fillColor: '#00f',
     		fillOpacity: 0.5,
     		radius: 2000
 	}).addTo(mymap);
+	/* Mark supplementary receiver location, if enabled */
+	if( second_receiver_enabled ){
+		var circle = L.circle([second_receiver_lat, second_receiver_lon], {
+	    		color: 'red',
+	    		fillColor: '#f00',
+	    		fillOpacity: 0.2,
+	    		radius: 2002
+		}).addTo(mymap);
+	}
 
     var getJSON = function(url, callback) {
     	var xhr = new XMLHttpRequest();
@@ -601,7 +611,7 @@
 						if(aci.tas)tas = aci.tas; else if(second_aci) if(second_aci.tas) tas = second_aci.tas;
 						if(aci.gs)gs = aci.gs; else if(second_aci) if(second_aci.gs) gs = second_aci.gs;
 						if(aci.rssi)rssi = aci.rssi;
-						if(aci.seen_pos)seen = aci.seen_pos;
+						if(aci.seen)seen = aci.seen;
 						if(aci.messages)msgs = aci.messages;
 						ac_msgs+=msgs;
 						if(aci.category)cat = aci.category;
@@ -661,6 +671,7 @@
 						if( !lat && !lon ) pos_style = "color: #8080A2;";
 						var seen_style = "";
 						if( seen > 15.0 ) seen_style = " color: #F07072";  
+						if( seen > (1*60) ) pos_style += " text-decoration: line-through; text-decoration-color: #F00000;";
 						var rssi_style = "";
 						if( rssi >= -3.0 ) rssi_style = " color: #FFFFFF; background: #901010; ";
 						var distance_style = "";
