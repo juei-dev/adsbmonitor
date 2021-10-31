@@ -115,7 +115,7 @@
 	var second_receiver_label = "E"; // change to supplementary ADS-B receiver label (one character works best)
 	var mapbox_accessToken = "<insert_you_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
 	var aircraft_refresh_rate = 1000; // Aircraft json fetch frequency - 1000ms
-	var stats_refresh_rate = 3000; // dump1090-fa statistics refresh rate0
+	var stats_refresh_rate = 3000; // dump1090-fa statistics refresh rate
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -556,21 +556,27 @@
 					// parse through all the primary receiver aircrafts
 					for(var key in data.aircraft)
 					{
-						primary_icaos.push(key);
+						var aci = data.aircraft[key];
 						var lat=0, lon=0, altitude=-1, rate=0, track=-1, tas=-1, gs=-1, squawk="", seen=-1, rssi=0.0, msgs=0, cat="";
 						var roll = 0, nav_altitude = 0, nav_heading = 0, nav_qnh = 0, mach = 0;
-						var flight="", icao=key;
-
+						var flight="", icao="";
 						var position_received = ""; // which receiver had the position
+
+						if( aci.hex ) icao = aci.hex;
+						primary_icaos.push(icao);
 
 						var second_aci = null;
 						// check secondary receiver data if this ac is in there
 						if( second_ac_data )
 							for( var k2 in second_ac_data.aircraft ){
-								if( k2 == key ){ second_aci = second_ac_data.aircraft[key]; break }
+								var tmp_aci = second_ac_data.aircraft[k2];
+								if(tmp_aci) 
+									if( tmp_aci.hex == icao ){
+										second_aci = tmp_aci;
+										break; 
+									}
 							}
 
-						var aci = data.aircraft[key];
 						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
 						if(aci.squawk)squawk = aci.squawk; else if(second_aci) if(second_aci.squawk) squawk = second_aci.squawk;
 						lat = aci.lat;
