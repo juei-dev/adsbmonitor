@@ -19,6 +19,8 @@ Oct 28, 2021: The initial version containing quite lot of bugs and unfinished fe
 
 Oct 30, 2021: Rewrote part of the table code & bug fixes. Added a feature which allows filter/limit infomation on the alti-bar and aircraft table to the visible on the map only 
 
+Oct 31, 2021: Added feature: support for supplementary / secondary receiver. If primary receiver lacks some information, the supplementary receiver data is used if available. Also applies to the position. Additionally, the stats of the supplementary receiver are displayed.
+
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time ;-)
 
