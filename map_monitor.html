@@ -12,6 +12,8 @@
 		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 		crossorigin=""></script>
 
+	<script src="company_callsigns.js"></script>
+
 	<style>
 		body { background-color: #000000; font: Tahoma, sans-serif, arial;}
 		h3 { color: #e0e2e3; }
@@ -570,7 +572,8 @@
 					//al.innerHTML = "";
 					var outHTML = "";
 
-					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0;
+					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0; 
+					while( primary_icaos.length > 0 ) primary_icaos.pop(); // clear up primary icaos list
 					// parse through all the primary receiver aircrafts
 					for(var key in data.aircraft)
 					{
@@ -579,6 +582,7 @@
 						var roll = 0, nav_altitude = 0, nav_heading = 0, nav_qnh = 0, mach = 0;
 						var flight="", icao="";
 						var position_received = ""; // which receiver had the position
+						var company_name = "";
 
 						ac_count++;	// update all aircrafts count
 
@@ -598,6 +602,8 @@
 							}
 
 						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
+						if(flight)company_name = findCompany(flight);
+						if(!company_name) company_name = "";
 						if(aci.squawk)squawk = aci.squawk; else if(second_aci) if(second_aci.squawk) squawk = second_aci.squawk;
 						lat = aci.lat;
 						lon = aci.lon;
@@ -699,7 +705,7 @@
 						if(second_aci && position_received!=second_receiver_label) avail += "+" + second_receiver_label;
 						else if(second_aci && position_received==second_receiver_label) avail += "+<span style='color: #50FF51; font-weight: bold;'>" + second_receiver_label + "</span>";
 
-						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
+						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='" + company_name + "''>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
 
 						outHTML += "</tr>";
 						//console.log( "|" + al.innerHTML + "|" );
