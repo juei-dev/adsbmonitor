@@ -32,5 +32,7 @@ Nov 1, 2021:
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time ;-)
 
-
 Juho
+
+![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/image.jpg?raw=true)
+
