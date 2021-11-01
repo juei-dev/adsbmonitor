@@ -122,7 +122,7 @@
 	var second_receiver_lat = 61.1, second_receiver_lon = 26.1; // change to supplementary ADS-B receiver location
 	var second_receiver_label = "E"; // change to supplementary ADS-B receiver label (one character works best)
 	var mapbox_accessToken = "<insert_you_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
-	var aircraft_refresh_rate = 1000; // Aircraft json fetch frequency - 1000ms
+	var aircraft_refresh_rate = 2000; // Aircraft json fetch frequency - 1000ms
 	var stats_refresh_rate = 3000; // dump1090-fa statistics refresh rate
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
@@ -640,6 +640,7 @@
 						if(tas<0)tas="";
 						if(gs<0)gs="";
 						if(seen<0)seen="";
+						if(seen>=100)seen = Math.floor(seen); 
 
 						// FD update
 						if(flight == FD_flight){
