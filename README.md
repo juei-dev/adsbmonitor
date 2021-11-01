@@ -25,6 +25,10 @@ Oct 31, 2021: Added features:
   - total row to stats for number of aircrafts, aircrafts with position, max. distance at the time and max. distance of the session (resets on refresh) 
   - secondary receiver red circle and ac seen older than 1 min with red overstrike
 
+Nov 1, 2021:
+  - Enable / disable checkbox for FD display added
+  - Added ATC call phrase to the callsign and squawk code list item titles and extended the list of the callsigns (extracted from Wikipedia https://en.wikipedia.org/wiki/List_of_airline_codes)
+
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time ;-)
 
