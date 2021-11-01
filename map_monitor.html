@@ -253,7 +253,7 @@
 	}
 
 	function showFD(flight){
-		if(!FD_enabled)return;
+		if(!document.getElementById("cb-FD-enabled").checked)return;
 		if(!FD_locked_flight)FD_flight = flight;		
 		if(FD_flight=="")return;
 		document.getElementById("fd").style.display = "block";
@@ -712,7 +712,11 @@
 						if(second_aci && position_received!=second_receiver_label) avail += "+" + second_receiver_label;
 						else if(second_aci && position_received==second_receiver_label) avail += "+<span style='color: #50FF51; font-weight: bold;'>" + second_receiver_label + "</span>";
 
-						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='ICAO hex: " + icao + "\nCompany: " + company_name + "''>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
+						var flight_title = "ICAO hex: " + icao;
+						if(selected_company_name) flight_title += "\nCompany: " + selected_company_name;
+						if(selected_company_phrase) flight_title += "\nATC callsign: " + selected_company_phrase + " " + flight.substring(3);
+
+						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='" + flight_title + "'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"' title='" + flight_title + "'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
 
 						outHTML += "</tr>";
 						//console.log( "|" + al.innerHTML + "|" );
