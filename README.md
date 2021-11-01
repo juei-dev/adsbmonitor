@@ -31,7 +31,7 @@ Nov 1, 2021:
   - Added openweathermap.org (https://openweathermap.org) layers for wind, clouds and rain. Also added slider for common opacity for those layers. If you don't want to have openweathermap layers, set openweathermap enabled variables to false. 
 
 ---
-Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time ;-)
+Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time.
 
 Juho
 
