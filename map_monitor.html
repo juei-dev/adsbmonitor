@@ -4,19 +4,16 @@
 	<title>ADS-B Receiver Monitor</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
 		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
 		crossorigin=""/>
 	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
 		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 		crossorigin=""></script>
-
 	<script src="company_callsigns.js"></script>
-
 	<style>
 		body { background-color: #000000; font: Tahoma, sans-serif, arial;}
-		h3 { color: #e0e2e3; }
+		h3 { color: #e0e2e3; font-variant: small-caps;}
 		#main { text-align: center; vertical-align: top; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
 		.leaflet-tooltip { 
@@ -38,34 +35,30 @@
 			border: none;
 			box-shadow: none;
 		}
-
 		#alti-bar {
 			border: 1px solid #303004; padding-left: 5px; padding-right: 5px; height: 518px;
 		}
-
 		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; }
 		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #307072 groove; margin-bottom: 5px;}
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
-		span.filters { font-size: 0.8em; }
+		span.filters { font-size: 0.7em; }
 		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px; }
 		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; }
 		.ac-list-footer td { text-align: center; background: #505021; color: #FFFFFF;  font-size: 0.8em; }
-
 		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
 			position: absolute; z-index: 10000; top: 100px;
 		}
 		canvas.fd-canvas-style { display: none; z-index: 10001; }
-
+		.owm-opacity { -webkit-appearance: none; height: 8px; width: 100px; background: #9091B0; margin-left: 6px; } 
+		.owm-opacity::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 10px; width: 10px;  cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px; } 
+		.owm-opacity::-moz-range-thumb { height: 10px; width: 10px; cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px;} 
 	</style>
-
 </head>
 <body>
-
 <div id="main">
 	<h3>ADS-B Receiver Monitor</h3>
-
 	<table><tr>
 		<td style="vertical-align: top;">
 			<div class="flight-director" id="fd">
@@ -84,9 +77,10 @@
         				<tbody id="stats-body" class="stats-list-body"></tbody>
         				<tfoot id="stats-footer" class="stats-list-footer"></tfoot>
         			</table>
-        			<span class="filters">
+        			<span id="filter-checkboxes" class="filters">
 						<input type="checkbox" id="cb-filter-map" onClick="checkFilters()"> Filter by visible only on map (<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi) 
-						<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()" checked> Enable FD 
+						<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()"> Enable FD
+						<br/>
 					</span>
         			<table id="aircrafts" class="ac-list" cellspacing="0">
         				<thead id="aircrafts-head" class="ac-list-head"></thead>
@@ -96,9 +90,7 @@
 			</div>
 		</td>
 	</tr></table>
-
 </div>
-
 <script>
 	// Originally written by Juho Einiö 2021
 	// Just enter your own receiver domain, location and MapBox (public) access token
@@ -121,9 +113,13 @@
 	var second_receiver_domain = "192.168.11.18"; // change to supplementary ADS-B receiver host IP or domainname
 	var second_receiver_lat = 61.1, second_receiver_lon = 26.1; // change to supplementary ADS-B receiver location
 	var second_receiver_label = "E"; // change to supplementary ADS-B receiver label (one character works best)
-	var mapbox_accessToken = "<insert_you_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
+	var mapbox_accessToken = "<insert_your_mapbox_public_access_token_here>"; // open an account in Mapbox and place the access token here
 	var aircraft_refresh_rate = 2000; // Aircraft json fetch frequency - 1000ms
 	var stats_refresh_rate = 3000; // dump1090-fa statistics refresh rate
+	var openweathermap_wind_enabled = true; // if you don't want to have openweathermap layers, set these to false 
+	var openweathermap_clouds_enabled = true;
+	var openweathermap_rain_enabled = true;
+	var openweathermap_apikey = "<insert_your_openweathermap_org_api_key_here>"; // open an account in openweathermap.org and place your api key here
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -142,6 +138,48 @@
 		document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
 	});
 
+	// Open weather layers to the map
+	if(openweathermap_wind_enabled){
+		var layer_wind = L.tileLayer("https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		layer_wind.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()' checked> Winds";
+	}
+	if(openweathermap_clouds_enabled){
+		var layer_clouds = L.tileLayer("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		layer_clouds.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()' checked> Clouds";
+	}
+	if(openweathermap_rain_enabled){
+		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		layer_rain.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()' checked> Rain";		
+	}
+	if(openweathermap_rain_enabled || openweathermap_clouds_enabled || openweathermap_wind_enabled){
+//		if(!document.getElementById("owm-opacity-slider")){
+			document.getElementById("filter-checkboxes").innerHTML += "<input type='range' min='1' max='100' value='50' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'>";
+			owmOpacityChange(); 
+//		}
+	}
+	function owmChange(){
+		if(!document.getElementById("owm-wind-checkbox").checked){
+			layer_wind.removeFrom(mymap); 
+		} else layer_wind.addTo(mymap); 
+		if(!document.getElementById("owm-clouds-checkbox").checked){
+			layer_clouds.removeFrom(mymap); 
+		} else layer_clouds.addTo(mymap); 
+		if(!document.getElementById("owm-rain-checkbox").checked){
+			layer_rain.removeFrom(mymap); 
+		} else layer_rain.addTo(mymap); 
+	}
+	var owm_selected_opacity = 1;
+	function owmOpacityChange(){
+		owm_selected_opacity = (document.getElementById("owm-opacity-slider").value / 100);
+		layer_wind.setOpacity(owm_selected_opacity);
+		layer_rain.setOpacity(owm_selected_opacity);
+		layer_clouds.setOpacity(owm_selected_opacity);
+	}
+
+	// Utils
 	function drawLine(ctx,begin,end,stroke='white',width=1){
 		if(stroke) ctx.strokeStyle=stroke;
 		if(width) ctx.lineWidth=width;
@@ -150,26 +188,6 @@
 		ctx.lineTo(...end);
 		ctx.closePath();
 		ctx.stroke();
-	}
-    const canvas = document.querySelector("#alti-bar");
-	function drawAltiBox(){
-        	if(canvas.getContext){
-				const ctx = canvas.getContext("2d");
-				// draw altimeter box
-				ctx.clearRect(0,0,canvas.width,canvas.height);
-				drawLine(ctx,[55,0],[55,500],'yellow',1);
-				drawLine(ctx,[55,500],[70,500],'yellow',1);
-				drawLine(ctx,[70,500],[70,0],'yellow',1);
-				drawLine(ctx,[70,0],[55,0],'yellow',1);
-				ctx.fillStyle = "#303072";
-				ctx.font = "small-caps normal 9px sans-serif";
-				ctx.fillRect(56,474,13,24);
-				ctx.strokeText("3000",0,474);
-				ctx.strokeText("FL100",0,405);
-				ctx.strokeText("FL200",0,304);
-				ctx.strokeText("FL300",0,204);
-				ctx.strokeText("FL400",0,104);
-       		}
 	}
 
 	function deg2rad(degrees){ return( degrees * (Math.PI/180)); }
@@ -211,21 +229,6 @@
    		return true;
 	}
 
-	var filters_map_checked = false;
-	var filters_map_center;
-	var filters_map_distance = -1; // in meters (center to eastest part of the map)
-	function checkFilters(){
-		if( document.getElementById("cb-filter-map").checked ){
-			filters_map_center = mymap.getCenter();
-			filters_map_distance = Math.floor(filters_map_center.distanceTo(L.latLng(filters_map_center.lat, mymap.getBounds().getEast()))/1000);
-			document.getElementById("cb-filter-map-distance").innerHTML = filters_map_distance; // kilometers
-			document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
-			filters_map_checked = true; 
-		} else {
-			filters_map_checked = false;	
-		}
-	}
-
 	function sortTable() {
 	}
 
@@ -241,6 +244,45 @@
 		al.innerHTML += outHTML;
 	}
 
+	// Alti-box
+	const canvas = document.querySelector("#alti-bar");
+	function drawAltiBox(){
+        	if(canvas.getContext){
+				const ctx = canvas.getContext("2d");
+				// draw altimeter box
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				drawLine(ctx,[55,0],[55,500],'yellow',1);
+				drawLine(ctx,[55,500],[70,500],'yellow',1);
+				drawLine(ctx,[70,500],[70,0],'yellow',1);
+				drawLine(ctx,[70,0],[55,0],'yellow',1);
+				ctx.fillStyle = "#303072";
+				ctx.font = "small-caps normal 9px sans-serif";
+				ctx.fillRect(56,474,13,24);
+				ctx.strokeText("3000",0,474);
+				ctx.strokeText("FL100",0,405);
+				ctx.strokeText("FL200",0,304);
+				ctx.strokeText("FL300",0,204);
+				ctx.strokeText("FL400",0,104);
+       		}
+	}
+
+	// Filters
+	var filters_map_checked = false;
+	var filters_map_center;
+	var filters_map_distance = -1; // in meters (center to eastest part of the map)
+	function checkFilters(){
+		if( document.getElementById("cb-filter-map").checked ){
+			filters_map_center = mymap.getCenter();
+			filters_map_distance = Math.floor(filters_map_center.distanceTo(L.latLng(filters_map_center.lat, mymap.getBounds().getEast()))/1000);
+			document.getElementById("cb-filter-map-distance").innerHTML = filters_map_distance; // kilometers
+			document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
+			filters_map_checked = true; 
+		} else {
+			filters_map_checked = false;	
+		}
+	}
+
+	// Fligth director
 	var FDtimer;
 	var FD_enabled = true;
 	var FD_flight = "", FD_effective_flight = "";
@@ -416,7 +458,7 @@
 		fd_ctx.font = "small-caps normal 14px sans-serif";
 		if(FD_altitude > 0)fd_ctx.fillText(FD_altitude,362,210);
 
-        // -- climb / descent rate
+		// -- climb / descent rate
 		fd_ctx.fillStyle = "#303032";
 		fd_ctx.beginPath();
 		fd_ctx.moveTo(410,120);
@@ -526,6 +568,7 @@
     		fillOpacity: 0.5,
     		radius: 2000
 	}).addTo(mymap);
+
 	/* Mark supplementary receiver location, if enabled */
 	if( second_receiver_enabled ){
 		var circle = L.circle([second_receiver_lat, second_receiver_lon], {
@@ -811,111 +854,111 @@
 	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
 
 	function refreshStats(){
-			getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
-					function(err,data){
-						if(err==null){
-								var sh = document.getElementById("stats-head");
-								var label_style = "background: #80F081; text-align: center;";
-								var hrate_style = "background: #F0F081; text-align: center;";
-								var h5_style = "background: #80F081; text-align: center;";
-								var h15_style = " text-align: center;";
-								sh.innerHTML="<th style='"+label_style+"; width: 30px;'><br/>#</th><th style='"+hrate_style+"'>Msg<br/>Rate</th><th style='"+h5_style+"'>5 min<br/>Peak</th><th style='"+h5_style+"'><br/>Sig</th><th style='"+h5_style+"'><br/>Noise</th><th style='"+h5_style+"'><br/>Msgs</th><th style='"+h5_style+"'><br/>Pos</th><th style='"+h15_style+"'>15 min<br/>Peak</th><th style='"+h15_style+"'><br/>Sig</th><th style='"+h15_style+"'><br/>Noise</th><th style='"+h15_style+"'><br/>Msgs</th><th style='"+h15_style+"'><br/>Pos</th>";
-								var st = document.getElementById("stats-body");
-								var outHTML = "";
-								//for(var key in data)
-								{
-									var msgs = 0.0, msgrate = 0.0; 
-									var noise5 = 0.0, peak5 = 0.0, sig5 = 0.0, msgs5 = 0, pos5 = 0, ok5 = 0;
-									var noise15 = 0.0, peak15 = 0.0, sig15 = 0.0, msgs15 = 0, pos15 = 0, ok15 = 0;
+		getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
+			function(err,data){
+				if(err==null){
+					var sh = document.getElementById("stats-head");
+					var label_style = "background: #80F081; text-align: center;";
+					var hrate_style = "background: #F0F081; text-align: center;";
+					var h5_style = "background: #80F081; text-align: center;";
+					var h15_style = " text-align: center;";
+					sh.innerHTML="<th style='"+label_style+"; width: 30px;'><br/>#</th><th style='"+hrate_style+"'>Msg<br/>Rate</th><th style='"+h5_style+"'>5 min<br/>Peak</th><th style='"+h5_style+"'><br/>Sig</th><th style='"+h5_style+"'><br/>Noise</th><th style='"+h5_style+"'><br/>Msgs</th><th style='"+h5_style+"'><br/>Pos</th><th style='"+h15_style+"'>15 min<br/>Peak</th><th style='"+h15_style+"'><br/>Sig</th><th style='"+h15_style+"'><br/>Noise</th><th style='"+h15_style+"'><br/>Msgs</th><th style='"+h15_style+"'><br/>Pos</th>";
+					var st = document.getElementById("stats-body");
+					var outHTML = "";
+					//for(var key in data)
+					{
+						var msgs = 0.0, msgrate = 0.0; 
+						var noise5 = 0.0, peak5 = 0.0, sig5 = 0.0, msgs5 = 0, pos5 = 0, ok5 = 0;
+						var noise15 = 0.0, peak15 = 0.0, sig15 = 0.0, msgs15 = 0, pos15 = 0, ok15 = 0;
 
-									if(data.last1min.messages) msgs = data.last1min.messages;
-									msgrate = (msgs / 60).toFixed(1);
+						if(data.last1min.messages) msgs = data.last1min.messages;
+						msgrate = (msgs / 60).toFixed(1);
 
-									if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
-									if(data.last5min.local.signal) sig5 = data.last5min.local.signal;
-									if(data.last5min.local.peak_signal) peak5 = data.last5min.local.peak_signal;
-									if(data.last5min.cpr.local_ok) ok5 = data.last5min.cpr.local_ok;									
-									if(data.last5min.cpr.airborne) pos5 = data.last5min.cpr.airborne;
-									if(data.last5min.messages) msgs5 = data.last5min.messages;
+						if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
+						if(data.last5min.local.signal) sig5 = data.last5min.local.signal;
+						if(data.last5min.local.peak_signal) peak5 = data.last5min.local.peak_signal;
+						if(data.last5min.cpr.local_ok) ok5 = data.last5min.cpr.local_ok;									
+						if(data.last5min.cpr.airborne) pos5 = data.last5min.cpr.airborne;
+						if(data.last5min.messages) msgs5 = data.last5min.messages;
 
-									if(data.last15min.local.noise) noise15 = data.last15min.local.noise;
-									if(data.last15min.local.signal) sig15 = data.last15min.local.signal;
-									if(data.last15min.local.peak_signal) peak15 = data.last15min.local.peak_signal;
-									if(data.last15min.cpr.local_ok) ok15 = data.last15min.cpr.local_ok;
-									if(data.last15min.cpr.airborne) pos15 = data.last15min.cpr.airborne;
-									if(data.last15min.messages) msgs15 = data.last15min.messages;
+						if(data.last15min.local.noise) noise15 = data.last15min.local.noise;
+						if(data.last15min.local.signal) sig15 = data.last15min.local.signal;
+						if(data.last15min.local.peak_signal) peak15 = data.last15min.local.peak_signal;
+						if(data.last15min.cpr.local_ok) ok15 = data.last15min.cpr.local_ok;
+						if(data.last15min.cpr.airborne) pos15 = data.last15min.cpr.airborne;
+						if(data.last15min.messages) msgs15 = data.last15min.messages;
 
-									var stat_style = " text-align: center;";
+						var stat_style = " text-align: center;";
 
-									var rate_style = " color: #B0B0FF;";
-									if(msgrate < 2) rate_style = " color: #FF1011;";
-									if(msgrate > 50) rate_style = " color: #80FF81;";
+						var rate_style = " color: #B0B0FF;";
+						if(msgrate < 2) rate_style = " color: #FF1011;";
+						if(msgrate > 50) rate_style = " color: #80FF81;";
 
-									var sig5_style = "";
-									if(sig5 > -3.0) sig5_style = " color: #FF1011;";
+						var sig5_style = "";
+						if(sig5 > -3.0) sig5_style = " color: #FF1011;";
 
-									var sig15_style = "";
-									if(sig15 > -3.0) sig15_style = " color: #FF1011;";
+						var sig15_style = "";
+						if(sig15 > -3.0) sig15_style = " color: #FF1011;";
 
-									outHTML += "<tr>";
+						outHTML += "<tr>";
 
-									outHTML += "<td style='" + stat_style + "'>" + receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+						outHTML += "<td style='" + stat_style + "'>" + receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
-									outHTML += "</tr>";
-								}
-								// fetch secondary receiver data json, if enabled
-								if( second_receiver_enabled ){
-									getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
-											function(err,data){
-												second_stat_data = null;
-												if(err==null) second_stat_data = data;
-											});
-								}
-								if( second_stat_data )
-								{
-									msgs = 0.0; msgrate = 0.0; 
-									noise5 = 0.0; peak5 = 0.0; sig5 = 0.0; msgs5 = 0; pos5 = 0; ok5 = 0;
-									noise15 = 0.0; peak15 = 0.0; sig15 = 0.0; msgs15 = 0; pos15 = 0; ok15 = 0;
+						outHTML += "</tr>";
+					}
+					// fetch secondary receiver data json, if enabled
+					if( second_receiver_enabled ){
+						getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
+								function(err,data){
+									second_stat_data = null;
+									if(err==null) second_stat_data = data;
+								});
+					}
+					if( second_stat_data )
+					{
+						msgs = 0.0; msgrate = 0.0; 
+						noise5 = 0.0; peak5 = 0.0; sig5 = 0.0; msgs5 = 0; pos5 = 0; ok5 = 0;
+						noise15 = 0.0; peak15 = 0.0; sig15 = 0.0; msgs15 = 0; pos15 = 0; ok15 = 0;
 
-									if(second_stat_data.last1min.messages) msgs = second_stat_data.last1min.messages;
-									msgrate = (msgs / 60).toFixed(1);
+						if(second_stat_data.last1min.messages) msgs = second_stat_data.last1min.messages;
+						msgrate = (msgs / 60).toFixed(1);
 
-									if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
-									if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
-									if(second_stat_data.last5min.local.peak_signal) peak5 = second_stat_data.last5min.local.peak_signal;
-									if(second_stat_data.last5min.cpr.local_ok) ok5 = second_stat_data.last5min.cpr.local_ok;									
-									if(second_stat_data.last5min.cpr.airborne) pos5 = second_stat_data.last5min.cpr.airborne;
-									if(second_stat_data.last5min.messages) msgs5 = second_stat_data.last5min.messages;
+						if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
+						if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
+						if(second_stat_data.last5min.local.peak_signal) peak5 = second_stat_data.last5min.local.peak_signal;
+						if(second_stat_data.last5min.cpr.local_ok) ok5 = second_stat_data.last5min.cpr.local_ok;									
+						if(second_stat_data.last5min.cpr.airborne) pos5 = second_stat_data.last5min.cpr.airborne;
+						if(second_stat_data.last5min.messages) msgs5 = second_stat_data.last5min.messages;
 
-									if(second_stat_data.last15min.local.noise) noise15 = second_stat_data.last15min.local.noise;
-									if(second_stat_data.last15min.local.signal) sig15 = second_stat_data.last15min.local.signal;
-									if(second_stat_data.last15min.local.peak_signal) peak15 = second_stat_data.last15min.local.peak_signal;
-									if(second_stat_data.last15min.cpr.local_ok) ok15 = second_stat_data.last15min.cpr.local_ok;
-									if(second_stat_data.last15min.cpr.airborne) pos15 = second_stat_data.last15min.cpr.airborne;
-									if(second_stat_data.last15min.messages) msgs15 = second_stat_data.last15min.messages;
+						if(second_stat_data.last15min.local.noise) noise15 = second_stat_data.last15min.local.noise;
+						if(second_stat_data.last15min.local.signal) sig15 = second_stat_data.last15min.local.signal;
+						if(second_stat_data.last15min.local.peak_signal) peak15 = second_stat_data.last15min.local.peak_signal;
+						if(second_stat_data.last15min.cpr.local_ok) ok15 = second_stat_data.last15min.cpr.local_ok;
+						if(second_stat_data.last15min.cpr.airborne) pos15 = second_stat_data.last15min.cpr.airborne;
+						if(second_stat_data.last15min.messages) msgs15 = second_stat_data.last15min.messages;
 
-									stat_style = " text-align: center; background: #202021;";
+						stat_style = " text-align: center; background: #202021;";
 
-									rate_style = " color: #B0B0FF;";
-									if(msgrate < 10) rate_style = " color: #FF1011;";
-									if(msgrate > 50) rate_style = " color: #80FF81;";
+						rate_style = " color: #B0B0FF;";
+						if(msgrate < 10) rate_style = " color: #FF1011;";
+						if(msgrate > 50) rate_style = " color: #80FF81;";
 
-									var sig5_style = "";
-									if(sig5 > -3.0) sig5_style = " color: #FF1011;";
+						var sig5_style = "";
+						if(sig5 > -3.0) sig5_style = " color: #FF1011;";
 
-									var sig15_style = "";
-									if(sig15 > -3.0) sig15_style = " color: #FF1011;";
+						var sig15_style = "";
+						if(sig15 > -3.0) sig15_style = " color: #FF1011;";
 
-									outHTML += "<tr>";
+						outHTML += "<tr>";
 
-									outHTML += "<td style='" + stat_style + "'>" + second_receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
+						outHTML += "<td style='" + stat_style + "'>" + second_receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
-									outHTML += "</tr>";
-								}
-								st.innerHTML = outHTML;
-							}
-						}
-					);
+						outHTML += "</tr>";
+					}
+					st.innerHTML = outHTML;
+				}
+			}
+		);
     }
 
 	refreshStats();
