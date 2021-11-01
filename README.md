@@ -34,5 +34,5 @@ Feel free to use or modify this to your own needs - there's no guarantee that th
 
 Juho
 
-![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/image.jpg?raw=true)
+![Example screenshot](https://github.com/juei-dev/adsbmonitor/main/image.jpg?raw=true)
 
