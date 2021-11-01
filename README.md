@@ -35,5 +35,8 @@ Feel free to use or modify this to your own needs - there's no guarantee that th
 
 Juho
 
+Example (Nov 1st 2021) without weather:
 ![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/example_screenshot.jpg?raw=true)
 
+Example (Nov 1st 2021) with weather:
+![Example screenshot with weather](https://github.com/juei-dev/adsbmonitor/blob/main/example_screenshot_weather.jpg?raw=true)
