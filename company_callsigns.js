@@ -6171,14 +6171,22 @@ var company_callsigns = [
 ["ZMA","Zambezi Airlines","ZAMBEZI WINGS"],
 ["ZZM","Agence Nationale des Aerodromes et de la Meteorologie",""]];
 
+var selected_company_name = "", selected_company_phrase = "";
+
 function findCompany(callsign){
 	var start = callsign.substring(0,3);
+	selected_company_phrase = "";
+	selected_company_name = "";
 	for( i=0; i<company_callsigns.length; i++ ) {
 		//console.log(company_callsigns[i]);
 		if(company_callsigns[i][0] == start){
 			//console.log(company_callsigns[i][1]); 
+			selected_company_name = company_callsigns[i][1];
+			selected_company_phrase = company_callsigns[i][2];
 			return company_callsigns[i][1];
 		}
 	}
 	return null; 
 }
+
+
