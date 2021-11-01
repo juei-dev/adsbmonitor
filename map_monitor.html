@@ -295,7 +295,7 @@
 		fd_ctx.beginPath();
 		fd_ctx.moveTo(60,80);
 		fd_ctx.quadraticCurveTo(60,40,100,40);
-    	fd_ctx.lineTo(300,40);
+		fd_ctx.lineTo(300,40);
 		fd_ctx.quadraticCurveTo(340,40,340,80);
 		fd_ctx.lineTo(340,320);
 		fd_ctx.quadraticCurveTo(340,360,300,360);
@@ -381,15 +381,15 @@
 		fd_ctx.font = "small-caps normal 14px sans-serif";
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.fillStyle = "white";
-        if(FD_tas > 0)fd_ctx.fillText(FD_tas,5,210);
-        //fd.ctx.rect(3,180,32,200);
-        //fd.ctx.stroke();
+		if(FD_tas > 0)fd_ctx.fillText(FD_tas,5,210);
+		//fd.ctx.rect(3,180,32,200);
+		//fd.ctx.stroke();
 		fd_ctx.font = "small-caps normal 12px sans-serif";
 
 		// -- ground speed
-        if(FD_gs > 0)fd_ctx.fillText("GS " + Math.floor(FD_gs),5,380);
+		if(FD_gs > 0)fd_ctx.fillText("GS " + Math.floor(FD_gs),5,380);
 
-        // -- altimeter
+		// -- altimeter
 		fd_ctx.fillStyle = "#303032";
 		fd_ctx.fillRect(360,40,45,320);
 		fd_ctx.strokeStyle = "white";
@@ -414,76 +414,75 @@
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.fillStyle = "white";
 		fd_ctx.font = "small-caps normal 14px sans-serif";
-        if(FD_altitude > 0)fd_ctx.fillText(FD_altitude,362,210);
+		if(FD_altitude > 0)fd_ctx.fillText(FD_altitude,362,210);
 
         // -- climb / descent rate
 		fd_ctx.fillStyle = "#303032";
-        fd_ctx.beginPath();
+		fd_ctx.beginPath();
 		fd_ctx.moveTo(410,120);
 		fd_ctx.lineTo(440,120);
 		fd_ctx.quadraticCurveTo(455,120,455,140);
 		fd_ctx.lineTo(455,280);
 		fd_ctx.quadraticCurveTo(455,290,440,290);
 		fd_ctx.lineTo(410,290);
-        fd_ctx.closePath();
-        fd_ctx.fill();  
+		fd_ctx.closePath();
+		fd_ctx.fill();  
 		//drawLine(fd_ctx,[210,455],[210,455+(FD_rate/100)],"white",3);   
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.lineWidth = 2;
 		fd_ctx.beginPath();
 		fd_ctx.moveTo(455,210);
 		fd_ctx.lineTo(415,210-((FD_rate/100)*1.1)); 
-        fd_ctx.closePath();
-        fd_ctx.stroke();
+		fd_ctx.closePath();
+		fd_ctx.stroke();
 		fd_ctx.lineWidth = 1;
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.font = "small-caps normal 9px sans-serif";
-        if(FD_rate > 0)fd_ctx.strokeText("+" + FD_rate,412,340); else fd_ctx.strokeText(FD_rate,412,340);
+		if(FD_rate > 0)fd_ctx.strokeText("+" + FD_rate,412,340); else fd_ctx.strokeText(FD_rate,412,340);
 
-        // -- heading
+		// -- heading
 		fd_ctx.fillStyle = "#303032";
 		fd_ctx.font = "small-caps normal 16px sans-serif";
-        fd_ctx.beginPath();
+		fd_ctx.beginPath();
 		fd_ctx.moveTo(60,400);
 		fd_ctx.quadraticCurveTo(200,335,340,400);
-        fd_ctx.closePath();
-        fd_ctx.fill();
+		fd_ctx.closePath();
+		fd_ctx.fill();
 
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.fillStyle = "white";
-        if(FD_track >= 0 )fd_ctx.fillText(FD_track,190,390);
+		if(FD_track >= 0 )fd_ctx.fillText(FD_track,190,390);
 
-        // -- mach
+		// -- mach
 		fd_ctx.strokeStyle = "green";
 		fd_ctx.font = "small-caps normal 14px sans-serif";
-        if(FD_mach > 0.5)fd_ctx.strokeText(FD_mach,5,395);
+		if(FD_mach > 0.5)fd_ctx.strokeText(FD_mach,5,395);
 
-        // -- autopilot enabled
+		// -- autopilot enabled
 		fd_ctx.strokeStyle = "lightgreen";
 		fd_ctx.fillStyle = "lightgreen";
 		fd_ctx.font = "small-caps normal 18px sans-serif";
 		if(FD_nav_heading!=-1 && FD_nav_altitude >0)fd_ctx.fillText("A/P",190,30);
 
-        // -- autopilot altitude
+		// -- autopilot altitude
 		fd_ctx.strokeStyle = "magenta";
 		fd_ctx.fillStyle = "magenta";
 		fd_ctx.font = "small-caps normal 16px sans-serif";
-        if(FD_nav_altitude > 0)fd_ctx.fillText(FD_nav_altitude,362,30);
+		if(FD_nav_altitude > 0)fd_ctx.fillText(FD_nav_altitude,362,30);
 
-        // -- autopilot QNH
+		// -- autopilot QNH
 		fd_ctx.strokeStyle = "cyan";
 		fd_ctx.font = "small-caps normal 10px sans-serif";
-        if(FD_nav_qnh > 0)fd_ctx.strokeText("QNH " + FD_nav_qnh,362,380);
+		if(FD_nav_qnh > 0)fd_ctx.strokeText("QNH " + FD_nav_qnh,362,380);
 
-
-        // -- autopilot heading 
-        /*
+		// -- autopilot heading 
+		/*
 		fd_ctx.strokeStyle = "cyan";
 		fd_ctx.font = "small-caps normal 14px sans-serif";
-        if(FD_nav_heading > 0)fd_ctx.strokeText(FD_nav_heading,190,368);
+		if(FD_nav_heading > 0)fd_ctx.strokeText(FD_nav_heading,190,368);
 		*/
-        /*
-        drawLine(fd_ctx,[55,0],[55,50],'yellow',1);
+		/*
+		drawLine(fd_ctx,[55,0],[55,50],'yellow',1);
 		fd_ctx.fillRect(56,474,13,24);
 		*/
 		return;
@@ -812,9 +811,9 @@
 	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
 
 	function refreshStats(){
-        	getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
-                	function(err,data){
-                        	if(err==null){
+			getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
+					function(err,data){
+						if(err==null){
 								var sh = document.getElementById("stats-head");
 								var label_style = "background: #80F081; text-align: center;";
 								var hrate_style = "background: #F0F081; text-align: center;";
@@ -864,15 +863,15 @@
 
 									outHTML += "</tr>";
 								}
-                        		// fetch secondary receiver data json, if enabled
-                        		if( second_receiver_enabled ){
-						        	getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
-						                	function(err,data){
-						                		second_stat_data = null;
-                        						if(err==null) second_stat_data = data;
-						                	});
-                        		}
-                        		if( second_stat_data )
+								// fetch secondary receiver data json, if enabled
+								if( second_receiver_enabled ){
+									getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
+											function(err,data){
+												second_stat_data = null;
+												if(err==null) second_stat_data = data;
+											});
+								}
+								if( second_stat_data )
 								{
 									msgs = 0.0; msgrate = 0.0; 
 									noise5 = 0.0; peak5 = 0.0; sig5 = 0.0; msgs5 = 0; pos5 = 0; ok5 = 0;
@@ -913,16 +912,13 @@
 
 									outHTML += "</tr>";
 								}
-                        			
-                        		
-								
 								st.innerHTML = outHTML;
 							}
 						}
 					);
     }
 
-    refreshStats();
+	refreshStats();
 	var refreshStatsInterval = setInterval(refreshStats, stats_refresh_rate);
 
 </script>
