@@ -724,20 +724,20 @@
 
 						// refresh altimeter graph
 						if( altitude > 0 ){
-    						if(canvas.getContext){
-         						const ctx = canvas.getContext("2d");
+							if(canvas.getContext){
+								const ctx = canvas.getContext("2d");
 								if(flight)
-                                	drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'red',1);
+									drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'red',1);
 								else
-                                	drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'darkyellow',1);
+									drawLine(ctx,[56,500-(altitude/100)],[69,500-(altitude/100)],'darkyellow',1);
 								var rate_prefix = " ";
 								if(rate>70) {
 									rate_prefix = "↑";
-                                    ctx.strokeStyle = "green";
+									ctx.strokeStyle = "green";
 								} else if (rate<-70) {
 									rate_prefix = "↓";
 									ctx.strokeStyle = "red";
-                                } else { 
+								} else { 
 									ctx.strokeStyle = "blue";
 								}
 								ctx.font = "small-caps normal 9px sans-serif";
@@ -752,21 +752,21 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-                            var ac = L.rectangle([[lat-0.01, lon-0.02], [lat+0.01,lon+0.02]], {
-                                    color: '#00FF00',
-                                    fillColor: '#000',
-                                    fillOpacity: 0.9,
-                                    radius: 2300
-                            }).addTo(layerGroup);
-                            // add heading line, variable by ground speed - indicating the ac position in the next 1 min if speed and heading are preserved
-                            var speed_km = gs *1.852;
-                            var headline_len = speed_km / 60;                           
-                            nextpoint_lat = 0; nextpoint_lon = 0;
-                            if( track )calcNextPoint(lat,lon,track,headline_len); // indicator with km distance calculated from gs
-                            if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
-                            	var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
-                            }
-                            // add tooltip text
+							var ac = L.rectangle([[lat-0.01, lon-0.02], [lat+0.01,lon+0.02]], {
+								color: '#00FF00',
+								fillColor: '#000',
+								fillOpacity: 0.9,
+								radius: 2300
+							}).addTo(layerGroup);
+							// add heading line, variable by ground speed - indicating the ac position in the next 1 min if speed and heading are preserved
+							var speed_km = gs *1.852;
+							var headline_len = speed_km / 60;                           
+							nextpoint_lat = 0; nextpoint_lon = 0;
+							if( track ) calcNextPoint(lat,lon,track,headline_len); // indicator with km distance calculated from gs
+							if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
+							var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+							}
+							// add tooltip text
 							var st_track = "-";
 							if( track )st_track = Math.floor(track);
 							var	st_alt = "FL" + Math.floor(altitude/100),
@@ -774,7 +774,7 @@
 								st_squawk = "[<span style='color: #9092e0;'>" + squawk + "</span>]";
 							if( !aci.squawk )st_squawk = ""; 
 							if( (squawk == "7700") || (squawk == "7600") || (squawk == "7500") )
-                                st_squawk = "<span style='color: #ff0000; font-size: 1.2em;'><b> EM </b> [" + squawk + "]</span>";
+								st_squawk = "<span style='color: #ff0000; font-size: 1.2em;'><b> EM </b> [" + squawk + "]</span>";
 							if( altitude < 5000 ) st_alt = altitude;
 							if( rate > 0 ) st_rate = "&uarr;<span style='color:#40c041;'>" + rate + "</span>";
 							if( rate < 0 ) st_rate = "&darr;<span style='color:#c04041;'>" + (-rate) + "</span>";
