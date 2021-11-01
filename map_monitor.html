@@ -13,7 +13,8 @@
 	<script src="company_callsigns.js"></script>
 	<style>
 		body { background-color: #000000; font: Tahoma, sans-serif, arial;}
-		h3 { color: #e0e2e3; font-variant: small-caps;}
+		h3 { color: #e0e2e3; font-variant: small-caps; margin-top: 3px; padding-bottom: 3px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000091);}
+		.maintable { margin-top: 0px }
 		#main { text-align: center; vertical-align: top; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
 		.leaflet-tooltip { 
@@ -59,7 +60,7 @@
 <body>
 <div id="main">
 	<h3>ADS-B Receiver Monitor</h3>
-	<table><tr>
+	<table class="main-table"><tr>
 		<td style="vertical-align: top;">
 			<div class="flight-director" id="fd">
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
@@ -304,8 +305,8 @@
 		FDtimer = setInterval(drawFD, 1000);
 	}
 
-    const fd_canvas = document.querySelector("#fd-canvas");
-    fd_canvas.addEventListener("click", onclickFD, false);
+	const fd_canvas = document.querySelector("#fd-canvas");
+	fd_canvas.addEventListener("click", onclickFD, false);
 
 	function drawFD(){
 		if(FD_flight=="")return;
@@ -331,7 +332,7 @@
 			fd_ctx.stroke();
 		}
 
-        // -- draw FD artificial horizon
+		// -- draw FD artificial horizon
 		fd_ctx.fillStyle = "#AFAFFF";
 		fd_ctx.strokeStyle = "white";
 		fd_ctx.beginPath();
