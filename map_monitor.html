@@ -17,6 +17,7 @@
 		.maintable { margin-top: 0px }
 		#main { text-align: center; vertical-align: top; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
+		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 
 			background: rgba(155,155,155,0); 
@@ -66,6 +67,7 @@
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
 			</div>
 			<div id="mapid"></div>
+			<div id="airports" class="airports-lists"></div>
 		</td>
 		<td style="padding-left: 5px; padding-top: 1px; padding-right: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left;">
 			<span style="padding-left: 10px;">FL</span> <span style="padding-left: 33px;">Alt</span> &nbsp; <span style="padding-left: 4px;">Flight</span><br/>
@@ -110,6 +112,7 @@
 	//					- Added ATC call phrases to title element of callsign and squawk
 	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
 	//					- some appearance changes
+	// 2021 Nov 2nd		- Added airports (credits for list to ourairports.com - see ourairports.com/data for more lists)
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -805,7 +808,7 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-							var ac = L.rectangle([[lat-0.01, lon-0.02], [lat+0.01,lon+0.02]], {
+							var ac = L.rectangle([[lat-0.005, lon-0.01], [lat+0.005,lon+0.01]], {
 								color: '#00FF00',
 								fillColor: '#000',
 								fillOpacity: 0.9,
@@ -974,6 +977,95 @@
 
 	refreshStats();
 	var refreshStatsInterval = setInterval(refreshStats, stats_refresh_rate);
+
+	var layerGroupRunways = new L.layerGroup().addTo(mymap);
+
+	function addRunwayToMap(airport,num1,lat1,lon1,num2,lat2,lon2){
+		var point1 = new L.LatLng(lat1,lon1);
+		var point2 = new L.LatLng(lat2,lon2);
+		var pointlist = [point1,point2];
+		var runway_line = new L.polyline(pointlist, {
+			color: '#1010C1',
+			weight: 4,
+			opacity: 0.4,
+			smoothFactor: 1
+		})
+		runway_line.addTo(layerGroupRunways);
+		runway_line.bindTooltip(airport + " " + num1 + " / " + num2, { permanent: false, direction: 'center', offset: [0,0], opacity: 1 });
+	}
+
+	function parseRunwayData(text, delimeter = ","){
+		text = text.replace(/["']/g,""); // remove double quotes
+		const headers = text.slice(0,text.indexOf("\n")).split(delimeter);
+		const rows = text.slice(text.indexOf("\n")+1).split("\n");
+		const runways = rows.map(function (row) {
+			const values = row.split(delimeter);
+			const runway = headers.reduce(function (object, header, index){
+				object[header] = values[index];
+				return object;
+			}, {});
+			return runway;
+		});
+		return runways;
+	}
+	var raw_runway_data = "";
+	var nearest_runways = [["","","","","","","","", ""]]; // airport code (airport_ident), runway start number (le_ident), runway end number (he_ident), elevation (le_elevation_ft), start lat (le_latitude_deg), start lon (le_longitude_deg), end lat (he_latitude_deg), end lon (he_longitude_deg), surface 
+	function refreshAirportdata(){
+		// load csv of runway data (credits to ourairports.com) - fetch only once
+		if(!raw_runway_data) {
+			console.log("Loading runways");
+			fetch("runways.csv")
+				.then(response => response.text())
+				.then(data => {
+					raw_runway_data = parseRunwayData(data,",");
+					console.log("Runways loaded");
+					findNearestRunways();
+				})
+				.catch(console.error);
+		} else {
+			// TO DO: update runway list and get weather information for those airports
+			for( i=0; i<nearest_runways; i++ ){
+
+			}
+		}
+	}
+
+		// process data into array of nearest runways
+	function findNearestRunways(){
+		for(c=0; c<nearest_runways.length; c++)nearest_runways.pop();
+		{
+			var min_lat, max_lat, min_lon, max_lon;
+			var map_bounds = mymap.getBounds();
+			min_lon = map_bounds.getWest(); max_lon = map_bounds.getEast();
+			min_lat = map_bounds.getSouth(); max_lat = map_bounds.getNorth();
+			console.log("Detecting nearest runways from " + raw_runway_data.length + " runways (" + min_lat + "-" + max_lat + "," + min_lon + "-" + max_lon);
+			//console.log(raw_runway_data);
+			for(i=0; i<raw_runway_data.length; i++){
+				// fetch using only start of the runways (might cut some of the runways at the sides of the map)
+				if(raw_runway_data[i].le_latitude_deg >= min_lat && raw_runway_data[i].le_latitude_deg <= max_lat && raw_runway_data[i].le_longitude_deg >= min_lon && raw_runway_data[i].le_longitude_deg <= max_lon){
+					var airport_code = "", r_start_number = "", r_end_number = "", r_elevation = "";
+					var r_start_lat = "", r_start_lon = "", r_end_lat = "", r_end_lon = "";
+					var r_surface = "";
+					airport_code = raw_runway_data[i].airport_ident;
+					r_start_number = raw_runway_data[i].le_ident;
+					r_end_number = raw_runway_data[i].he_ident;
+					r_elevation = raw_runway_data[i].le_elevation_ft;
+					r_start_lat = raw_runway_data[i].le_latitude_deg; 
+					r_start_lon = raw_runway_data[i].le_longitude_deg; 
+					r_end_lat = raw_runway_data[i].he_latitude_deg; 
+					r_end_lon = raw_runway_data[i].he_longitude_deg;
+					r_surface = raw_runway_data[i].surface;
+					nearest_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface]);
+					addRunwayToMap(airport_code,r_start_number,r_start_lat,r_start_lon,r_end_number,r_end_lat,r_end_lon); 
+					//console.log(raw_runway_data[i]);
+				}				
+			}
+			console.log("Nearest runways determined");
+		}
+		console.log(nearest_runways);
+	}
+	refreshAirportdata();
+
 
 </script>
 </body>
