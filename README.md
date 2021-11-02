@@ -42,4 +42,4 @@ Example (Nov 1st 2021) with weather:
 ![Example screenshot with weather](https://github.com/juei-dev/adsbmonitor/blob/main/example_screenshot_weather.jpg?raw=true)
 
 Example (Nov 2nd 2021) with FD:
-![Example screenshot with FD](https://github.com/juei-dev/adsbmonitor/blob/main/example_screenshot_fd.jpg?raw=true)
+![Example screenshot with FD](https://github.com/juei-dev/adsbmonitor/blob/main/example_fd.jpg?raw=true)
