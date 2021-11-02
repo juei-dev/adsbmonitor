@@ -125,6 +125,7 @@
 	var openweathermap_clouds_enabled = true;
 	var openweathermap_rain_enabled = true;
 	var openweathermap_apikey = "<insert_your_openweathermap_org_api_key_here>"; // open an account in openweathermap.org and place your api key here
+	var map_complete_refresh_rate = 15*(60*1000); // to refresh the OWM layers
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -155,7 +156,7 @@
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()' checked> Clouds";
 	}
 	if(openweathermap_rain_enabled){
-		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/percipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		layer_rain.addTo(mymap);
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()' checked> Rain";		
 	}
@@ -181,6 +182,13 @@
 		layer_rain.setOpacity(owm_selected_opacity);
 		layer_clouds.setOpacity(owm_selected_opacity);
 	}
+	function refreshMap(){
+		// In order to refresh OWM layers, the whole map should be refreshed. This, of course, will generate more calls to both OSM and OWM.
+		// Also, it might cause sort of a flickering (due to redraw). So this should not be called too often. Once in 15 minutes or so?
+		mymap._onResize();
+		//console.log("Map refreshed");
+	}
+	var mapRefreshTimer = setInterval(refreshMap, map_complete_refresh_rate);
 
 	// Utils
 	function drawLine(ctx,begin,end,stroke='white',width=1){
