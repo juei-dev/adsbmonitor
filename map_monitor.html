@@ -12,7 +12,7 @@
 		crossorigin=""></script>
 	<script src="company_callsigns.js"></script>
 	<style>
-		body { background-color: #000000; font: Tahoma, sans-serif, arial; margin: 0px;}
+		body { background-color: #000000; font: Tahoma, sans-serif, arial; margin: 0px; }
 		h3 { color: #e0e2e3; font-variant: small-caps; margin-top: 3px; padding-bottom: 3px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000091);}
 		.maintable { margin-top: 0px }
 		#main { text-align: center; vertical-align: top; }
@@ -106,6 +106,10 @@
 	// 2021 Oct 31st	- Added feature: secondary supplementary receiver appends information the primary receiver has
 	//					- still to be done: secondary receiver only aircraft are not displayed
 	//					- Added totals to stats, secondary receiver red circle and ac seen older than 1 min with red overstrike
+	// 2021 Nov 1st		- Added FD enable/disable checkbox, extended the list of callsigns
+	//					- Added ATC call phrases to title element of callsign and squawk
+	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
+	//					- some appearance changes
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -146,20 +150,18 @@
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()' checked> Winds";
 	}
 	if(openweathermap_clouds_enabled){
-		var layer_clouds = L.tileLayer("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		var layer_clouds = L.tileLayer("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		layer_clouds.addTo(mymap);
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()' checked> Clouds";
 	}
 	if(openweathermap_rain_enabled){
-		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
+		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/percipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		layer_rain.addTo(mymap);
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()' checked> Rain";		
 	}
 	if(openweathermap_rain_enabled || openweathermap_clouds_enabled || openweathermap_wind_enabled){
-//		if(!document.getElementById("owm-opacity-slider")){
-			document.getElementById("filter-checkboxes").innerHTML += "<input type='range' min='1' max='100' value='50' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'>";
+			document.getElementById("filter-checkboxes").innerHTML += "<input type='range' min='1' max='100' value='100' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'>";
 			owmOpacityChange(); 
-//		}
 	}
 	function owmChange(){
 		if(!document.getElementById("owm-wind-checkbox").checked){
