@@ -6173,16 +6173,32 @@ var company_callsigns = [
 
 var selected_company_name = "", selected_company_phrase = "";
 
+// TODO: finish array of already resolved company names and ATC callsigns and use that before resolving from the large array
+// --> improving the performance
+
+var cache_companycallsigns = [["","",""]];
+
 function findCompany(callsign){
 	var start = callsign.substring(0,3);
 	selected_company_phrase = "";
 	selected_company_name = "";
+	// check cache
+	for( c=0; c<cache_companycallsigns.length; c++){
+		if(cache_companycallsigns[c][0]==callsign){
+			selected_company_name = cache_companycallsigns[c][1];
+			selected_company_phrase = cache_companycallsigns[c][2];
+			//console.log("Callsign-cache hit: " + callsign + " - " + selected_company_phrase + " - " + selected_company_name);
+			return cache_companycallsigns[c][0];
+		}
+	}
+	// if not found from cache, resolve these
 	for( i=0; i<company_callsigns.length; i++ ) {
 		//console.log(company_callsigns[i]);
 		if(company_callsigns[i][0] == start){
-			//console.log(company_callsigns[i][1]); 
+			//console.log(company_callsigns[i][1]);
 			selected_company_name = company_callsigns[i][1];
 			selected_company_phrase = company_callsigns[i][2];
+			cache_companycallsigns.push([callsign,selected_company_name,selected_company_phrase]);
 			return company_callsigns[i][1];
 		}
 	}
