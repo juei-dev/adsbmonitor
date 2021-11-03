@@ -33,6 +33,64 @@ Nov 1, 2021:
 Nov 2, 2021:
   - Added nearest runways to the map using over 42k runway definitions in the csv. Credits to ourairports.com, see ourairports.com/data for more lists.
 
+
+---
+Current features:
+- OpenStreetMap (using Leaflet) displaying:
+	- Aircraft position
+	- Aircraft heading/track with a line which end point is in a position where the aircraft would be in one minute if the speed and and track would be the same
+	- Aircraft information: 
+		- 1st line: callsign and squawk code
+		- 2nd line: true heading, speed, flight level / altitude and altitude change (green=up, red=down)
+	- All the airports & runways at current zoom level, if enabled. To update airports after map position/zoom change, cycle airport checkbox
+	- Weather information from OpenWeatherMap; selectable layers are wind, clouds and/or rain
+
+- Mockup FD (not completed though) - can be displayed by hovering mouse over the aircraft callsign
+
+- Altitude / Flight Level Indicator of all the aircrafts visible on the map / on the table (if altitude information received)
+
+- Receiver status information:
+	- Supports primary receiver and a supplementary receiver
+	- Displays:
+		- Current message rate (msgs / minute)
+		- Last 5 min and 15 min peak, signal and noiselevels, messages and position messages in respective timeframe
+		- Aircrafts in total received and aircrafts with position messages received
+		- Maximum distance in currently shown aircrafts and in total in session (refresh will reset the max distance)
+
+- Filtering options:
+	- Filter aircrafts visible on the map 
+		- When zooming in, the list of the aircrafts and Flight Level Indicator will display only those aircrafts which are visible on the map
+		- Also limits the aircrafts to those which have position information
+	- Enable / disable FD mockup display
+	- Weather information:
+		- Winds, Clouds and Rain map overlays
+		- Range slider for the overlays opacity
+	- Airports toggle
+		- List of over 42000 runways is used to draw all the runways in visible map
+		- Toggle on & off to refresh the runways displayed (dragging the map or zooming out won't refresh automatically those yet)
+	
+- List of the aircraft information from primary receiver added by the information for supplementary receiver
+	- Columns:
+		- Callsign - hover mouse over to either display FD mockup and/or extra information:
+			- ICAO hex number
+			- Aircraft company name
+			- ATC resolved call sign (used in radio communications)
+		- Cat - A category of the aircraft, hover mouse to check explanation
+		- Track - a heading of the aircraft, hover mouse to check aircraft's current Roll, A/P set heading, altitude and QNH
+		- Squawk code - hover over for the same information as in callsign (useful when FD display enabled)
+		- Alt - an altitude of an aircraft in feet
+		- Rate - Climb/descent rate in feet/min
+		- GS - Ground speed
+		- TAS - True air speed
+		- Dist - Distance from the primary (or supplementary, if no primary position information available) receiver in kilometers
+		- RSSI - signal level of last message (not only position messages), if over -3 dBi, background will be red (a bit too strong signal)
+		- Seen - seconds from the last message received, if over 15s, the data will be in red, if over 60, the data will have red strike through line
+		- Msgs - number of all the messages received for this aircraft
+		- Recvd - Primary + Supplementary label shown respectively which has information of this aircraft, greened label for which has the position information
+	- In general, if primary receiver information lacks of some information, the supplementary information will be used
+	- If position is not known by the primary receiver, the possible supplementary receiver position information is used
+	
+
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time.
 
