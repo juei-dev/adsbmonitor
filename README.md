@@ -67,6 +67,7 @@ Current features:
 		- Range slider for the overlays opacity
 	- Airports toggle
 		- List of over 42000 runways is used to draw all the runways in visible map
+		- Overall list credits to ourairports.com, see ourairports.com/data for more lists.
 		- Toggle on & off to refresh the runways displayed (dragging the map or zooming out won't refresh automatically those yet)
 	
 - List of the aircraft information from primary receiver added by the information for supplementary receiver
