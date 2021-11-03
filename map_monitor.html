@@ -151,18 +151,18 @@
 	// Open weather layers to the map
 	if(openweathermap_wind_enabled){
 		var layer_wind = L.tileLayer("https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
-		layer_wind.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()' checked> Winds";
+		//layer_wind.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()'> Winds";
 	}
 	if(openweathermap_clouds_enabled){
 		var layer_clouds = L.tileLayer("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
-		layer_clouds.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()' checked> Clouds";
+		//layer_clouds.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()'> Clouds";
 	}
 	if(openweathermap_rain_enabled){
 		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
-		layer_rain.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()' checked> Rain";		
+		//layer_rain.addTo(mymap);
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()'> Rain";		
 	}
 	if(openweathermap_rain_enabled || openweathermap_clouds_enabled || openweathermap_wind_enabled){
 			document.getElementById("filter-checkboxes").innerHTML += "<input type='range' min='1' max='100' value='100' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'>";
@@ -636,6 +636,14 @@
 					//al.innerHTML = "";
 					var outHTML = "";
 
+					// calculate zoom corrections for the aircraft map marker
+					var zoom_correction_lat = 0.01, zoom_correction_lon = 0.02;
+					var zoom_level = mymap.getZoom();
+					if(zoom_level){
+						zoom_correction_lat = 0.01 * (36/Math.pow(zoom_level,2));
+						zoom_correction_lon = 0.02 * (36/Math.pow(zoom_level,2));
+					}					
+
 					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0; 
 					while( primary_icaos.length > 0 ) primary_icaos.pop(); // clear up primary icaos list
 					// parse through all the primary receiver aircrafts
@@ -809,7 +817,7 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-							var ac = L.rectangle([[lat-0.005, lon-0.01], [lat+0.005,lon+0.01]], {
+							var ac = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
 								color: '#00FF00',
 								fillColor: '#000',
 								fillOpacity: 0.9,
@@ -1010,7 +1018,7 @@
 		return runways;
 	}
 	var raw_runway_data = "";
-	var nearest_runways = [["","","","","","","","", ""]]; // airport code (airport_ident), runway start number (le_ident), runway end number (he_ident), elevation (le_elevation_ft), start lat (le_latitude_deg), start lon (le_longitude_deg), end lat (he_latitude_deg), end lon (he_longitude_deg), surface 
+	var nearest_runways = [["","","","","","","","","","",""]]; // airport code (airport_ident), runway start number (le_ident), runway end number (he_ident), elevation (le_elevation_ft), start lat (le_latitude_deg), start lon (le_longitude_deg), end lat (he_latitude_deg), end lon (he_longitude_deg), surface, length (length_ft), width (width_ft)
 	function refreshAirportdata(){
 		if(!airports_enabled)return;
 		// load csv of runway data (credits to ourairports.com) - fetch only once
@@ -1054,7 +1062,7 @@
 				if(raw_runway_data[i].le_latitude_deg >= min_lat && raw_runway_data[i].le_latitude_deg <= max_lat && raw_runway_data[i].le_longitude_deg >= min_lon && raw_runway_data[i].le_longitude_deg <= max_lon){
 					var airport_code = "", r_start_number = "", r_end_number = "", r_elevation = "";
 					var r_start_lat = "", r_start_lon = "", r_end_lat = "", r_end_lon = "";
-					var r_surface = "";
+					var r_surface = "", r_length = "";
 					airport_code = raw_runway_data[i].airport_ident;
 					r_start_number = raw_runway_data[i].le_ident;
 					r_end_number = raw_runway_data[i].he_ident;
@@ -1064,6 +1072,8 @@
 					r_end_lat = raw_runway_data[i].he_latitude_deg; 
 					r_end_lon = raw_runway_data[i].he_longitude_deg;
 					r_surface = raw_runway_data[i].surface;
+					r_length = raw_runway_data[i].length_ft;
+					r_width = raw_runway_data[i].width_ft;
 					nearest_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface]);
 					addRunwayToMap(airport_code,r_start_number,r_start_lat,r_start_lon,r_end_number,r_end_lat,r_end_lon); 
 					//console.log(raw_runway_data[i]);
