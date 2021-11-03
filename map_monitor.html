@@ -129,6 +129,7 @@
 	var openweathermap_rain_enabled = true;
 	var openweathermap_apikey = "<insert_your_openweathermap_org_api_key_here>"; // open an account in openweathermap.org and place your api key here
 	var map_complete_refresh_rate = 15*(60*1000); // to refresh the OWM layers
+	var airports_enabled = true;
 
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -1011,6 +1012,7 @@
 	var raw_runway_data = "";
 	var nearest_runways = [["","","","","","","","", ""]]; // airport code (airport_ident), runway start number (le_ident), runway end number (he_ident), elevation (le_elevation_ft), start lat (le_latitude_deg), start lon (le_longitude_deg), end lat (he_latitude_deg), end lon (he_longitude_deg), surface 
 	function refreshAirportdata(){
+		if(!airports_enabled)return;
 		// load csv of runway data (credits to ourairports.com) - fetch only once
 		if(!raw_runway_data) {
 			console.log("Loading runways");
@@ -1022,17 +1024,24 @@
 					findNearestRunways();
 				})
 				.catch(console.error);
-		} else {
-			// TO DO: update runway list and get weather information for those airports
-			for( i=0; i<nearest_runways; i++ ){
+		} 
+		// TO DO: update runway list and get weather information for those airports
+		for( i=0; i<nearest_runways; i++ ){
 
-			}
+		}
+		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' checked> Airports";		
+	}
+	function airportsEnabledChange(){
+		if(document.getElementById("airports-enabled").checked){
+			findNearestRunways();
+		} else {
+			layerGroupRunways.clearLayers();
 		}
 	}
 
-		// process data into array of nearest runways
+	// process data into array of nearest runways
 	function findNearestRunways(){
-		for(c=0; c<nearest_runways.length; c++)nearest_runways.pop();
+		for(c=0; c<nearest_runways.length; c++)nearest_runways.pop(); // empty the nearest runways array first before repopulating it
 		{
 			var min_lat, max_lat, min_lon, max_lon;
 			var map_bounds = mymap.getBounds();
