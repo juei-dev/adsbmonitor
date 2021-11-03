@@ -1058,6 +1058,8 @@
 			console.log("Detecting nearest runways from " + raw_runway_data.length + " runways (" + min_lat + "-" + max_lat + "," + min_lon + "-" + max_lon);
 			//console.log(raw_runway_data);
 			for(i=0; i<raw_runway_data.length; i++){
+				// ditch all the 0 lat and/or lon value runways (error data)
+				if(raw_runway_data[i].le_latitude_deg==0 || raw_runway_data[i].le_longitude_deg == 0 || raw_runway_data[i].he_latitude_deg==0 || raw_runway_data[i].he_longitude_deg==0) continue;
 				// fetch using only start of the runways (might cut some of the runways at the sides of the map)
 				if(raw_runway_data[i].le_latitude_deg >= min_lat && raw_runway_data[i].le_latitude_deg <= max_lat && raw_runway_data[i].le_longitude_deg >= min_lon && raw_runway_data[i].le_longitude_deg <= max_lon){
 					var airport_code = "", r_start_number = "", r_end_number = "", r_elevation = "";
