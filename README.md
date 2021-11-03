@@ -1,9 +1,11 @@
 # adsbmonitor
-Simple ADS-B monitor UI using dump1090-fa JSONs
+*Simple ADS-B monitor UI using dump1090-fa JSONs*
 
 A very simple, quick and dirty UI using Leaftlet and Mapbox for the map and HTML5 Canvas for the Flight Level indicator and FD mock up.
 
 ---
+**Quick info**
+
 Just add your information directly to the javascript variables in the beginning of the script element.
 - receiver_domain = your ADS-B receiver IP / hostname where the dump1090-fa is running (be sure that the host is accepting the requests and accepts CORS)
 - receiver_lat & receiver_lon = your receiver latitude and longitude - used in map and disctance calculations
@@ -13,7 +15,7 @@ Just add your information directly to the javascript variables in the beginning 
 
 
 ---
-History
+**History**
 
 Oct 28, 2021: The initial version containing quite lot of bugs and unfinished features. E.g. scrolling / refresh of the aircrafts tends to be very irritating when the list of aircrafts is long. Also FD mock up (hover the mouse over the aircraft callsign to display) has unfinished stuff like pitch calculation and altitude "roller". Additionally, the code is just in one html and requires cleaning up & breaking into several .js -files (preferrably minified). But that comes later. Hopefully.
 
@@ -35,7 +37,7 @@ Nov 2, 2021:
 
 
 ---
-Current features:
+**Current features:**
 - OpenStreetMap (using Leaflet) displaying:
 	- Aircraft position
 	- Aircraft heading/track with a line which end point is in a position where the aircraft would be in one minute if the speed and and track would be the same
@@ -96,6 +98,8 @@ Current features:
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time.
 
 Juho
+
+---
 
 Example (Nov 1st 2021) without weather:
 ![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/example_screenshot.jpg?raw=true)
