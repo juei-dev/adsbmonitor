@@ -74,6 +74,7 @@ Nov 3, 2021:
 		- List of over 42000 runways is used to draw all the runways in visible map
 		- Overall list credits to ourairports.com, see ourairports.com/data for more lists.
 		- Toggle on & off to refresh the runways displayed (dragging the map or zooming out won't refresh automatically those yet)
+		- Also the bigger airports (with over 8000ft runways) are used to detect if and aircraft is landing or departing to or from it. Must be within 30 miles of the airport, under 1000ft of alitude and descenting or climbing in certain rate. 
 	
 - List of the aircraft information from primary receiver added by the information for supplementary receiver
 	- Columns:
