@@ -116,5 +116,5 @@ Example (Nov 1st 2021) with weather:
 Example (Nov 2nd 2021) with FD:
 ![Example screenshot with FD](https://github.com/juei-dev/adsbmonitor/blob/main/example_fd.jpg?raw=true)
 
-Example (Nov 2nd 2021) with runways and landing/departing note:
-![Example screenshot with FD](https://github.com/juei-dev/adsbmonitor/blob/main/example_runways_and_landing_departing.jpg?raw=true)
+Example (Nov 4th 2021) with runways and landing/departing note:
+![Example screenshot with runways_and_landing_departing](https://github.com/juei-dev/adsbmonitor/blob/main/example_runways_and_landing_departing.jpg?raw=true)
