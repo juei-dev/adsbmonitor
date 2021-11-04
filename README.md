@@ -35,6 +35,9 @@ Nov 1, 2021:
 Nov 2, 2021:
   - Added nearest runways to the map using over 42k runway definitions in the csv. Credits to ourairports.com, see ourairports.com/data for more lists.
 
+Nov 3, 2021:
+  - Added list of nearest runways under the map. Over 8000 ft long runways are marked with blue background.
+
 
 ---
 **Current features:**
