@@ -334,7 +334,7 @@
 	fd_canvas.addEventListener("click", onclickFD, false);
 
 	function drawFD(){
-		if(FD_flight=="")return;
+		//if(FD_flight=="" && FD_locked_flight=="")return;
 		// draw template
 		const fd_ctx = fd_canvas.getContext("2d");
 		// -- erase canvas
@@ -564,9 +564,9 @@
 	}
 
 	function clickOpenFD(flight){
-		if(FD_locked_flight){ FD_flight = flight; FD_locked_flight = flight; hideFD(); return; }
-		showFD();
+		if(FD_locked_flight){ FD_flight = flight; FD_locked_flight = ""; hideFD(); return; }
 		FD_locked_flight = flight;
+		showFD();
 	}
 
 	function clickCloseFD(){
@@ -804,7 +804,7 @@
 										if(getDistanceFromLatLonInKm(nearest_longer_runways[i][4],nearest_longer_runways[i][5],lat,lon,'m')<30){
 											near_airport = nearest_longer_runways[i][0];
 											landing_departing = "D";
-											ld_style += " background: #FFFFFF; color: #00FF00;";
+											ld_style += " background: #FFFFFF; color: #006F00;";
 											ld_title = "Most likely departing from " + near_airport;
 											break;
 										}
@@ -1092,7 +1092,7 @@
 					var rwd = document.getElementById("runways-body");
 					var outHTML = "";
 					// TO DO: get weather information for those airports
-					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Location</th><th>Elevation</th><th>Lenght</th><th>Width</th><th>Surface</th>";
+					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Location</th><th>Elevation</th><th>Length</th><th>Width</th><th>Surface</th>";
 					for( i=0; i<nearest_runways.length; i++ ){
 						var style_common = "";
 						if(nearest_runways[i][9]>=8000) style_common += " background: #202181"; 
