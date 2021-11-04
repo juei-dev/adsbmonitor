@@ -37,7 +37,7 @@ Nov 2, 2021:
 
 Nov 3, 2021:
   - Added list of nearest runways under the map. Over 8000 ft long runways are marked with blue background.
-
+  - Added column to aircraft list L/D (Landing / Departing) and populating that with a title and link to bigger airport to which or from which the aircraft is probably landing or departing. Very simple rules, so it's definitely not always right.
 
 ---
 **Current features:**
@@ -93,6 +93,7 @@ Nov 3, 2021:
 		- Seen - seconds from the last message received, if over 15s, the data will be in red, if over 60, the data will have red strike through line
 		- Msgs - number of all the messages received for this aircraft
 		- Recvd - Primary + Supplementary label shown respectively which has information of this aircraft, greened label for which has the position information
+		- L/D - Possibly landing or departing aircraft detected - hover to check which airport and click to scroll to runway description of given bigger airport
 	- In general, if primary receiver information lacks of some information, the supplementary information will be used
 	- If position is not known by the primary receiver, the possible supplementary receiver position information is used
 	
