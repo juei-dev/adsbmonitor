@@ -56,6 +56,11 @@
 		.owm-opacity { -webkit-appearance: none; height: 8px; width: 100px; background: #9091B0; margin-left: 6px; } 
 		.owm-opacity::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 10px; width: 10px;  cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px; } 
 		.owm-opacity::-moz-range-thumb { height: 10px; width: 10px; cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px;} 
+		table.runway-list {
+			color: #ffffff; font-size: 0.8em; vertical-align: top; width: 100%;
+		}
+		.runway-list-header th { text-align: center; background: #70C0C1; color: #000000; font-size: 0.8em; }
+		.runway-list-body { text-align: center; }
 	</style>
 </head>
 <body>
@@ -67,7 +72,12 @@
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
 			</div>
 			<div id="mapid"></div>
-			<div id="airports" class="airports-lists"></div>
+			<div id="airports" class="airports-lists">
+				<table id="runways" class="runway-list" cellspacing="0">
+					<thead id="runways-head" class="runway-list-header"></thead>
+					<tbody id="runways-body" class="runway-list-body"></tbody>
+				</table>				
+			</div>
 		</td>
 		<td style="padding-left: 5px; padding-top: 1px; padding-right: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left;">
 			<span style="padding-left: 10px;">FL</span> <span style="padding-left: 33px;">Alt</span> &nbsp; <span style="padding-left: 4px;">Flight</span><br/>
@@ -817,12 +827,20 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-							var ac = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
-								color: '#00FF00',
-								fillColor: '#000',
-								fillOpacity: 0.9,
-								radius: 2300
-							}).addTo(layerGroup);
+							if(cat.substring(0,1)=="A" || cat.substring(0,1) == "")
+								var ac = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
+									color: '#00FF00',
+									fillColor: '#000',
+									fillOpacity: 0.9,
+									radius: 2300
+								}).addTo(layerGroup);
+							else
+								var ac = L.rectangle([[lat-0.00001, lon-0.00002], [lat+0.0001,lon+0.00002]], {
+									color: '#FF00FF',
+									fillColor: '#000',
+									fillOpacity: 0.9,
+									radius: 100
+								}).addTo(layerGroup);
 							// add heading line, variable by ground speed - indicating the ac position in the next 1 min if speed and heading are preserved
 							var speed_km = gs *1.852;
 							var headline_len = speed_km / 60;                           
@@ -1010,7 +1028,7 @@
 		const runways = rows.map(function (row) {
 			const values = row.split(delimeter);
 			const runway = headers.reduce(function (object, header, index){
-				object[header] = values[index];
+				if(values[index]) object[header] = values[index]; else object[header] = "";
 				return object;
 			}, {});
 			return runway;
@@ -1030,13 +1048,28 @@
 					raw_runway_data = parseRunwayData(data,",");
 					console.log("Runways loaded");
 					findNearestRunways();
+					var rwh = document.getElementById("runways-head");
+					var rwd = document.getElementById("runways-body");
+					var outHTML = "";
+					// TO DO: get weather information for those airports
+					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Location</th><th>Elevation</th><th>Lenght</th><th>Width</th><th>Surface</th>";
+					for( i=0; i<nearest_runways.length; i++ ){
+						var style_common = "";
+						if(nearest_runways[i][9]>=8000) style_common += " background: #202181"; 
+						outHTML += "<tr>";
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][0] + "</td>";
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][1] + " / " + nearest_runways[i][2] + "</td>";
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][4] + ", " + nearest_runways[i][5] + " --> " + nearest_runways[i][6] + ", " + nearest_runways[i][7] + "</td>";
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][3] + "</td>"; // elevation
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][9] + "</td>"; // length
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][10] + "</td>"; // width
+						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][8] + "</td>"; // surface
+						outHTML += "</tr>";
+					}
+					rwd.innerHTML = outHTML;
 				})
 				.catch(console.error);
 		} 
-		// TO DO: update runway list and get weather information for those airports
-		for( i=0; i<nearest_runways; i++ ){
-
-		}
 		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' checked> Airports";		
 	}
 	function airportsEnabledChange(){
@@ -1076,7 +1109,7 @@
 					r_surface = raw_runway_data[i].surface;
 					r_length = raw_runway_data[i].length_ft;
 					r_width = raw_runway_data[i].width_ft;
-					nearest_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface]);
+					nearest_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface,r_length,r_width]);
 					addRunwayToMap(airport_code,r_start_number,r_start_lat,r_start_lon,r_end_number,r_end_lat,r_end_lon); 
 					//console.log(raw_runway_data[i]);
 				}				
