@@ -57,7 +57,7 @@ Nov 3, 2021:
 - Receiver status information:
 	- Supports primary receiver and a supplementary receiver
 	- Displays:
-		- Current message rate (msgs / minute)
+		- Current message rate (msgs / second)
 		- Last 5 min and 15 min peak, signal and noiselevels, messages and position messages in respective timeframe
 		- Aircrafts in total received and aircrafts with position messages received
 		- Maximum distance in currently shown aircrafts and in total in session (refresh will reset the max distance)
