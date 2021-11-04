@@ -14,6 +14,7 @@
 	<style>
 		body { background-color: #000000; font: Tahoma, sans-serif, arial; margin: 0px; }
 		h3 { color: #e0e2e3; font-variant: small-caps; margin-top: 3px; padding-bottom: 3px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000091);}
+		a { text-decoration: none; color: inherit; }
 		.maintable { margin-top: 0px }
 		#main { text-align: center; vertical-align: top; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
@@ -81,7 +82,7 @@
 		</td>
 		<td style="padding-left: 5px; padding-top: 1px; padding-right: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left;">
 			<span style="padding-left: 10px;">FL</span> <span style="padding-left: 33px;">Alt</span> &nbsp; <span style="padding-left: 4px;">Flight</span><br/>
-			<canvas id="alti-bar" height="500" width="150" class="alti-bar"></canvas>
+			<canvas id="alti-bar" height="500" width="130" class="alti-bar"></canvas>
 		</td>
 		<td style="vertical-align: top; overflow-y: scroll; display: block;">
 			<div id="info" class="info-div">
@@ -640,7 +641,7 @@
 					layerGroup.clearLayers();
 					drawAltiBox();
 					var ah = document.getElementById("aircrafts-head");
-					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th><th>Recvd</th>";
+					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th><th>Recvd</th><th>L/D</th>";
 					ah.innerHTML = headHTML;
 					var al = document.getElementById("aircrafts-body");
 					//al.innerHTML = "";
@@ -792,7 +793,37 @@
 						if(selected_company_name) flight_title += "\nCompany: " + selected_company_name;
 						if(selected_company_phrase) flight_title += "\nATC callsign: " + selected_company_phrase + " " + flight.substring(3);
 
-						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='" + flight_title + "'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"' title='" + flight_title + "'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td>"; 
+						var near_airport = "", landing_departing = "";
+						var ld_style = "text-align: center;";
+						var ld_title = "";
+						if( altitude < 10000 ){ // determine landing and departing aircrafts
+							if( cat != "" && cat != "A1" && cat != "A7" ) // forget about light aircrafts and helicopters (too vague conditions for those)
+								if( rate > 500 ){ // over +500 ft/min, could be departing if near runway
+									for(i=0; i<nearest_longer_runways.length; i++){
+										// within 30 miles (although not nautical miles)
+										if(getDistanceFromLatLonInKm(nearest_longer_runways[i][4],nearest_longer_runways[i][5],lat,lon,'m')<30){
+											near_airport = nearest_longer_runways[i][0];
+											landing_departing = "D";
+											ld_style += " background: #FFFFFF; color: #00FF00;";
+											ld_title = "Most likely departing from " + near_airport;
+											break;
+										}
+									}
+								} else if( rate < -250 ){ // steeper than -250 ft/min, could be landing if near runway
+									for(i=0; i<nearest_longer_runways.length; i++){
+										// within 30 miles (although not nautical miles)
+										if(getDistanceFromLatLonInKm(nearest_longer_runways[i][4],nearest_longer_runways[i][5],lat,lon,'m')<30){
+											near_airport = nearest_longer_runways[i][0];
+											landing_departing = "L";
+											ld_style += " background: #FFFFFF; color: #FF0000;";
+											ld_title = "Most likely landing to " + near_airport;
+											break;
+										}
+									}
+								}
+						}
+
+						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='" + flight_title + "'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"' title='" + flight_title + "'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td><td style='"+ pos_style + ld_style + "' title='"+ ld_title +"'><a href='#" + near_airport + "'>" + landing_departing + "</a></td>"; 
 
 						outHTML += "</tr>";
 						//console.log( "|" + al.innerHTML + "|" );
@@ -1007,16 +1038,24 @@
 
 	var layerGroupRunways = new L.layerGroup().addTo(mymap);
 
-	function addRunwayToMap(airport,num1,lat1,lon1,num2,lat2,lon2){
+	function addRunwayToMap(airport,num1,lat1,lon1,num2,lat2,lon2,len){
 		var point1 = new L.LatLng(lat1,lon1);
 		var point2 = new L.LatLng(lat2,lon2);
 		var pointlist = [point1,point2];
-		var runway_line = new L.polyline(pointlist, {
-			color: '#1010C1',
-			weight: 4,
-			opacity: 0.4,
-			smoothFactor: 1
-		})
+		if(len<8000) // smaller runways
+			var runway_line = new L.polyline(pointlist, {
+				color: '#1010C1',
+				weight: 4,
+				opacity: 0.4,
+				smoothFactor: 1
+			});
+		else // major runways
+			var runway_line = new L.polyline(pointlist, {
+				color: '#F030F1',
+				weight: 4,
+				opacity: 0.4,
+				smoothFactor: 1
+			});
 		runway_line.addTo(layerGroupRunways);
 		runway_line.bindTooltip(airport + " " + num1 + " / " + num2, { permanent: false, direction: 'center', offset: [0,0], opacity: 1 });
 	}
@@ -1037,6 +1076,7 @@
 	}
 	var raw_runway_data = "";
 	var nearest_runways = [["","","","","","","","","","",""]]; // airport code (airport_ident), runway start number (le_ident), runway end number (he_ident), elevation (le_elevation_ft), start lat (le_latitude_deg), start lon (le_longitude_deg), end lat (he_latitude_deg), end lon (he_longitude_deg), surface, length (length_ft), width (width_ft)
+	var nearest_longer_runways = [["","","","","","","","","","",""]];
 	function refreshAirportdata(){
 		if(!airports_enabled)return;
 		// load csv of runway data (credits to ourairports.com) - fetch only once
@@ -1057,7 +1097,7 @@
 						var style_common = "";
 						if(nearest_runways[i][9]>=8000) style_common += " background: #202181"; 
 						outHTML += "<tr>";
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][0] + "</td>";
+						outHTML += "<td style='"+ style_common + "'><a name='" + nearest_runways[i][0] + "'>" + nearest_runways[i][0] + "</a></td>";
 						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][1] + " / " + nearest_runways[i][2] + "</td>";
 						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][4] + ", " + nearest_runways[i][5] + " --> " + nearest_runways[i][6] + ", " + nearest_runways[i][7] + "</td>";
 						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][3] + "</td>"; // elevation
@@ -1110,7 +1150,9 @@
 					r_length = raw_runway_data[i].length_ft;
 					r_width = raw_runway_data[i].width_ft;
 					nearest_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface,r_length,r_width]);
-					addRunwayToMap(airport_code,r_start_number,r_start_lat,r_start_lon,r_end_number,r_end_lat,r_end_lon); 
+					if(r_length>8000)
+						nearest_longer_runways.push([airport_code, r_start_number, r_end_number, r_elevation, r_start_lat, r_start_lon, r_end_lat, r_end_lon,r_surface,r_length,r_width]);
+					addRunwayToMap(airport_code,r_start_number,r_start_lat,r_start_lon,r_end_number,r_end_lat,r_end_lon,r_length); 
 					//console.log(raw_runway_data[i]);
 				}				
 			}
