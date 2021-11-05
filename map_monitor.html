@@ -54,7 +54,7 @@
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
 		div.filter-place { margin-left: 1px; background-color: #202031; border: 1px solid #707091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; }
 		span.filters { font-size: 0.7em; }
-		.btn-reset-map { border: 3px groove; background-color: #90909A; color: #00008F; font-size: 0.7em; margin-right: 4px; border-radius: 2px; margin-bottom: 3px; font: sans-serif;}
+		.btn-reset-map { border: 3px groove; background-color: #90909A; color: #0000BF; font-size: 0.7em; margin-right: 4px; border-radius: 2px; margin-bottom: 3px; font: sans-serif;}
 		table.ac-list { color: #ffffff; font-size: 0.8em; border: 1px solid #000000; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px;  border-radius: 5px; }
 		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; padding: 2px; }
 		.ac-list-footer td { text-align: center; background: #505021; color: #FFFFFF;  font-size: 0.8em; }
@@ -66,7 +66,7 @@
 		.owm-opacity::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 10px; width: 10px;  cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px; } 
 		.owm-opacity::-moz-range-thumb { height: 10px; width: 10px; cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px;} 
 		table.runway-list {
-			color: #ffffff; font-size: 0.8em; vertical-align: top; width: 100%;
+			color: #ffffff; font-size: 0.8em; vertical-align: top; width: 600px; table-layout: fixed;
 		}
 		.runway-list-header th { text-align: center; background: #70C0C1; color: #000000; font-size: 0.8em; }
 		.runway-list-body { text-align: center; }
@@ -154,7 +154,8 @@
 	var openweathermap_apikey = "<insert_your_openweathermap_org_api_key_here>"; // open an account in openweathermap.org and place your api key here
 	var map_complete_refresh_rate = 15*(60*1000); // to refresh the OWM layers
 	var airports_enabled = true;
-	
+	var airport_aircraft_refresh_rate = 10*1000; // refresh airport aircrafts every 10 seconds
+
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -1130,24 +1131,10 @@
 					console.log("Runways loaded");
 					findNearestRunways();
 					var rwh = document.getElementById("runways-head");
-					var rwd = document.getElementById("runways-body");
 					var outHTML = "";
 					// TO DO: get weather information for those airports
-					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Location</th><th>Elevation</th><th>Length</th><th>Width</th><th>Surface</th>";
-					for( i=0; i<nearest_runways.length; i++ ){
-						var style_common = " cursor: pointer;";
-						if(nearest_runways[i][9]>=8000) style_common += " background: #202181"; 
-						outHTML += "<tr onClick='goToMapPoint(" + nearest_runways[i][4] + "," + nearest_runways[i][5] + ",9)'>";
-						outHTML += "<td style='"+ style_common + "'><a name='" + nearest_runways[i][0] + "'>" + nearest_runways[i][0] + "</a></td>";
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][1] + " / " + nearest_runways[i][2] + "</td>";
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][4] + ", " + nearest_runways[i][5] + " --> " + nearest_runways[i][6] + ", " + nearest_runways[i][7] + "</td>";
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][3] + "</td>"; // elevation
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][9] + "</td>"; // length
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][10] + "</td>"; // width
-						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][8] + "</td>"; // surface
-						outHTML += "</tr>";
-					}
-					rwd.innerHTML = outHTML;
+					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Elevation</th><th>Length</th><th>Width</th><th>Surface</th><th style='width: 200px;'>Aircrafts</th>";
+					refreshAirportAircraftdata();
 				})
 				.catch(console.error);
 		} 
@@ -1202,6 +1189,42 @@
 		console.log(nearest_runways);
 	}
 	refreshAirportdata();
+
+	function refreshAirportAircraftdata(){
+		var rwd = document.getElementById("runways-body");
+		var num_of_runways = 0;
+		var outHTML = "";
+		for( i=0; i<nearest_runways.length; i++ ){
+			var style_common = " cursor: pointer;";
+			if(nearest_runways[i][9]>=7000 && nearest_runways[i][9]<8000) style_common += " background: #000141";
+			if(nearest_runways[i][9]>=8000 && nearest_runways[i][9]<9000) style_common += " background: #102151";
+			if(nearest_runways[i][9]>=9000 && nearest_runways[i][9]<10000) style_common += " background: #302171";
+			if(nearest_runways[i][9]>=10000) style_common += " background: #502191";
+			outHTML += "<tr onClick='goToMapPoint(" + nearest_runways[i][4] + "," + nearest_runways[i][5] + ",8)'>";
+			outHTML += "<td style='"+ style_common + "'><a name='" + nearest_runways[i][0] + "'>" + nearest_runways[i][0] + "</a></td>";
+			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][1] + " / " + nearest_runways[i][2] + "</td>";
+			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][3] + "</td>"; // elevation
+			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][9] + "</td>"; // length
+			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][10] + "</td>"; // width
+			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][8] + "</td>"; // surface
+			outHTML += "<td style='"+ style_common + "'>"; // near-by aircrafts
+			var acs = 0;
+			for( a=0; a<aircrafts_positions.length; a++){
+				if(!aircrafts_positions[a][0])continue; // do not try to show empty flight name string
+				if( getDistanceFromLatLonInKm(nearest_runways[i][4],nearest_runways[i][5],aircrafts_positions[a][1],aircrafts_positions[a][2],'km') <= 88 ) { // 88 km is the zoom level 9
+					if(acs>0) outHTML += ", ";
+					outHTML += "<span onClick='goToMapPoint(" + aircrafts_positions[a][1] + "," + aircrafts_positions[a][2] + ",9)'>" + aircrafts_positions[a][0] + "</span>"; 
+					acs++;
+				} 
+			}
+			outHTML += "</td>";
+			outHTML += "</tr>";
+			num_of_runways++;
+		}
+		rwd.innerHTML = outHTML;
+		//console.log("Airport aircrafts updated (" + num_of_runways + " runways checked)");
+	}
+	var refreshAirportAircraftsInterval = setInterval(refreshAirportAircraftdata, airport_aircraft_refresh_rate);
 
 
 </script>
