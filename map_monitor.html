@@ -12,12 +12,15 @@
 		crossorigin=""></script>
 	<script src="company_callsigns.js"></script>
 	<style>
-		body { background-color: #000000; font: Tahoma, sans-serif, arial; margin: 0px; }
-		h3 { color: #e0e2e3; font-variant: small-caps; margin-top: 3px; padding-bottom: 3px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000091);}
 		a { text-decoration: none; color: inherit; }
-		.maintable { margin-top: 0px }
-		#main { text-align: center; vertical-align: top; }
-		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; }
+		body { background-color: #000000; font: Tahoma, sans-serif, arial; margin: 0px; padding: 0px;}
+		h3 { color: #e0e2e3; font-variant: small-caps; padding-top: 1px; margin-top: 0px; padding-bottom: 2px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000091); border-bottom: 1px solid #3030df; border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px #000000; border-radius: 5px;}
+		.main-table { margin: 0px; padding: 0px; background: #000000; }
+		td.main-left { vertical-align: top; padding: 0px; margin: 0px; background: #00001f; }
+		td.main-center { margin: 0px; padding-left: 1px; padding-top: 0px; padding-right: 1px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left; background: #20203c; border-radius: 3px; }
+		td.main-right { vertical-align: top; overflow-y: scroll; display: block; padding: 0px; margin: 0px; }
+		#main { text-align: center; vertical-align: top; margin-top: 0px; }
+		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 
@@ -38,19 +41,24 @@
 			border: none;
 			box-shadow: none;
 		}
-		#alti-bar {
-			border: 1px solid #303004; padding-left: 5px; padding-right: 5px; height: 518px;
+		.alti-bar-header { 
+			background: #404012; border: 1px solid #505012; border-radius: 3px; border-radius-bottom: 0px;
 		}
-		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; }
-		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px #307072 groove; margin-bottom: 5px;}
+		#alti-bar {
+			border: 1px solid #505004; padding-left: 5px; padding-right: 2px; height: 518px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 0px;
+		}
+		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; padding-left: 2px; margin: 0px;}
+		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px groove #307072; margin-bottom: 5px; border-radius: 5px; padding: 0px; }
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
+		div.filter-place { margin-left: 1px; background-color: #202031; border: 1px solid #707091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; }
 		span.filters { font-size: 0.7em; }
-		table.ac-list { color: #ffffff; font-size: 0.8em; border: 0px; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px; }
-		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; }
+		.btn-reset-map { border: 3px groove; background-color: #90909A; color: #00008F; font-size: 0.7em; margin-right: 4px; border-radius: 2px; margin-bottom: 3px; font: sans-serif;}
+		table.ac-list { color: #ffffff; font-size: 0.8em; border: 1px solid #000000; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px;  border-radius: 5px; }
+		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; padding: 2px; }
 		.ac-list-footer td { text-align: center; background: #505021; color: #FFFFFF;  font-size: 0.8em; }
-		div.flight-director { border: 1px solid #606060; background: black; display: none; width: 460px; height: 400px; margin-left: 100px; 
+		div.flight-director { border: 2px groove #60607E; border-radius: 6px; background: black; display: none; width: 458px; height: 400px; margin-left: 100px; padding-left: 2px;
 			position: absolute; z-index: 10000; top: 100px;
 		}
 		canvas.fd-canvas-style { display: none; z-index: 10001; }
@@ -68,7 +76,7 @@
 <div id="main">
 	<h3>ADS-B Receiver Monitor</h3>
 	<table class="main-table"><tr>
-		<td style="vertical-align: top;">
+		<td class="main-left">
 			<div class="flight-director" id="fd">
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
 			</div>
@@ -80,22 +88,27 @@
 				</table>				
 			</div>
 		</td>
-		<td style="padding-left: 5px; padding-top: 1px; padding-right: 5px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left;">
-			<span style="padding-left: 10px;">FL</span> <span style="padding-left: 33px;">Alt</span> &nbsp; <span style="padding-left: 4px;">Flight</span><br/>
+		<td class="main-center">
+			<div class="alti-bar-header">
+				<span style="padding-left: 13px;">FL</span><span style="padding-left: 33px;">Alt</span><span style="padding-left: 15px;">Flight</span>
+			</div>
 			<canvas id="alti-bar" height="500" width="130" class="alti-bar"></canvas>
 		</td>
-		<td style="vertical-align: top; overflow-y: scroll; display: block;">
+		<td class="main-right">
 			<div id="info" class="info-div">
         			<table id="stats" class="stats-list" cellspacing="0">
         				<thead id="stats-head" class="stats-list-head"></thead>
         				<tbody id="stats-body" class="stats-list-body"></tbody>
         				<tfoot id="stats-footer" class="stats-list-footer"></tfoot>
         			</table>
+        			<div class="filter-place">
         			<span id="filter-checkboxes" class="filters">
-						<input type="checkbox" id="cb-filter-map" onClick="checkFilters()"> Filter by visible only on map (<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi) 
+						<input type="button" id="btn-reset-map-pos" class="btn-reset-map" onClick="resetMapPosition()" value="Reset Map">
 						<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()"> Enable FD
+						<input type="checkbox" id="cb-filter-map" onClick="checkFilters()"> Filter by visible only on map (<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi) 
 						<br/>
 					</span>
+					</div>
         			<table id="aircrafts" class="ac-list" cellspacing="0">
         				<thead id="aircrafts-head" class="ac-list-head"></thead>
         				<tbody id="aircrafts-body" class="ac-list-body"></tbody>
@@ -141,7 +154,7 @@
 	var openweathermap_apikey = "<insert_your_openweathermap_org_api_key_here>"; // open an account in openweathermap.org and place your api key here
 	var map_complete_refresh_rate = 15*(60*1000); // to refresh the OWM layers
 	var airports_enabled = true;
-
+	
 	var mymap = L.map('mapid').setView([receiver_lat, receiver_lon], 6);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -158,6 +171,15 @@
 		document.getElementById("cb-filter-map-distance").innerHTML = filters_map_distance;
 		document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
 	});
+
+	function goToMapPoint(lat, lon, zoom){
+		mymap.flyTo([lat,lon],zoom);
+		window.scrollTo(0,0);
+	}
+
+	function resetMapPosition(){
+		mymap.flyTo([receiver_lat, receiver_lon], 6);
+	}
 
 	// Open weather layers to the map
 	if(openweathermap_wind_enabled){
@@ -321,7 +343,9 @@
 	}
 
 	function showFD(flight){
-		if(!document.getElementById("cb-FD-enabled").checked)return;
+		if(!document.getElementById("cb-FD-enabled").checked){
+			return;
+		}
 		if(!FD_locked_flight)FD_flight = flight;		
 		if(FD_flight=="")return;
 		document.getElementById("fd").style.display = "block";
@@ -344,8 +368,8 @@
 		fd_ctx.font = "small-caps normal 10px sans-serif";
         fd_ctx.strokeText(FD_effective_flight,1,10);
 
-        // -- close button
-        if( FD_locked_flight ){
+		// -- close button
+		if( FD_locked_flight ){
 			fd_ctx.strokeStyle = "lightgray";
 			fd_ctx.rect(440,5,10,10);
 			fd_ctx.stroke();
@@ -564,6 +588,17 @@
 	}
 
 	function clickOpenFD(flight){
+		if(!document.getElementById("cb-FD-enabled").checked){		
+			// in case FD is disabled, focus to flight clicked
+			for(i=0; i<aircrafts_positions.length; i++){
+				if(aircrafts_positions[i][0]==flight){ 
+					// mymap.flyTo([aircrafts_positions[i][1],aircrafts_positions[i][2]],8);
+					goToMapPoint(aircrafts_positions[i][1],aircrafts_positions[i][2],8);
+					break;
+				}
+			}
+		}
+		// otherwise, lock the FD to the selected flight
 		if(FD_locked_flight){ FD_flight = flight; FD_locked_flight = ""; hideFD(); return; }
 		FD_locked_flight = flight;
 		showFD();
@@ -580,7 +615,7 @@
 			clickX = e.clientX + document.body.scrollLeft + ddocument.documentElement.scrollLeft;
 			clickY = e.clientY + document.body.scrollTop + ddocument.documentElement.scrollTop;
 		}
-		clickX -= fd_canvas.offsetLeft + 115; // had to calibrate manually..
+		clickX -= fd_canvas.offsetLeft + 110; // had to calibrate manually..
 		clickY -= fd_canvas.offsetTop + 105;
  		// close button click?
 		if( clickX >= 438 && clickX <= 454 && clickY >= 0 && clickY <=20 )clickCloseFD();
@@ -620,6 +655,7 @@
 	var layerGroup = L.layerGroup().addTo(mymap);
 
 	const primary_icaos = []; // primary receiver icaos
+	var aircrafts_positions = ["",0,0]; // all visible flights with callsign, lat, lon
 	var second_ac_data = null; // supplementary / secondary receiver aircraft json - null if error
 	var second_stat_data = null; // supplementary / secondary receiver statistics json - null if error
 
@@ -657,6 +693,7 @@
 
 					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0; 
 					while( primary_icaos.length > 0 ) primary_icaos.pop(); // clear up primary icaos list
+					while( aircrafts_positions.length > 0 ) aircrafts_positions.pop(); // clear up aircraft positions
 					// parse through all the primary receiver aircrafts
 					for(var key in data.aircraft)
 					{
@@ -717,6 +754,10 @@
 						if(gs<0)gs="";
 						if(seen<0)seen="";
 						if(seen>=100)seen = Math.floor(seen); 
+
+						// Add flight to aircrafts_positions
+						if(lat && lon)
+							aircrafts_positions.push([flight,lat,lon]);
 
 						// FD update
 						if(flight == FD_flight){
@@ -1094,9 +1135,9 @@
 					// TO DO: get weather information for those airports
 					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Location</th><th>Elevation</th><th>Length</th><th>Width</th><th>Surface</th>";
 					for( i=0; i<nearest_runways.length; i++ ){
-						var style_common = "";
+						var style_common = " cursor: pointer;";
 						if(nearest_runways[i][9]>=8000) style_common += " background: #202181"; 
-						outHTML += "<tr>";
+						outHTML += "<tr onClick='goToMapPoint(" + nearest_runways[i][4] + "," + nearest_runways[i][5] + ",9)'>";
 						outHTML += "<td style='"+ style_common + "'><a name='" + nearest_runways[i][0] + "'>" + nearest_runways[i][0] + "</a></td>";
 						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][1] + " / " + nearest_runways[i][2] + "</td>";
 						outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][4] + ", " + nearest_runways[i][5] + " --> " + nearest_runways[i][6] + ", " + nearest_runways[i][7] + "</td>";
@@ -1110,7 +1151,7 @@
 				})
 				.catch(console.error);
 		} 
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' checked> Airports";		
+		document.getElementById("filter-checkboxes").innerHTML += " <input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' checked> Airports";		
 	}
 	function airportsEnabledChange(){
 		if(document.getElementById("airports-enabled").checked){
