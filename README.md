@@ -39,7 +39,7 @@ Nov 3, 2021:
   - Added list of nearest runways under the map. Over 8000 ft long runways are marked with blue background.
   - Added column to aircraft list L/D (Landing / Departing) and populating that with a title and link to bigger airport to which or from which the aircraft is probably landing or departing. Very simple rules, so it's definitely not always right.
 
-Nov 4, 2021:
+Nov 4-5, 2021:
   - Visual changes, made things a bit more "round"
   - Click to aircraft callsign in the aircraft list now flies the map to that particular aircraft
   - Click to airport runway now flies the map to that runway (and scrolls to top)
