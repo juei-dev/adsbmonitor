@@ -45,6 +45,7 @@ Nov 4, 2021:
   - Click to airport runway now flies the map to that runway (and scrolls to top)
   - Added Reset map -button
   - Fixed FD display "locking" (if FD display is enabled and mouse click is made to the callsign, the FD stays on)
+  - Airports/runways have now near-by aircrafts listed
 
 ---
 **Current features:**
