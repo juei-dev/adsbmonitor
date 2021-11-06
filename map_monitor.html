@@ -137,6 +137,8 @@
 	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
 	//					- some appearance changes
 	// 2021 Nov 2nd		- Added airports (credits for list to ourairports.com - see ourairports.com/data for more lists)
+	// ...
+	// See README for more history
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -1133,7 +1135,7 @@
 					var rwh = document.getElementById("runways-head");
 					var outHTML = "";
 					// TO DO: get weather information for those airports
-					rwh.innerHTML = "<th>Airport</th><th>Runway</th><th>Elevation</th><th>Length</th><th>Width</th><th>Surface</th><th style='width: 200px;'>Aircrafts</th>";
+					rwh.innerHTML = "<th style='width: 45px;'>Airport</th><th style='width: 60px;'>Runway</th><th>Elev.</th><th style='width: 50px;'>Length</th><th>Width</th><th style='width: 80px;'>Surface</th><th style='background:#40C0FF;'>A72</th><th>E17</th><th style='background:#40C0FF;'>737</th><th>747</th><th style='background:#40C0FF;'>767</th><th>777</th><th style='background:#40C0FF;'>787</th><th>319</th><th style='background:#40C0FF;'>320</th><th>321</th><th style='background:#40C0FF;'>330</th><th>350</th><th style='background:#40C0FF;'>380</th><th style='width: 100px;'>Aircrafts</th>";
 					refreshAirportAircraftdata();
 				})
 				.catch(console.error);
@@ -1196,6 +1198,8 @@
 		var outHTML = "";
 		for( i=0; i<nearest_runways.length; i++ ){
 			var style_common = " cursor: pointer;";
+			var a_no = "background: #400000;", a_maybe = "background: #404000", a_yes = "background: #004000";
+			if(nearest_runways[i][9]<5000) style_common += " background: #000000; color: #707071;"; // smaller runways
 			if(nearest_runways[i][9]>=7000 && nearest_runways[i][9]<8000) style_common += " background: #000141";
 			if(nearest_runways[i][9]>=8000 && nearest_runways[i][9]<9000) style_common += " background: #102151";
 			if(nearest_runways[i][9]>=9000 && nearest_runways[i][9]<10000) style_common += " background: #302171";
@@ -1207,15 +1211,242 @@
 			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][9] + "</td>"; // length
 			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][10] + "</td>"; // width
 			outHTML += "<td style='"+ style_common + "'>" + nearest_runways[i][8] + "</td>"; // surface
+			// <th>AT72</th><th>E170</th><th>737</th><th>747</th><th>757</th><th>767</th><th>777</th><th>787</th><th>319</th><th>320</th><th>321</th><th>330</th><th>340</th><th>350</th><th>380</th>
+			// Take-off capabilities of some commercial aircrafts with MTOW
+			if(nearest_runways[i][9]<4500)
+			{
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // ATR 72
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // E170
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A319
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=4500 && nearest_runways[i][9]<5500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // E170
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A319
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=5500 && nearest_runways[i][9]<6000)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A319
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=6000 && nearest_runways[i][9]<6500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A319
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=6500 && nearest_runways[i][9]<7000)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A319
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=7000 && nearest_runways[i][9]<7500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=7500 && nearest_runways[i][9]<8000)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A321
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=8000 && nearest_runways[i][9]<8500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=8500 && nearest_runways[i][9]<9500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A350
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=9500 && nearest_runways[i][9]<10000)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A350
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=10000 && nearest_runways[i][9]<10500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B747
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A350
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=10500 && nearest_runways[i][9]<11000)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // B747
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B767
+				outHTML += "<td style='"+ a_no +"'>-</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A350
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=11000 && nearest_runways[i][9]<11500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B747
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B767
+				outHTML += "<td style='"+ a_maybe +"'>o</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A350
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A380
+			}
+			if(nearest_runways[i][9]>=11500)
+			{
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // ATR 72
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // E170
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B737
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B747
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B767
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B777
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // B787
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A319
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A320
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A321
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A330
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A350
+				outHTML += "<td style='"+ a_yes +"'>x</td>"; // A380
+			}
 			outHTML += "<td style='"+ style_common + "'>"; // near-by aircrafts
 			var acs = 0;
 			for( a=0; a<aircrafts_positions.length; a++){
 				if(!aircrafts_positions[a][0])continue; // do not try to show empty flight name string
-				if( getDistanceFromLatLonInKm(nearest_runways[i][4],nearest_runways[i][5],aircrafts_positions[a][1],aircrafts_positions[a][2],'km') <= 88 ) { // 88 km is the zoom level 9
-					if(acs>0) outHTML += ", ";
-					outHTML += "<span onClick='goToMapPoint(" + aircrafts_positions[a][1] + "," + aircrafts_positions[a][2] + ",9)'>" + aircrafts_positions[a][0] + "</span>"; 
-					acs++;
-				} 
+				if(nearest_runways[i][9]>=5000) // do not display aircrafts if runway is less than 5000ft (clearing things)
+					if( getDistanceFromLatLonInKm(nearest_runways[i][4],nearest_runways[i][5],aircrafts_positions[a][1],aircrafts_positions[a][2],'km') <= 88 ) { // 88 km is the zoom level 9
+						if(acs>0) outHTML += ", ";
+						outHTML += "<span onClick='goToMapPoint(" + aircrafts_positions[a][1] + "," + aircrafts_positions[a][2] + ",9)'>" + aircrafts_positions[a][0].trim() + "</span>"; 
+						acs++;
+					} 
 			}
 			outHTML += "</td>";
 			outHTML += "</tr>";
