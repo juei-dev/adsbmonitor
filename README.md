@@ -48,7 +48,8 @@ Nov 4-5, 2021:
   - Airports/runways have now near-by aircrafts listed
 
 Nov 6, 2021:
-  - Added several commercial AC approximated required runway lengths for takeoff (in MTOW) to runway list 
+  - Added several commercial AC approximated required runway lengths for takeoff (in MTOW) to runway list
+  - Added sorting functionality to aircrafts table (just click the header column)
 
 
 ---
