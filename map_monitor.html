@@ -137,8 +137,6 @@
 	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
 	//					- some appearance changes
 	// 2021 Nov 2nd		- Added airports (credits for list to ourairports.com - see ourairports.com/data for more lists)
-	// ...
-	// See README for more history
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -280,7 +278,52 @@
    		return true;
 	}
 
-	function sortTable() {
+	function sortTable(tbl,col,ascending,numeric) {
+		var table, rows, switching, i, x, y, shouldSwitch;
+		table = document.getElementById(tbl);
+		switching = true;
+		while (switching) {
+			switching = false;
+			rows = table.rows;
+			for (i = 1; i < (rows.length - 1); i++) {
+				shouldSwitch = false;
+				x = rows[i].getElementsByTagName("TD")[col];
+				y = rows[i + 1].getElementsByTagName("TD")[col];
+				if(!numeric){ // characters
+					if(ascending){
+						if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+							shouldSwitch = true;
+							break;
+						}
+					} else {
+						if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+							shouldSwitch = true;
+							break;
+						}					
+					}
+				} else { // numeric values
+					if(ascending){
+						if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
+							shouldSwitch = true;
+							break;
+						}
+					} else {
+						if (parseInt(x.innerHTML) < parseInt(y.innerHTML)) {
+							shouldSwitch = true;
+							break;
+						}					
+					}					
+				}
+			}
+			if (shouldSwitch) {
+				if(ascending){
+					rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+				} else { // descending doesn't work yet!
+					rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);					
+				}
+				switching = true;
+			}
+		}
 	}
 
 	function debugTable() {
@@ -625,6 +668,19 @@
 		//console.log("Mouse click: " + clickX + "," + clickY);
 	}
 
+	/* handle ACs sort order change request */
+	function onClickACHeader(col){
+		var ah = document.getElementById("aircrafts-head");
+		if(aircrafts_table_sort_col == col){
+			if(aircrafts_table_sort_ascending)aircrafts_table_sort_ascending=false; else aircrafts_table_sort_ascending=true;}
+		aircrafts_table_sort_col = col;
+		aircrafts_table_sort_numeric = aircrafts_table_column_numerics[col];
+		if(aircrafts_table_sort_ascending)
+			ah.getElementsByTagName("TH")[col].style.background = "#600000";
+		else
+			ah.getElementsByTagName("TH")[col].style.background = "#006000";
+	}
+
 	/* Mark main receiver location */
 	var circle = L.circle([receiver_lat, receiver_lon], {
     		color: 'blue',
@@ -663,7 +719,11 @@
 	var second_stat_data = null; // supplementary / secondary receiver statistics json - null if error
 
 	var ac_count = 0, ac_with_pos_count = 0, ac_msgs = 0, ac_max_distance = 0, ac_max_distance_all_time = 0;
-	
+
+	// table sorting variables
+	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
+	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
+
 	function refreshAircrafts(){
 		getJSON("http://" + receiver_domain + "/dump1090-fa/data/aircraft.json",
 			function(err,data){
@@ -680,7 +740,7 @@
 					layerGroup.clearLayers();
 					drawAltiBox();
 					var ah = document.getElementById("aircrafts-head");
-					var headHTML = "<th style='text-align: left;'>Callsign</th><th>Cat</th><th>Track</th><th>Squawk</th><th>Alt</th><th>Rate</th><th>GS</th><th>TAS</th><th>Dist</th><th>RSSI</th><th>Seen</th><th>Msgs</th><th>Recvd</th><th>L/D</th>";
+					var headHTML = "<th style='text-align: left;' onClick='onClickACHeader(0)'>Callsign</th><th onClick='onClickACHeader(1)'>Cat</th><th onClick='onClickACHeader(2)'>Track</th><th onClick='onClickACHeader(3)'>Squawk</th><th onClick='onClickACHeader(4)'>Alt</th><th onClick='onClickACHeader(5)'>Rate</th><th onClick='onClickACHeader(6)'>GS</th><th onClick='onClickACHeader(7)'>TAS</th><th onClick='onClickACHeader(8)'>Dist</th><th onClick='onClickACHeader(9)'>RSSI</th><th onClick='onClickACHeader(10)'>Seen</th><th onClick='onClickACHeader(11)'>Msgs</th><th onClick='onClickACHeader(12)'>Recvd</th><th onClick='onClickACHeader(13)'>L/D</th>";
 					ah.innerHTML = headHTML;
 					var al = document.getElementById("aircrafts-body");
 					//al.innerHTML = "";
@@ -943,6 +1003,7 @@
 						}
 					}
 					al.innerHTML = outHTML; // populate aircraft table
+					sortTable("aircrafts",aircrafts_table_sort_col,aircrafts_table_sort_ascending,aircrafts_table_sort_numeric); // sort by column 8 = distance, ascending, numeric information
 					//debugTable();
 					// insert footer with total counts to stats
 					var footHTML = "";
