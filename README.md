@@ -47,6 +47,10 @@ Nov 4-5, 2021:
   - Fixed FD display "locking" (if FD display is enabled and mouse click is made to the callsign, the FD stays on)
   - Airports/runways have now near-by aircrafts listed
 
+Nov 6, 2021:
+  - Added several commercial AC approximated required runway lengths for takeoff (in MTOW) to runway list 
+
+
 ---
 **Current features:**
 - OpenStreetMap (using Leaflet) displaying:
