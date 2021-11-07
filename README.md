@@ -51,6 +51,9 @@ Nov 6, 2021:
   - Added several commercial AC approximated required runway lengths for takeoff (in MTOW) to runway list
   - Added sorting functionality to aircrafts table (just click the header column)
 
+Nov 7, 2021:
+  - New button / checkbox styles in filtering
+
 
 ---
 **Current features:**
@@ -134,3 +137,7 @@ Example (Nov 4th 2021) with runways and landing/departing note:
 
 Example (Nov 6th 2021) runway list with some commercial ACs take-off approximated capabilities in MTOW:
 ![Example_runway_list_and_TO_length_approximations](https://github.com/juei-dev/adsbmonitor/blob/main/example_runway_list_and_TO_length_approximations.jpg?raw=true)
+
+Example (Nov 7th 2021) new button / checkbox styles:
+![Example_new_filter_buttonss](https://github.com/juei-dev/adsbmonitor/blob/main/example_new_filter_buttons.jpg?raw=true)
+
