@@ -52,9 +52,23 @@
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
-		div.filter-place { margin-left: 1px; background-color: #202031; border: 1px solid #707091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; }
-		span.filters { font-size: 0.7em; }
-		.btn-reset-map { border: 3px groove; background-color: #90909A; color: #0000BF; font-size: 0.7em; margin-right: 4px; border-radius: 2px; margin-bottom: 3px; font: sans-serif;}
+		div.filter-place { margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; }
+		span.filters { 
+			font-size: 0.7em; 
+			padding-top: 3px;
+			padding-bottom: 0px;
+			display: grid;
+			grid-template-columns: 80px 100px 235px 125px;
+			grid-gap: 0;
+			margin: 0;
+		}
+		.form-control:nth-child(n+5){
+			padding-top: 5px;
+			border-top: 1px solid #707590;
+		}
+		.btn-reset-map { 
+			border: 0px; background-color: #10101A; color: #F0202F; font-size: 1.0em; margin-right: 1px; border-radius: 1px; margin-bottom: 1px; font: sans-serif; width: 70px height: 25px; 
+		}
 		table.ac-list { color: #ffffff; font-size: 0.8em; border: 1px solid #000000; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px;  border-radius: 5px; }
 		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; padding: 2px; }
 		.ac-list-footer td { text-align: center; background: #505021; color: #FFFFFF;  font-size: 0.8em; }
@@ -62,14 +76,135 @@
 			position: absolute; z-index: 10000; top: 100px;
 		}
 		canvas.fd-canvas-style { display: none; z-index: 10001; }
-		.owm-opacity { -webkit-appearance: none; height: 8px; width: 100px; background: #9091B0; margin-left: 6px; } 
-		.owm-opacity::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 10px; width: 10px;  cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px; } 
-		.owm-opacity::-moz-range-thumb { height: 10px; width: 10px; cursor: pointer; background: #5051E0; outline-color: #FFFFFF; outline-style: groove; outline-width: 3px;} 
+		.owm-opacity { -webkit-appearance: none; height: 8px; width: 90px; background: #101120; margin-left: 6px; margin-top: 7px; outline-style: ridge; outline-color: #555556; outline-width: 2px; border: 1px solid #404041; padding-top: 4px;} 
+		.owm-opacity::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 10px; width: 10px;  cursor: pointer; background: #202140; outline-color: #FFFFFF; outline-style: groove; outline-width: 2px; } 
+		.owm-opacity::-moz-range-thumb { height: 10px; width: 10px; cursor: pointer; background: #202140; outline-color: #FFFFFF; outline-style: groove; outline-width: 2px;} 
 		table.runway-list {
 			color: #ffffff; font-size: 0.8em; vertical-align: top; width: 600px; table-layout: fixed;
 		}
 		.runway-list-header th { text-align: center; background: #70C0C1; color: #000000; font-size: 0.8em; }
 		.runway-list-body { text-align: center; }
+
+		.form-control {
+			font-family: system-ui, sans-serif;
+			font-size: inherit;
+			line-height: 0.8;
+			padding-left: 3px;
+			padding-right: 2px;
+			padding-bottom: 3px;
+		}
+		input[type="button"] {
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			appearance: none;
+			background-color: #000;
+			margin: 0;
+			vertical-align: middle;
+			font: inherit;
+			font-family: monospace;
+			font-size: 10px;
+			/* color: currentColor; */
+			width: 7.3em;
+			height: 3.05em;
+			border: 0.25em solid #335;
+			border-radius: 0.35em;
+			transform: translateY(-0.075em);
+		}
+		input[type="button"]:active {
+			transform: scale(1);
+			background-color: #900;
+			color: #fff;
+			transform-origin: bottom left;
+			transition: 120ms transform ease-in-out;
+			box-shadow: inset 1em 1em var(--form-control-color);
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"] {
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			appearance: none;
+			background-color: #000;
+			margin: 0;
+			vertical-align: middle;
+			font: inherit;
+			font-family: monospace;
+			font-size: 10px;
+			/* color: currentColor; */
+			width: 3.05em;
+			height: 3.05em;
+			border: 0.25em solid #335;
+			border-radius: 0.15em;
+			transform: translateY(-0.075em);
+		}
+		input[type="checkbox"]::before {
+			/* content: '';*/
+			font-family: monospace;
+			font-size: 10px;
+			content: 'OFF';
+			color: #fff;
+			position: relative;
+			top: 5px;
+			left: 5px;
+			width: 0.65em;
+			height: 0.65em;
+			transform: scale(0);
+			transition: 120ms transform ease-in-out;
+			box-shadow: inset 1em 1em var(--form-control-color);
+			background-color: #112;
+		}
+		input[type="checkbox"]:checked:before {
+			content: '';
+			transform: scale(1);
+			background-color: #330;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"]:checked {
+			content: attr(cb-text);
+			transform: scale(1);
+			background-color: #112;
+			color: #fff;
+			transform-origin: bottom left;
+			outline: max(1px, 0.10em) solid #555;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"]:checked:after {
+			content: attr(cb-text);
+			position: relative;
+			top: 15px;
+			left: 5px;
+			transform: scale(1);
+			color: #0f0;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"].cb-map:checked:after {
+			content: attr(cb-text);
+			position: relative;
+			top: 15px;
+			left: 5px;
+			transform: scale(1);
+			background-color: #000;
+			color: #ff0 !important;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"].runways-cb:checked:after {
+			content: attr(cb-text);
+			position: relative;
+			top: 15px;
+			left: 5px;
+			transform: scale(1);
+			background-color: #000;
+			color: #33f !important;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"]:focus {
+			outline: max(1px, 0.10em) solid #557;
+			/* outline-offset: max(1px,0.10em); */
+			outline-offset: 0px;
+		}
 	</style>
 </head>
 <body>
@@ -103,10 +238,17 @@
         			</table>
         			<div class="filter-place">
         			<span id="filter-checkboxes" class="filters">
-						<input type="button" id="btn-reset-map-pos" class="btn-reset-map" onClick="resetMapPosition()" value="Reset Map">
-						<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()"> Enable FD
-						<input type="checkbox" id="cb-filter-map" onClick="checkFilters()"> Filter by visible only on map (<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi) 
-						<br/>
+						<label class="form-control">
+							<input type="button" id="btn-reset-map-pos" class="btn-reset-map" onClick="resetMapPosition()" value="Reset Map">
+						</label>
+						<label class="form-control">
+							<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()" value="FD"> Virtual FD
+						</label>
+						<label class="form-control">
+							<input type="checkbox" id="cb-filter-map" onClick="checkFilters()" value="MAP" class="cb-map"> Only on map: <span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi
+						</label>
+						<label class="form-control" id="airports-cb" value="RWYS">
+						</label>						
 					</span>
 					</div>
         			<table id="aircrafts" class="ac-list" cellspacing="0">
@@ -137,6 +279,7 @@
 	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
 	//					- some appearance changes
 	// 2021 Nov 2nd		- Added airports (credits for list to ourairports.com - see ourairports.com/data for more lists)
+	// ... see more in README
 
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
@@ -182,36 +325,53 @@
 		mymap.flyTo([receiver_lat, receiver_lon], 6);
 	}
 
+	// check check box content
+	function setCBDefaultValues(){
+		document.getElementById("cb-FD-enabled").setAttribute('cb-text','VFD');
+		document.getElementById("airports-enabled").setAttribute('cb-text','RWY');
+		document.getElementById("cb-filter-map").setAttribute('cb-text','MAP');
+		document.getElementById("owm-wind-checkbox").setAttribute('cb-text','WND');
+		document.getElementById("owm-clouds-checkbox").setAttribute('cb-text','CLD');
+		document.getElementById("owm-rain-checkbox").setAttribute('cb-text','RAN');
+	}
+	var initCBtimer = setTimeout(setCBDefaultValues,1000);
+
 	// Open weather layers to the map
 	if(openweathermap_wind_enabled){
 		var layer_wind = L.tileLayer("https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		//layer_wind.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()'> Winds";
+		document.getElementById("filter-checkboxes").innerHTML += "<label class='form-control'><input type='checkbox' id='owm-wind-checkbox' onclick='owmChange()'> Winds</label>";
 	}
 	if(openweathermap_clouds_enabled){
 		var layer_clouds = L.tileLayer("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		//layer_clouds.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()'> Clouds";
+		document.getElementById("filter-checkboxes").innerHTML += "<label class='form-control'><input type='checkbox' id='owm-clouds-checkbox' onclick='owmChange()'> Clouds</label>";
 	}
 	if(openweathermap_rain_enabled){
 		var layer_rain = L.tileLayer("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=" + openweathermap_apikey);
 		//layer_rain.addTo(mymap);
-		document.getElementById("filter-checkboxes").innerHTML += "<input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()'> Rain";		
+		document.getElementById("filter-checkboxes").innerHTML += "<label class='form-control'><input type='checkbox' id='owm-rain-checkbox' onclick='owmChange()'> Rain</label>";		
 	}
 	if(openweathermap_rain_enabled || openweathermap_clouds_enabled || openweathermap_wind_enabled){
-			document.getElementById("filter-checkboxes").innerHTML += "<input type='range' min='1' max='100' value='100' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'>";
+			document.getElementById("filter-checkboxes").innerHTML += "<label class='form-control'><input type='range' min='1' max='100' value='100' step='1' id='owm-opacity-slider' class='owm-opacity' onclick='owmOpacityChange()'></label>";
 			owmOpacityChange(); 
 	}
 	function owmChange(){
 		if(!document.getElementById("owm-wind-checkbox").checked){
 			layer_wind.removeFrom(mymap); 
-		} else layer_wind.addTo(mymap); 
+		} else { 
+			layer_wind.addTo(mymap);
+		} 
 		if(!document.getElementById("owm-clouds-checkbox").checked){
 			layer_clouds.removeFrom(mymap); 
-		} else layer_clouds.addTo(mymap); 
+		} else { 
+			layer_clouds.addTo(mymap);
+		} 
 		if(!document.getElementById("owm-rain-checkbox").checked){
 			layer_rain.removeFrom(mymap); 
-		} else layer_rain.addTo(mymap); 
+		} else { 
+			layer_rain.addTo(mymap);
+		} 
 	}
 	var owm_selected_opacity = 1;
 	function owmOpacityChange(){
@@ -1201,7 +1361,7 @@
 				})
 				.catch(console.error);
 		} 
-		document.getElementById("filter-checkboxes").innerHTML += " <input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' checked> Airports";		
+		document.getElementById("airports-cb").innerHTML += " <label class='form-control'><input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' class='runways-cb' checked> Runways</label>";		
 	}
 	function airportsEnabledChange(){
 		if(document.getElementById("airports-enabled").checked){
