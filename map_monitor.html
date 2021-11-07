@@ -18,7 +18,7 @@
 		.main-table { margin: 0px; padding: 0px; background: #000000; }
 		td.main-left { vertical-align: top; padding: 0px; margin: 0px; background: #00001f; }
 		td.main-center { margin: 0px; padding-left: 1px; padding-top: 0px; padding-right: 1px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left; background: #20203c; border-radius: 3px; }
-		td.main-right { vertical-align: top; overflow-y: scroll; display: block; padding: 0px; margin: 0px; }
+		td.main-right { vertical-align: top; display: block; padding: 0px; margin: 0px; }
 		#main { text-align: center; vertical-align: top; margin-top: 0px; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
@@ -47,7 +47,7 @@
 		#alti-bar {
 			border: 1px solid #505004; padding-left: 5px; padding-right: 2px; height: 518px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 0px;
 		}
-		div.info-div { text-align: left; vertical-align: top; color: #ffffff; overflow-y: scroll; font: sans-serif; padding-left: 2px; margin: 0px; }
+		div.info-div { text-align: left; vertical-align: top; color: #ffffff; font: sans-serif; padding-left: 2px; margin: 0px; }
 		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px groove #307072; margin-bottom: 5px; border-radius: 5px; padding: 0px; }
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
@@ -58,11 +58,11 @@
 			padding-top: 3px;
 			padding-bottom: 0px;
 			display: grid;
-			grid-template-columns: 80px 100px 235px 125px;
+			grid-template-columns: 100px 100px 100px 125px 115px;
 			grid-gap: 0;
 			margin: 0;
 		}
-		.form-control:nth-child(n+5){
+		.form-control:nth-child(n+6){
 			padding-top: 5px;
 			border-top: 1px solid #707590;
 		}
@@ -218,6 +218,16 @@
 			border-radius: 6px;
 			margin-bottom: 1px;
 		}
+		.map-distance{
+			height: 18px;
+			width: 120px;
+			border: 1px solid #404041;
+			border-radius: 6px;
+			background: #000;
+			color: #0F0;
+			padding-top: 7px;
+			text-align: center;			
+		}
 
 	</style>
 </head>
@@ -251,7 +261,7 @@
         				<tfoot id="stats-footer" class="stats-list-footer"></tfoot>
         			</table>
 					<div class="ecam-display-place">
-						<input type="text" class="ecam-warm-display" id="ecam-display">
+						<input type="text" class="ecam-warm-display" id="ecam-display" readonly>
 					</div>
         			<div class="filter-place">
         			<span id="filter-checkboxes" class="filters">
@@ -262,10 +272,18 @@
 							<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()" value="FD"> Virtual FD
 						</label>
 						<label class="form-control">
-							<input type="checkbox" id="cb-filter-map" onClick="checkFilters()" value="MAP" class="cb-map"> Only on map: <span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi
+							<input type="checkbox" id="cb-filter-map" onClick="checkFilters()" value="MAP" class="cb-map"> Only map
+						</label>
+						<label class="form-control">
+							<div class="map-distance">
+						 		<span id="cb-filter-map-distance">---</span> km / <span id="cb-filter-map-distance-miles">---</span> nmi
+						 	</div>
 						</label>
 						<label class="form-control" id="airports-cb" value="RWYS">
 						</label>						
+						<label class="form-control">
+							<input type="checkbox" value="inop"> INOP
+						</label>
 					</span>
 					</div>
         			<table id="aircrafts" class="ac-list" cellspacing="0">
@@ -386,6 +404,30 @@
 			owmOpacityChange(); 
 	} else {
 			document.getElementById("filter-checkboxes").innerHTML += "<label class='form-control'><input type='range' min='1' max='100' value='100' step='1' id='owm-opacity-slider' class='owm-opacity' disabled></label>";		
+	}
+	if(layer_wind){
+		layer_wind.on('tileerror', function() {
+			document.getElementById("ecam-display").value += "  WX WIND FAIL"; 			
+		});
+		layer_wind.on('load', function() {
+			document.getElementById("ecam-display").value.replace("  WX WIND FAIL",""); 
+		});
+	}
+	if(layer_clouds){
+		layer_clouds.on('tileerror', function() {
+			document.getElementById("ecam-display").value += "  WX CLOUDS FAIL"; 			
+		});
+		layer_clouds.on('load', function() {
+			document.getElementById("ecam-display").value.replace("  WX CLOUDS FAIL",""); 
+		});
+	}
+	if(layer_rain){
+		layer_rain.on('tileerror', function() {
+			document.getElementById("ecam-display").value += "  WX RAIN FAIL"; 			
+		});
+		layer_rain.on('load', function() {
+			document.getElementById("ecam-display").value.replace("  WX RAIN FAIL",""); 
+		});
 	}
 	function owmChange(){
 		if(!document.getElementById("owm-wind-checkbox").checked){
@@ -919,13 +961,19 @@
 		getJSON("http://" + receiver_domain + "/dump1090-fa/data/aircraft.json",
 			function(err,data){
 				if(err==null){
+					document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL",""); 
 					// fetch secondary receiver data json, if enabled
 					if( second_receiver_enabled ){
 						getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/aircraft.json",
 							function(err,data){
 								second_ac_data = null;
-								if(err==null) second_ac_data = data;
-								});
+								if(err==null){ 
+									second_ac_data = data;
+				 					document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
+								} else {
+									document.getElementById("ecam-display").value += "  ADSB 2 FAIL";  
+				 				}
+							});
 					}
 					// begin update by clearing all the map data and redrawing the alti-bar box
 					layerGroup.clearLayers();
@@ -1213,6 +1261,8 @@
 					footHTML += "<td colspan='2'>km this session</td>";					
 					footHTML += "</tr>";
 					document.getElementById("stats-footer").innerHTML = footHTML;					
+				} else {
+					document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
 				}
 			}
 		);
@@ -1383,7 +1433,7 @@
 		if(!raw_runway_data) {
 			console.log("Loading runways");
 			fetch("runways.csv")
-				.then(response => response.text())
+				.then(response => { if(response.ok)return response.text();else throw new Error("Fetching runways failed"); })
 				.then(data => {
 					raw_runway_data = parseRunwayData(data,",");
 					console.log("Runways loaded");
@@ -1394,7 +1444,10 @@
 					rwh.innerHTML = "<th style='width: 45px;'>Airport</th><th style='width: 60px;'>Runway</th><th>Elev.</th><th style='width: 50px;'>Length</th><th>Width</th><th style='width: 80px;'>Surface</th><th style='background:#40C0FF;'>A72</th><th>E17</th><th style='background:#40C0FF;'>737</th><th>747</th><th style='background:#40C0FF;'>767</th><th>777</th><th style='background:#40C0FF;'>787</th><th>319</th><th style='background:#40C0FF;'>320</th><th>321</th><th style='background:#40C0FF;'>330</th><th>350</th><th style='background:#40C0FF;'>380</th><th style='width: 100px;'>Aircrafts</th>";
 					refreshAirportAircraftdata();
 				})
-				.catch(console.error);
+				.catch((error) => {
+					document.getElementById("ecam-display").value += "  RUNWAYS FAIL"; 
+					console.error;
+				});
 		} 
 		document.getElementById("airports-cb").innerHTML += " <label class='form-control'><input type='checkbox' id='airports-enabled' onclick='airportsEnabledChange()' class='runways-cb' checked> Runways</label>";		
 	}
