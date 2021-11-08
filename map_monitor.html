@@ -48,28 +48,36 @@
 			border: 1px solid #505004; padding-left: 5px; padding-right: 2px; height: 518px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 0px;
 		}
 		div.info-div { text-align: left; vertical-align: top; color: #ffffff; font: sans-serif; padding-left: 2px; margin: 0px; }
-		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 550px; border: 2px groove #307072; margin-bottom: 5px; border-radius: 5px; padding: 0px; }
+		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 580px; border: 2px groove #307072; margin-bottom: 5px; border-radius: 5px; padding: 0px; }
 		.stats-list-head th { text-align: center; background: #90E0E1; color: #000000; font-size: 0.8em; }
 		.stats-list-body { }
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
-		div.filter-place { margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; }
+		div.filter-place { margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 1px; padding-bottom: 1px; }
 		span.filters { 
 			font-size: 0.7em; 
 			padding-top: 3px;
 			padding-bottom: 0px;
 			display: grid;
-			grid-template-columns: 100px 100px 100px 125px 115px;
+			grid-template-columns: 80px 80px 100px 125px 100px 80px;
 			grid-gap: 0;
 			margin: 0;
 		}
-		.form-control:nth-child(n+6){
+		.form-control:nth-child(n+7){
 			padding-top: 5px;
 			border-top: 1px solid #707590;
+		}
+		.form-control:nth-child(4){
+			padding-top: 5px;
+			border-right: 1px solid #707590;
+		}
+		.form-control:nth-child(10){
+			padding-top: 5px;
+			border-right: 1px solid #707590;
 		}
 		.btn-reset-map { 
 			border: 0px; background-color: #10101A; color: #F0202F; font-size: 1.0em; margin-right: 1px; border-radius: 1px; margin-bottom: 1px; font: sans-serif; width: 70px height: 25px; 
 		}
-		table.ac-list { color: #ffffff; font-size: 0.8em; border: 1px solid #000000; vertical-align: top; width: 550px; cursor: pointer; margin-top: 5px;  border-radius: 5px; }
+		table.ac-list { color: #ffffff; font-size: 0.8em; border: 1px solid #000000; vertical-align: top; width: 580px; cursor: pointer; margin-top: 5px;  border-radius: 5px; }
 		.ac-list-head th { text-align: center; background: #208081; color: #FFFFFF;  font-size: 0.8em; padding: 2px; }
 		.ac-list-footer td { text-align: center; background: #505021; color: #FFFFFF;  font-size: 0.8em; }
 		div.flight-director { border: 2px groove #60607E; border-radius: 6px; background: black; display: none; width: 458px; height: 400px; margin-left: 100px; padding-left: 2px;
@@ -207,7 +215,7 @@
 		}
 		.ecam-display-place{
 			text-align: center;
-			width: 550px;
+			width: 574px;
 			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px; 
 		}
 		input[type="text"].ecam-warm-display{
@@ -220,12 +228,12 @@
 		}
 		.map-distance{
 			height: 18px;
-			width: 120px;
+			width: 118px;
 			border: 1px solid #404041;
 			border-radius: 6px;
 			background: #000;
 			color: #0F0;
-			padding-top: 7px;
+			padding-top: 9px;
 			text-align: center;			
 		}
 
@@ -269,7 +277,7 @@
 							<input type="button" id="btn-reset-map-pos" class="btn-reset-map" onClick="resetMapPosition()" value="Reset Map">
 						</label>
 						<label class="form-control">
-							<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()" value="FD"> Virtual FD
+							<input type="checkbox" id="cb-FD-enabled" onClick="switchFD()" value="FD"> VirtFD
 						</label>
 						<label class="form-control">
 							<input type="checkbox" id="cb-filter-map" onClick="checkFilters()" value="MAP" class="cb-map"> Only map
