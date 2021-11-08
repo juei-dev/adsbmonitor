@@ -55,6 +55,9 @@ Nov 7, 2021:
   - New button / checkbox styles in filtering
   - New virtual ECAM to display if weather or airpots are not enabled ("INOP") 
 
+Nov 8, 2021:
+  - Layout changes for buttons
+
 
 ---
 **Current features:**
