@@ -21,7 +21,7 @@
 		td.main-right { vertical-align: top; display: block; padding: 0px; margin: 0px; }
 		td.additional-pager { vertical-align: top; padding: 0px; margin: 0px; width: 15px; }
 		td.additional-page-left { vertical-align: top; padding: 0px; margin: 0px; }
-		td.additional-page-right { vertical-align: top; padding: 0px; margin: 0px; width: 320px; display: none; }
+		td.additional-page-right { vertical-align: top; padding: 0px; margin: 0px; width: 420px; display: none; }
 		#main { text-align: center; vertical-align: top; margin-top: 0px; }
 		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
@@ -57,7 +57,7 @@
 		.stats-list-footer td { text-align: center; background: #205051; color: #FFFFFF;  font-size: 0.8em; }
 		div.filter-place { margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 1px; padding-bottom: 1px; }
 		span.filters { 
-			font-size: 0.7em; 
+			font-size: 0.7em;
 			padding-top: 3px;
 			padding-bottom: 0px;
 			display: grid;
@@ -259,12 +259,26 @@
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
+		.section-title {
+			font-variant: small-caps;
+			font-size: 11px;
+			color: #fff;
+			text-align: left;
+		}
 		.receiver-circular-info-div {
 			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-top: 1px; padding-bottom: 1px;
 		}
 		canvas.receiver-circular-canvas {
 			border: 1px solid #506084; padding: 5px; height: 300px; width: 300px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
 		}
+
+		.receiver-altitude-info-div {
+			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-top: 1px; padding-bottom: 1px;
+		}
+		canvas.receiver-altitude-canvas {
+			border: 1px solid #506084; padding: 5px; height: 220px; width: 415px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
+		}
+
 
 	</style>
 </head>
@@ -333,9 +347,12 @@
 		</td>
 		<td class="additional-page-right" id="additional-page-right-id">
 			<div id="receiver-circular-info" class="receiver-circular-info-div">
+				<span class="section-title">Receiver Distances / Direction</span>
 				<canvas id="receiver-circular-canvas" height="300" width="300" class="receiver-circular-canvas"></canvas>
 			</div>
 			<div id="receiver-altitude-info" class="receiver-altitude-info-div">
+				<span class="section-title">Minimum Altitude / Distance</span>
+				<canvas id="receiver-altitude-canvas" height="220" width="410" class="receiver-altitude-canvas"></canvas>
 			</div>
 		</td>
 	</tr></tbody></table>
@@ -1231,10 +1248,8 @@
 								// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
 								for(i=0;i<360;i++){
 									if(receiver_circular_stats[i][0] == receiver_label && receiver_circular_stats[i][1] == angle){
-										if(distance < receiver_circular_stats[i][2])receiver_circular_stats[i][2]=distance;
-										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; }
-										if(altitude < receiver_circular_stats[i][5])receiver_circular_stats[i][5]=altitude;
-										if(altitude > receiver_circular_stats[i][6])receiver_circular_stats[i][6]=altitude;
+										if(distance < receiver_circular_stats[i][2]){ receiver_circular_stats[i][2]=distance; receiver_circular_stats[i][5]=altitude; }
+										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; receiver_circular_stats[i][6]=altitude; }
 										break;
 									} 
 								}
@@ -1243,10 +1258,8 @@
 								var angle = getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,lat,lon);
 								for(i=360;i<receiver_circular_stats.length;i++){
 									if(receiver_circular_stats[i][0] == second_receiver_label && receiver_circular_stats[i][1] == angle){
-										if(distance < receiver_circular_stats[i][2])receiver_circular_stats[i][2]=distance;
-										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; }
-										if(altitude < receiver_circular_stats[i][5])receiver_circular_stats[i][5]=altitude;
-										if(altitude > receiver_circular_stats[i][6])receiver_circular_stats[i][6]=altitude;
+										if(distance < receiver_circular_stats[i][2]){ receiver_circular_stats[i][2]=distance; receiver_circular_stats[i][5]=altitude; }
+										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; receiver_circular_stats[i][6]=altitude; }
 										break;
 									} 
 								}
@@ -1861,8 +1874,11 @@
 	// ------ second page
 	var rc_canvas = document.getElementById("receiver-circular-canvas");
 	var rc_ctx = rc_canvas.getContext("2d");
+	var ra_canvas = document.getElementById("receiver-altitude-canvas");
+	var ra_ctx = ra_canvas.getContext("2d");
 	var receiver_snr_min = -99, receiver_snr_max = 0;
 	const max_cs_distance = 450;
+	const max_ca_altitude = 50000;
 
 	function receiverDetailsChange(){
 		if(document.getElementById("receiver-details-cb").checked){
@@ -1883,7 +1899,7 @@
 		return [Math.floor(x+Math.cos(rad_angle)*r),Math.floor(y+Math.sin(rad_angle)*r)];
 	}
 	function initCircularStats(){
-		rc_ctx.clearRect(0,0,fd_canvas.width,fd_canvas.height);
+		rc_ctx.clearRect(0,0,rc_canvas.width,rc_canvas.height);
 		rc_ctx.beginPath();
 		rc_ctx.fillStyle = "#AFAFFF";
 		rc_ctx.strokeStyle = "white";
@@ -1910,33 +1926,82 @@
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
 		rc_ctx.fillText("max " + receiver_snr_max.toFixed(1) + " dBi",1,300);		 
 	}
-	function refreshCircularStats() {
+	function initAltitudeStats(){
+		ra_ctx.clearRect(0,0,ra_canvas.width,ra_canvas.height);
+		ra_ctx.beginPath();
+		ra_ctx.fillStyle = "#AFAFFF";
+		ra_ctx.strokeStyle = "white";
+		ra_ctx.moveTo(5,0);
+		ra_ctx.lineTo(405,0);
+		ra_ctx.lineTo(405,200);
+		ra_ctx.lineTo(5,200);
+		ra_ctx.lineTo(5,0);
+		ra_ctx.closePath();
+		ra_ctx.stroke();
+		ra_ctx.beginPath();
+		ra_ctx.arc(5,200,5,0,2*Math.PI);
+		ra_ctx.closePath();
+		ra_ctx.fill();
+	}
+	function refreshCircularAndAltitudeStats() {
 		if(!receiver_details_shown){
 			return;
 		}
 		initCircularStats();
+		initAltitudeStats();
 		var next_x = -1, next_y = -1;
+		var next_alt_x = -1, next_alt_y = -1;
+
 		// approximations
 		rc_ctx.fillStyle = "#5F5F9F";
 		rc_ctx.strokeStyle = "#9092FF";
+		ra_ctx.fillStyle = "#5F9F9F";
+		ra_ctx.strokeStyle = "#90F2FF";
+
 		rc_ctx.beginPath();
 		rc_ctx.moveTo(150, 150);
+		ra_ctx.beginPath();
+		ra_ctx.moveTo(5,200);
+
+		var alt_profile = [];
+		for(c=0; c<400; c++)alt_profile.push(-1);
 		for(i=0; i<360; i++){
 			// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
 			if(receiver_circular_stats[i][0]==receiver_label){
 				if(receiver_circular_stats[i][4]!=99){
-					var dist = (receiver_circular_stats[i][3]/max_cs_distance)*(140);
+					// update circular stats 
+					var true_dist = receiver_circular_stats[i][3];
+					var dist = (true_dist/max_cs_distance)*(140);
 					if(dist>140)dist=140;
 					var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
 					next_x = next_pos[0]; next_y = next_pos[1];
 					rc_ctx.lineTo(next_x, next_y);
 					// console.log(receiver_circular_stats[i][1] + " dist: " + dist + " - " + next_x + "," + next_y);
+
+					// update altitude stats per max distance
+					if(receiver_circular_stats[i][6] > 50000)continue;
+					if(true_dist>=400)continue;
+					if( (alt_profile[Math.floor(true_dist)] > receiver_circular_stats[i][6]) || (alt_profile[Math.floor(true_dist)]==-1)  ) 
+						alt_profile[Math.floor(true_dist)] = receiver_circular_stats[i][6];
 				}
 			}
+		}
+		//console.log(alt_profile);
+		for(i=0; i<400; i++){
+			if(alt_profile[i]<0)continue;
+			next_alt_y = 200-Math.floor(200*(alt_profile[i]/max_ca_altitude));
+			if(next_alt_y < 5)next_alt_y = 5; // cut over max display altitudes off
+			next_alt_x = 5+i;
+			ra_ctx.lineTo(next_alt_x, next_alt_y);
 		}
 		rc_ctx.lineTo(150, 150);
 		rc_ctx.closePath();
 		rc_ctx.fill();
+
+		ra_ctx.lineTo(next_alt_x, 200);
+		ra_ctx.closePath();
+		ra_ctx.fill();
+
 		// strict
 		rc_ctx.fillStyle = "#EF8FFF";
 		rc_ctx.strokeStyle = "#9092FF";
@@ -1963,13 +2028,14 @@
 		rc_ctx.fill();
 		//console.log(receiver_circular_stats);
 
-		// cross-hairs / measurement lines
+		// cross-hairs / measurement lines for circular stats
 		rc_ctx.strokeStyle = "#505052";
 		rc_ctx.beginPath();
 		rc_ctx.moveTo(10, 150);
 		rc_ctx.lineTo(290, 150);
 		rc_ctx.moveTo(150, 10);
 		rc_ctx.lineTo(150, 290);
+		rc_ctx.moveTo(10, 150);
 		rc_ctx.closePath();
 		rc_ctx.stroke();
 		rc_ctx.beginPath();
@@ -1994,12 +2060,40 @@
 		rc_ctx.fillText("270",3,152);		 
 		rc_ctx.closePath();
 
+		// cross-hairs / measurement lines for altitude stats
+		ra_ctx.strokeStyle = "#505052";
+		ra_ctx.beginPath();
+		ra_ctx.moveTo(5, (10000/max_ca_altitude)*200);
+		ra_ctx.lineTo(405, (10000/max_ca_altitude)*200);
+		ra_ctx.moveTo(5, (20000/max_ca_altitude)*200);
+		ra_ctx.lineTo(405, (20000/max_ca_altitude)*200);
+		ra_ctx.moveTo(5, (30000/max_ca_altitude)*200);
+		ra_ctx.lineTo(405, (30000/max_ca_altitude)*200);
+		ra_ctx.moveTo(5, (40000/max_ca_altitude)*200);
+		ra_ctx.lineTo(405, (40000/max_ca_altitude)*200);
+		ra_ctx.closePath();
+		ra_ctx.stroke();
+		ra_ctx.beginPath();
+		ra_ctx.font = "normal 10px sans-serif"; // small-caps 
+		ra_ctx.fillStyle = "#F0F0F2";
+		ra_ctx.fillText("0",5,210);		 
+		ra_ctx.fillText("100",95,210);		 
+		ra_ctx.fillText("200",195,210);		 
+		ra_ctx.fillText("250",245,210);		 
+		ra_ctx.fillText("300",295,210);		 
+		ra_ctx.fillText("350",345,210);		 
+		ra_ctx.fillText("400",390,210);		 
+		ra_ctx.fillStyle = "#40F042";
+		ra_ctx.fillText("FL100",5,200-(10000/max_ca_altitude)*200);		 
+		ra_ctx.fillText("FL200",5,200-(20000/max_ca_altitude)*200);		 
+		ra_ctx.fillText("FL300",5,200-(30000/max_ca_altitude)*200);		 
+		ra_ctx.fillText("FL400",5,200-(40000/max_ca_altitude)*200);		 
+		ra_ctx.closePath();
 
 	}
-	var refreshCircularStatsInterval = setInterval(refreshCircularStats, stats_refresh_rate);
+	var refreshCircularAndAltitudeStatsInterval = setInterval(refreshCircularAndAltitudeStats, stats_refresh_rate);
 	initCircularStats();
-
-
+	initAltitudeStats();
 
 </script>
 </body>
