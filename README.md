@@ -62,6 +62,7 @@ Nov 9, 2021:
   - Added receiver reach graph - still not finished yet though
   - Receiver details (receiver reach circle) is now hidden and can be enabled using RcvDet -button
   - Added receiver minimum altitude / distance graph
+  - Finally made even some cleanup and separated all the scripts to distinct js -files and the styles to the own CSS-file
 
 
 ---
