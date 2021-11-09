@@ -60,6 +60,8 @@ Nov 8, 2021:
 
 Nov 9, 2021:
   - Added receiver reach graph - still not finished yet though
+  - Receiver details (receiver reach circle) is now hidden and can be enabled using RcvDet -button
+
 
 ---
 **Current features:**
