@@ -124,6 +124,10 @@ Nov 9, 2021:
 	- In general, if primary receiver information lacks of some information, the supplementary information will be used
 	- If position is not known by the primary receiver, the possible supplementary receiver position information is used
 	
+- Receiver detailed information (per session)
+	- Distances / direction circle (like an antenna radiation pattern)
+	- Minimum altitude / distance graph
+	
 
 ---
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time.
