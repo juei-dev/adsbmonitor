@@ -58,6 +58,8 @@ Nov 7, 2021:
 Nov 8, 2021:
   - Layout changes for buttons
 
+Nov 9, 2021:
+  - Added receiver reach graph - still not finished yet though
 
 ---
 **Current features:**
