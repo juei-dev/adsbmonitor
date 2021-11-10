@@ -79,9 +79,13 @@
 		var next_x = -1, next_y = -1;
 		var next_alt_x = -1, next_alt_y = -1;
 
+		var q1_max_dist = 0, q2_max_dist = 0, q3_max_dist = 0, q4_max_dist = 0;
+		var q1_x = 150, q1_y = 150, q2_x = 150, q2_y = 150, q3_x = 150, q3_y = 150, q4_x = 150, q4_y = 150;
+
 		// approximations
 		rc_ctx.fillStyle = "#5F5F9F";
 		rc_ctx.strokeStyle = "#9092FF";
+		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
 		ra_ctx.fillStyle = "#5F9F9F";
 		ra_ctx.strokeStyle = "#90F2FF";
 
@@ -103,8 +107,49 @@
 					var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
 					next_x = next_pos[0]; next_y = next_pos[1];
 					rc_ctx.lineTo(next_x, next_y);
-					// console.log(receiver_circular_stats[i][1] + " dist: " + dist + " - " + next_x + "," + next_y);
-
+					// also mark the point if the angle is dividable by 18 and add rssi information (only if distance is more tha 100km)
+					if(((receiver_circular_stats[i][1]%18)==0) && true_dist >= 100){
+						rc_ctx.fillStyle = "#FF5FFF";
+						rc_ctx.arc(next_x,next_y,3,0,2*Math.PI);
+						if(receiver_circular_stats[i][1]<=90){
+							rc_ctx.fillText(receiver_circular_stats[i][4].toFixed(1)+" dBi",next_x+10,next_y-10);
+						}
+						else if(receiver_circular_stats[i][1]<=180){
+							rc_ctx.fillText(receiver_circular_stats[i][4].toFixed(1)+" dBi",next_x+10,next_y+10);		 						
+						}
+						else if(receiver_circular_stats[i][1]<=270){
+							rc_ctx.fillText(receiver_circular_stats[i][4].toFixed(1)+" dBi",next_x-10,next_y+10);		 						
+						}
+						else {
+							rc_ctx.fillText(receiver_circular_stats[i][4].toFixed(1)+" dBi",next_x-10,next_y-10);		 						
+						}
+						rc_ctx.fillStyle = "#5F5F9F";
+					}
+					// record maximums per quadrant
+					if(receiver_circular_stats[i][1]<=90){
+						if(true_dist>q1_max_dist){
+							q1_max_dist = true_dist;
+							q1_x = next_x; q1_y = next_y;
+						}
+					}
+					else if(receiver_circular_stats[i][1]<=180){
+						if(true_dist>q2_max_dist){
+							q2_max_dist = true_dist;
+							q2_x = next_x; q2_y = next_y;
+						}
+					}
+					else if(receiver_circular_stats[i][1]<=270){
+						if(true_dist>q3_max_dist){
+							q3_max_dist = true_dist;
+							q3_x = next_x; q3_y = next_y;
+						}
+					}
+					else {
+						if(true_dist>q4_max_dist){
+							q4_max_dist = true_dist;
+							q4_x = next_x; q4_y = next_y;
+						}
+					}
 					// update altitude stats per max distance
 					if(receiver_circular_stats[i][6] > 50000)continue;
 					if(true_dist>=400)continue;
@@ -113,7 +158,8 @@
 				}
 			}
 		}
-		//console.log(alt_profile);
+
+		// draw altitude profile
 		for(i=0; i<400; i++){
 			if(alt_profile[i]<0)continue;
 			next_alt_y = 200-Math.floor(200*(alt_profile[i]/max_ca_altitude));
@@ -121,15 +167,31 @@
 			next_alt_x = 5+i;
 			ra_ctx.lineTo(next_alt_x, next_alt_y);
 		}
+
+		// finish distance circle main distance image
+		rc_ctx.fillStyle = "#5F5F9F";
 		rc_ctx.lineTo(150, 150);
 		rc_ctx.closePath();
 		rc_ctx.fill();
 
+		// draw red max lines for quardrants in distance circle
+		rc_ctx.beginPath();
+		rc_ctx.fillStyle = "#FF0002";
+		rc_ctx.strokeStyle = "#FF0002";
+		rc_ctx.moveTo(150,150); rc_ctx.lineTo(q1_x,q1_y);	
+		rc_ctx.moveTo(150,150); rc_ctx.lineTo(q2_x,q2_y);	
+		rc_ctx.moveTo(150,150); rc_ctx.lineTo(q3_x,q3_y);	
+		rc_ctx.moveTo(150,150); rc_ctx.lineTo(q4_x,q4_y);	
+		rc_ctx.moveTo(150,150);
+		rc_ctx.closePath();
+		rc_ctx.stroke();
+
+		// finish altitude profile
 		ra_ctx.lineTo(next_alt_x, 200);
 		ra_ctx.closePath();
 		ra_ctx.fill();
 
-		// strict
+		// strict lines to ditance circle
 		rc_ctx.fillStyle = "#EF8FFF";
 		rc_ctx.strokeStyle = "#9092FF";
 		rc_ctx.beginPath();
