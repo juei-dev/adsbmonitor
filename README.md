@@ -79,7 +79,7 @@ Nov 10, 2021:
 
 
 
-## Current features:
+## Current features
 
 - OpenStreetMap (using Leaflet) displaying:
 	- Aircraft position
