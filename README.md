@@ -5,7 +5,7 @@ A ~~very~~ quite simple, quick and dirty UI using Leaftlet and Mapbox for the ma
 All run in client browser, no server-side services / APIs included in this project.
 
 
----
+
 ## Quick info
 
 Just add your information to config.js -file:
@@ -24,7 +24,7 @@ Just add your information to config.js -file:
 - receiver_detais_shown = enable the distance / direction and alitude graphs
 
 
----
+
 ## History
 
 Oct 28, 2021: The initial version containing quite lot of bugs and unfinished features. E.g. scrolling / refresh of the aircrafts tends to be very irritating when the list of aircrafts is long. Also FD mock up (hover the mouse over the aircraft callsign to display) has unfinished stuff like pitch calculation and altitude "roller". Additionally, the code is just in one html and requires cleaning up & breaking into several .js -files (preferrably minified). But that comes later. Hopefully.
@@ -78,7 +78,7 @@ Nov 10, 2021:
   - Added some minor details to main receiver distance / direction circle (RSSI on each 18 degrees recorded and red quadrant lines for max distances in the quadrant)
 
 
----
+
 ## Current features:
 
 - OpenStreetMap (using Leaflet) displaying:
