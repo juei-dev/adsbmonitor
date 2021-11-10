@@ -1,21 +1,31 @@
 # adsbmonitor
 *Simple ADS-B monitor UI using dump1090-fa JSONs*
 
-A very simple, quick and dirty UI using Leaftlet and Mapbox for the map and HTML5 Canvas for the Flight Level indicator and FD mock up.
+A ~~very~~ quite simple, quick and dirty UI using Leaftlet and Mapbox for the map and HTML5 Canvas for the Flight Level indicator, FD mock up and Receiver Detailed information (distance/direction circle and altitude graph).
+All run in client browser, no server-side services / APIs included in this project.
+
 
 ---
-**Quick info**
+## Quick info
 
-Just add your information directly to the javascript variables in the beginning of the script element.
+Just add your information to config.js -file:
 - receiver_domain = your ADS-B receiver IP / hostname where the dump1090-fa is running (be sure that the host is accepting the requests and accepts CORS)
-- receiver_lat & receiver_lon = your receiver latitude and longitude - used in map and disctance calculations
+- receiver_lat & receiver_lon = your receiver latitude and longitude - used in map and disctance calculations - this is not using dump1090-fa receiver.json just yet
+- second_receiver_* -settings as in primary receiver_* -settings for the supplementary receiver information
 - mapbox_accessToken = your Mapbox public default accesstoken - just create an account in Mapbox and use the default token it creates for you (free-tier usage)
-- aircraft_refresh_rate = timer setting for aircraft.json calls for map, FL graph and aircraft list updates
-- stats_refresh_rate = timer setting for stats.json calls to refresh the receiver message rate (msgs/s), 5 minute and 15 minute statistics (noise, signal, peak, overall msgs and pos msgs)
+- aircraft_refresh_rate = timer setting for aircraft.json calls for map, FL graph and aircraft list updates - decrease this if you experience performance issues (default every 2 sec) - I don't recommend go below 1 second, you might experience some "jumping" because previous refresh is not completed before the next one starts
+- stats_refresh_rate = timer setting for stats.json calls to refresh the receiver message rate (msgs/s), 5 minute and 15 minute statistics (noise, signal, peak, overall msgs and pos msgs) - decrease this if you experience performance issues (default every 3 secs)
+- openweathermap_wind_enabled = enable OpenWeatherMap wind layer feature (requires OpenWeatherMap API key to be in place)
+- openweathermap_clouds_enabled = enable OpenWeatherMap clouds layer feature (requires OpenWeatherMap API key to be in place)
+- openweathermap_rain_enabled = enable OpenWeatherMap rain layer feature (requires OpenWeatherMap API key to be in place)
+- openweathermap_apikey = place your OpenWeatherMap API key here, you can obtain one by creating an account at OpenWeatherMap.org - free plan should be enough providing that you're not manually refreshing the page constantly
+- map_complete_refresh_rate = timer setting to force refresh the OpenWeatherMap layers (just to be sure the layers are up-to-date - default every 15 minutes)
+- airport_aircraft_refresh_rate = how often the airport list's aircrafts nearby -field is updated - decrease this if you experience performance issues (default every 10 secs)
+- receiver_detais_shown = enable the distance / direction and alitude graphs
 
 
 ---
-**History**
+## History
 
 Oct 28, 2021: The initial version containing quite lot of bugs and unfinished features. E.g. scrolling / refresh of the aircrafts tends to be very irritating when the list of aircrafts is long. Also FD mock up (hover the mouse over the aircraft callsign to display) has unfinished stuff like pitch calculation and altitude "roller". Additionally, the code is just in one html and requires cleaning up & breaking into several .js -files (preferrably minified). But that comes later. Hopefully.
 
@@ -60,13 +70,17 @@ Nov 8, 2021:
 
 Nov 9, 2021:
   - Added receiver reach graph - still not finished yet though
-  - Receiver details (receiver reach circle) is now hidden and can be enabled using RcvDet -button
+  - Receiver details (main receiver reach circle) is now hidden and can be enabled using RcvDet -button
   - Added receiver minimum altitude / distance graph
   - Finally made even some cleanup and separated all the scripts to distinct js -files and the styles to the own CSS-file
 
+Nov 10, 2021:
+  - Added some minor details to main receiver distance / direction circle (RSSI on each 18 degrees recorded and red quadrant lines for max distances in the quadrant)
+
 
 ---
-**Current features:**
+## Current features:
+
 - OpenStreetMap (using Leaflet) displaying:
 	- Aircraft position
 	- Aircraft heading/track with a line which end point is in a position where the aircraft would be in one minute if the speed and and track would be the same
@@ -126,16 +140,19 @@ Nov 9, 2021:
 	- If position is not known by the primary receiver, the possible supplementary receiver position information is used
 	
 - Receiver detailed information (per session)
-	- Distances / direction circle (like an antenna radiation pattern)
+	- Distances / direction circle (like an antenna radiation pattern) with RSSI information for each 18 degree increment (if that exact degree has been recorded) and red line per each quadrant for maximum distances
 	- Minimum altitude / distance graph
 	
 
 ---
+
 Feel free to use or modify this to your own needs - there's no guarantee that this would be updated over the time.
 
 Juho
 
 ---
+
+### Examples
 
 Example (Nov 1st 2021) without weather:
 ![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_screenshot.jpg?raw=true)
