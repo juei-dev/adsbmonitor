@@ -81,6 +81,7 @@ Nov 11, 2021:
   - Added Leaflet plugin for fullscreen mode via mapbox api, so the map has now full screen -button under the zoom buttons
 
 
+
 ## Current features
 
 - OpenStreetMap (using Leaflet) displaying:
@@ -144,7 +145,8 @@ Nov 11, 2021:
 - Receiver detailed information (per session)
 	- Distances / direction circle (like an antenna radiation pattern) with RSSI information for each 18 degree increment (if that exact degree has been recorded) and red line per each quadrant for maximum distances
 	- Minimum altitude / distance graph
-	
+
+
 
 ---
 
