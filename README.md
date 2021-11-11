@@ -92,6 +92,7 @@ Nov 11, 2021:
 		- 2nd line: true heading, speed, flight level / altitude and altitude change (green=up, red=down)
 	- All the airports & runways at current zoom level, if enabled. To update airports after map position/zoom change, cycle airport checkbox
 	- Weather information from OpenWeatherMap; selectable layers are wind, clouds and/or rain
+	- Full screen possibility via Mapbox plugin
 
 - Mockup FD (not completed though) - can be displayed by hovering mouse over the aircraft callsign
 
