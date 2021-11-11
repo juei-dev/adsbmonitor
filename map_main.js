@@ -15,6 +15,8 @@
 		document.getElementById("cb-filter-map-distance-miles").innerHTML = Math.floor(filters_map_distance * 0.539957); // nautical miles
 	});
 
+	mymap.addControl(new L.Control.Fullscreen());
+
 	function goToMapPoint(lat, lon, zoom){
 		mymap.flyTo([lat,lon],zoom);
 		window.scrollTo(0,0);
