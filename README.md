@@ -77,6 +77,8 @@ Nov 9, 2021:
 Nov 10, 2021:
   - Added some minor details to main receiver distance / direction circle (RSSI on each 18 degrees recorded and red quadrant lines for max distances in the quadrant)
 
+Nov 11, 2021:
+  - Added Leaflet plugin for fullscreen mode via mapbox api, so the map has now full screen -button under the zoom buttons
 
 
 ## Current features
