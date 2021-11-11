@@ -79,6 +79,7 @@ Nov 10, 2021:
 
 Nov 11, 2021:
   - Added Leaflet plugin for fullscreen mode via mapbox api, so the map has now full screen -button under the zoom buttons
+  - Added noise figures (current, min, max) to the receiver under the distance / direction circle
 
 
 
