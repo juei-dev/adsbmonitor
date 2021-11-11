@@ -4,6 +4,7 @@
 	var ra_canvas = document.getElementById("receiver-altitude-canvas");
 	var ra_ctx = ra_canvas.getContext("2d");
 	var receiver_snr_min = -99, receiver_snr_max = 0;
+	var receiver_noise_min = 0, receiver_noise_max = -99;
 	const max_cs_distance = 450;
 	const max_ca_altitude = 50000;
 
@@ -25,7 +26,13 @@
 		var rad_angle = (angle*Math.PI)/180;
 		return [Math.floor(x+Math.cos(rad_angle)*r),Math.floor(y+Math.sin(rad_angle)*r)];
 	}
+
 	function initCircularStats(){
+		// check the cookie - this solution is not ok - length of base64 str would be at minimum around 28k bytes and cookie is only allowing 4k  
+		// var tmp_str = getCookie("circular_stats");
+		// if(tmp_str) receiver_circular_stats = base64ToArray(tmp_str);
+
+		// init canvas
 		rc_ctx.clearRect(0,0,rc_canvas.width,rc_canvas.height);
 		rc_ctx.beginPath();
 		rc_ctx.fillStyle = "#AFAFFF";
@@ -45,13 +52,21 @@
 		if(receiver_noise<0) receiver_snr = receiver_noise - receiver_signal;
 		if(receiver_snr < receiver_snr_max && receiver_snr != 0) receiver_snr_max = receiver_snr;
 		if(receiver_snr > receiver_snr_min && receiver_snr != 0) receiver_snr_min = receiver_snr;
+		if(receiver_noise > receiver_noise_max && receiver_noise != 0) receiver_noise_max = receiver_noise;
+		if(receiver_noise < receiver_noise_min && receiver_noise != 0) receiver_noise_min = receiver_noise;
 		rc_ctx.fillStyle = "#AFAFFF";
 		rc_ctx.font = "normal 10px sans-serif"; // small-caps 
 		rc_ctx.fillText("SNR " + receiver_snr.toFixed(1) + " dBi",1,280);		 
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("min " + receiver_snr_min.toFixed(1) + " dBi",1,290);		 
+		rc_ctx.fillText("min " + receiver_snr_min.toFixed(1) + " dBi",6,290);		 
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("max " + receiver_snr_max.toFixed(1) + " dBi",1,300);		 
+		rc_ctx.fillText("max " + receiver_snr_max.toFixed(1) + " dBi",6,300);		 
+		rc_ctx.font = "normal 10px sans-serif"; // small-caps 
+		rc_ctx.fillText("Noise " + receiver_noise.toFixed(1) + " dBi",225,280);		 
+		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+		rc_ctx.fillText("min " + receiver_noise_min.toFixed(1) + " dBi",235,290);		 
+		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+		rc_ctx.fillText("max " + receiver_noise_max.toFixed(1) + " dBi",235,300);		 
 	}
 	function initAltitudeStats(){
 		ra_ctx.clearRect(0,0,ra_canvas.width,ra_canvas.height);
@@ -278,6 +293,9 @@
 		ra_ctx.fillText("FL300",5,200-(30000/max_ca_altitude)*200);		 
 		ra_ctx.fillText("FL400",5,200-(40000/max_ca_altitude)*200);		 
 		ra_ctx.closePath();
+
+		// finally set the current array to cookie to preserve the stats for about the next 6 months
+		// setCookie("circular_stats", arrayToBase64(receiver_circular_stats), (6*30));
 
 	}
 	var refreshCircularAndAltitudeStatsInterval = setInterval(refreshCircularAndAltitudeStats, stats_refresh_rate);

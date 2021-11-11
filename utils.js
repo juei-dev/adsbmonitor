@@ -127,4 +127,34 @@
 			xhr.send();
 	}
 
+	function setCookie(cname, cvalue, exdays) {
+		const d = new Date();
+		d.setTime(d.getTime() + (exdays*24*60*60*1000));
+		var expires = "expires=" + d.toUTCString();
+		var domain = "domain=" + window.location.hostname;
+		document.cookie = cname + "=" + cvalue + ";" + domain + ";path=/;" + expires + ";path=/";  // let's keep path always "/" so assumption is that this is located in the root of the domain
+	}
+	function getCookie(cname) {
+		var name = cname + "=";
+		var decodedCookie = decodeURIComponent(document.cookie);
+		var ca = decodedCookie.split(';');
+		for(let i = 0; i <ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) == ' ') c = c.substring(1);
+			if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+		}
+		return "";
+	}
+	function delCookie(cname) {  // let's keep path always "/" so assumption is that this is located in the root of the same domain 
+		if( getCookie(cname) ){ // if cookie exists, just mark it empty and expiration to past
+			document.cookie = name + "=" + ";path=/;domain=" + window.location.hostname + ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+		}
+	}
+
+	function arrayToBase64(a){
+		return btoa(JSON.stringify(a));
+	}
+	function base64ToArray(str){
+		return JSON.parse(atob(str));
+	}
 
