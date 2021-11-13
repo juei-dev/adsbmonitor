@@ -6,7 +6,7 @@ function refreshCompanyList(){
 	var cl = document.getElementById("company-body");
 	var outHTML = "";
 
-	console.log(company_flights);
+	//console.log(company_flights);
 
 	for(i=0; i<companies.length; i++){
 		var current_company = companies[i][0];
