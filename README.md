@@ -81,6 +81,8 @@ Nov 11, 2021:
   - Added Leaflet plugin for fullscreen mode via mapbox api, so the map has now full screen -button under the zoom buttons
   - Added noise figures (current, min, max) to the receiver under the distance / direction circle
 
+Nov 13, 2021:
+  - Added company flights list under the altimeter graph. All flights are recorded there grouped by the company. Over 14 days old flights are not displayed
 
 
 ## Current features
