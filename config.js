@@ -15,4 +15,5 @@
 	var map_complete_refresh_rate = 15*(60*1000); // to refresh the OWM layers
 	var airports_enabled = true;
 	var airport_aircraft_refresh_rate = 10*1000; // refresh airport aircrafts every 10 seconds
+	var receiver_details_shown = true;
 	
