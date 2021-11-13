@@ -26,6 +26,10 @@
 	for(i=0;i<360;i++)receiver_circular_stats.push([receiver_label,i,999,0,99,99999,0]);
 	for(i=0;i<360;i++)receiver_circular_stats.push([second_receiver_label,i,999,0,99,99999,0]);
 
+	// company data
+	var companies = []; // company_name, last seen (not used for now)
+	var company_flights = []; // company_name, flight, last seen (Date object)
+
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
@@ -98,7 +102,29 @@
 
 						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
 						if(flight)company_name = findCompany(flight);
-						if(!company_name) company_name = "";
+						if(!company_name) company_name = ""; 
+						if(selected_company_name!=flight && flight!=""){
+							var current_date = new Date();
+							var company_already_added = false;
+							var company_index = 0;
+							for( c=0; c<companies.length; c++ ) 
+								if(companies[c][0]==selected_company_name){ company_index = c; company_already_added = true; break; }
+							if(!company_already_added) companies.push([selected_company_name,current_date]);
+							else { companies[company_index][1] = current_date; }
+							var company_flight_already_added = false, company_flight_index = 0;
+							for( c=0; c<company_flights.length; c++ )
+								if((company_flights[c][0] == selected_company_name) && (company_flights[c][1]==flight))
+								{
+									company_flight_already_added=true; company_flight_index = c; break; 
+								}
+							//console.log("company '" + company_name + "' flight '" + flight + "'"); 
+							if(!company_flight_already_added){
+								company_flights.push([selected_company_name,flight,current_date]);
+							} else {
+								//console.log("updated cflight " + flight + " to " + current_date);
+								company_flights[company_flight_index][2] = current_date;
+							}
+						}
 						if(aci.squawk)squawk = aci.squawk; else if(second_aci) if(second_aci.squawk) squawk = second_aci.squawk;
 						lat = aci.lat;
 						lon = aci.lon;

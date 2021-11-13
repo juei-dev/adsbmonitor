@@ -33,8 +33,25 @@
 		.alti-bar-header { 
 			background: #404012; border: 1px solid #505012; border-radius: 3px; border-radius-bottom: 0px;
 		}
+		.alti-bar-div{
+			margin: 0px;			
+		}
 		#alti-bar {
-			border: 1px solid #505004; padding-left: 5px; padding-right: 2px; padding-bottom: 10px; padding-top: 5px; height: 520px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 0px;
+			border: 1px solid #505004; padding-left: 5px; padding-right: 2px; padding-bottom: 10px; padding-top: 5px; height: 517px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 0px;
+		}
+		.company-list-div{
+			margin: 0px;			
+		}
+		table.company-list{
+			margin: 0px;
+			font-size: 0.75em;
+			width: 100%;
+		}
+		th.company-header {
+			background: #90C2C9; color: #000000;
+		}
+		td.company-list-name {
+			background: #101030; color: #ffffff;
 		}
 		div.info-div { text-align: left; vertical-align: top; color: #ffffff; font: sans-serif; padding-left: 2px; margin: 0px; }
 		table.stats-list { color: #ffffff; font-size: 0.8em; vertical-align: top; width: 580px; border: 2px groove #307072; margin-bottom: 5px; border-radius: 5px; padding: 0px; }
@@ -264,4 +281,5 @@
 		canvas.receiver-altitude-canvas {
 			border: 1px solid #506084; padding: 5px; height: 220px; width: 415px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
 		}
+
 

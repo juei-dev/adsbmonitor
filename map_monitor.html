@@ -35,7 +35,15 @@
 			<div class="alti-bar-header">
 				<span style="padding-left: 13px;">FL</span><span style="padding-left: 33px;">Alt</span><span style="padding-left: 15px;">Flight</span>
 			</div>
-			<canvas id="alti-bar" height="500" width="130" class="alti-bar"></canvas>
+			<div class="alti-bar-div">
+				<canvas id="alti-bar" height="500" width="130" class="alti-bar"></canvas>
+			</div>
+			<div class="company-list-div">
+				<table class="company-list" id="company" cellspacing="0">
+					<thead id="company-head" class="company-header"></thead>
+					<tbody id="company-body"></tbody>
+				</table>
+			</div>
 		</td>
 		<td class="main-right">
 			<div id="info" class="info-div">
@@ -102,6 +110,7 @@
 <script src="stats.js" type="application/javascript"></script>
 <script src="runways.js" type="application/javascript"></script>
 <script src="receiverdetails.js" type="application/javascript"></script>
+<script src="company_list.js" type="application/javascript"></script>
 <script>
 	// Originally written by Juho Einiö 2021
 	// Just enter your own receiver domain, location and MapBox (public) access token in config.js
