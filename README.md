@@ -23,6 +23,7 @@ Just add your information to config.js -file:
 - airport_aircraft_refresh_rate = how often the airport list's aircrafts nearby -field is updated - decrease this if you experience performance issues (default every 10 secs)
 - receiver_detais_shown = enable the distance / direction and alitude graphs
 
+*Please note, that after creating an account at OpenWeatherMap, the API key might take over an hour to be in effect / enabled there.*
 
 
 ## History
