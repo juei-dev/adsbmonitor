@@ -85,6 +85,9 @@ Nov 11, 2021:
 Nov 13, 2021:
   - Added company flights list under the altimeter graph. All flights are recorded there grouped by the company. Over 14 days old flights are not displayed
 
+Nov 14, 2021:
+  - Changes to style (map width scales hopefully now better with bigger monitors), companies flight lists are now collapsed and expandable by company and receiver url paths (for aircrafts and stats) are now able to be changed from config.js. There is still some known issues with company/flight list with unknown companies/call signs.
+
 
 ## Current features
 
