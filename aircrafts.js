@@ -35,13 +35,13 @@
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
 
 	function refreshAircrafts(){
-		getJSON("http://" + receiver_domain + "/dump1090-fa/data/aircraft.json",
+		getJSON("http://" + receiver_domain + receiver_url_path,
 			function(err,data){
 				if(err==null){
 					document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL",""); 
 					// fetch secondary receiver data json, if enabled
 					if( second_receiver_enabled ){
-						getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/aircraft.json",
+						getJSON("http://" + second_receiver_domain + second_receiver_url_path,
 							function(err,data){
 								second_ac_data = null;
 								if(err==null){ 

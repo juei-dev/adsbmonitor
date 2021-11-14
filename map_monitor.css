@@ -2,14 +2,14 @@
 		body { background-color: #102023; font: Tahoma, sans-serif, arial; margin: 0px; padding: 0px; }
 		h3 { color: #e0e2e3; font-variant: small-caps; padding-top: 1px; margin-top: 0px; padding-bottom: 2px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000071); border-bottom: 1px solid #3030df; border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px #000000; border-radius: 5px; font-size: 12px; width: 99%;}
 		.main-table { margin: 0px; padding: 0px; background: #102023; }
-		td.main-left { vertical-align: top; padding: 0px; margin: 0px; background: #00101f; width: 600px; }
+		td.main-left { vertical-align: top; padding: 0px; margin: 0px; background: #00101f; width: 100%; min-width: 600px; }
 		td.main-center { margin: 0px; padding-left: 1px; padding-top: 0px; padding-right: 1px; vertical-align: top; color: yellow; font-size: 0.7em; text-align: left; background: #20203c; border: 1px solid #304045; border-radius: 3px; }
 		td.main-right { vertical-align: top; display: block; padding: 0px; margin: 0px; }
 		td.additional-pager { vertical-align: top; padding: 0px; margin: 0px; width: 15px; }
 		td.additional-page-left { vertical-align: top; padding: 0px; margin: 0px; display: none; }
 		td.additional-page-right { vertical-align: top; padding: 0px; margin: 0px; width: 420px; display: none; }
 		#main { text-align: center; vertical-align: top; margin-top: 0px; }
-		#mapid { height: 550px; width: 600px; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
+		#mapid { height: 550px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 

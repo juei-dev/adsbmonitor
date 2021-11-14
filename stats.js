@@ -1,7 +1,7 @@
 	var receiver_noise = 0, receiver_signal = 0;
 
 	function refreshStats(){
-		getJSON("http://" + receiver_domain + "/dump1090-fa/data/stats.json",
+		getJSON("http://" + receiver_domain + receiver_stats_url_path,
 			function(err,data){
 				if(err==null){
 					var sh = document.getElementById("stats-head");
@@ -57,7 +57,7 @@
 					}
 					// fetch secondary receiver data json, if enabled
 					if( second_receiver_enabled ){
-						getJSON("http://" + second_receiver_domain + "/dump1090-fa/data/stats.json",
+						getJSON("http://" + second_receiver_domain + second_receiver_stats_url_path,
 								function(err,data){
 									second_stat_data = null;
 									if(err==null) second_stat_data = data;
