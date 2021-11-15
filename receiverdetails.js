@@ -168,10 +168,10 @@
 						}
 					}
 					// update altitude stats per max distance
-					if(receiver_circular_stats[i][6] > 50000)continue;
+					if(receiver_circular_stats[i][5] > 50000)continue;
 					if(true_dist>=400)continue;
-					if( (alt_profile[Math.floor(true_dist)] < receiver_circular_stats[i][6]) || (alt_profile[Math.floor(true_dist)]==-1)  ){ 
-						alt_profile[Math.floor(true_dist)] = receiver_circular_stats[i][6];
+					if( (alt_profile[Math.floor(true_dist)] > receiver_circular_stats[i][5]) || (alt_profile[Math.floor(true_dist)]==-1)  ){ 
+						alt_profile[Math.floor(true_dist)] = receiver_circular_stats[i][5];
 						if(max_dist < true_dist){
 							max_dist=true_dist;
 							max_dist_bearing = receiver_circular_stats[i][1];
