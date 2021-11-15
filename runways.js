@@ -58,7 +58,7 @@
 					var rwh = document.getElementById("runways-head");
 					var outHTML = "";
 					// TO DO: get weather information for those airports
-					rwh.innerHTML = "<th style='width: 45px;'>Airport</th><th style='width: 60px;'>Runway</th><th>Elev.</th><th style='width: 50px;'>Length</th><th>Width</th><th style='width: 80px;'>Surface</th><th style='background:#40C0FF;'>A72</th><th>E17</th><th style='background:#40C0FF;'>737</th><th>747</th><th style='background:#40C0FF;'>767</th><th>777</th><th style='background:#40C0FF;'>787</th><th>319</th><th style='background:#40C0FF;'>320</th><th>321</th><th style='background:#40C0FF;'>330</th><th>350</th><th style='background:#40C0FF;'>380</th><th style='width: 100px;'>Aircrafts</th>";
+					rwh.innerHTML = "<th style='width: 45px;'>Airport</th><th style='width: 60px;'>Runway</th><th>Elev.</th><th style='width: 50px;'>Length</th><th>Width</th><th style='width: 80px;'>Surface</th><th class='runway-list-header2'>A72</th><th>E17</th><th class='runway-list-header2'>737</th><th>747</th><th class='runway-list-header2'>767</th><th>777</th><th class='runway-list-header2'>787</th><th>319</th><th class='runway-list-header2'>320</th><th>321</th><th class='runway-list-header2'>330</th><th>350</th><th class='runway-list-header2'>380</th><th style='width: 100px;'>Aircrafts</th>";
 					refreshAirportAircraftdata();
 				})
 				.catch((error) => {
