@@ -111,7 +111,7 @@
 		ra_ctx.beginPath();
 		ra_ctx.moveTo(5,200);
 
-		var alt_profile = [];
+		var alt_profile = [], max_dist = 0, max_dist_bearing = -1;
 		for(c=0; c<400; c++)alt_profile.push(-1);
 		for(i=0; i<360; i++){
 			// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
@@ -170,19 +170,29 @@
 					// update altitude stats per max distance
 					if(receiver_circular_stats[i][6] > 50000)continue;
 					if(true_dist>=400)continue;
-					if( (alt_profile[Math.floor(true_dist)] > receiver_circular_stats[i][6]) || (alt_profile[Math.floor(true_dist)]==-1)  ) 
+					if( (alt_profile[Math.floor(true_dist)] < receiver_circular_stats[i][6]) || (alt_profile[Math.floor(true_dist)]==-1)  ){ 
 						alt_profile[Math.floor(true_dist)] = receiver_circular_stats[i][6];
+						if(max_dist < true_dist){
+							max_dist=true_dist;
+							max_dist_bearing = receiver_circular_stats[i][1];
+						} 
+					}
 				}
 			}
 		}
 
 		// draw altitude profile
+		var max_x = 0, min_y = 300;
 		for(i=0; i<400; i++){
 			if(alt_profile[i]<0)continue;
 			next_alt_y = 200-Math.floor(200*(alt_profile[i]/max_ca_altitude));
 			if(next_alt_y < 5)next_alt_y = 5; // cut over max display altitudes off
 			next_alt_x = 5+i;
 			ra_ctx.lineTo(next_alt_x, next_alt_y);
+			if(max_x<next_alt_x){ 
+				max_x=next_alt_x;
+				min_y=next_alt_y;
+			}
 		}
 
 		// finish distance circle main distance image
@@ -205,6 +215,27 @@
 
 		// finish altitude profile
 		ra_ctx.lineTo(next_alt_x, 200);
+		ra_ctx.closePath();
+		ra_ctx.fill();
+
+		// from receiver to max distance altitude red line, bearing and altitude of max distance and angle to max distance altitude
+		ra_ctx.strokeStyle = "#FF0002";
+		ra_ctx.beginPath();
+		ra_ctx.moveTo(5,200);
+		ra_ctx.lineTo(max_x, min_y);
+		ra_ctx.closePath();
+		ra_ctx.stroke();
+		ra_ctx.fillStyle = "#E0E052";
+		ra_ctx.font = "normal 8px sans-serif"; // small-caps 
+		ra_ctx.beginPath();
+		ra_ctx.fillText("B:" + max_dist_bearing + "° ", max_x-20, min_y-6);		 
+		if(max_dist>=100)
+			ra_ctx.fillText(max_dist.toFixed(0), max_x-10, 220);		 
+		else
+			ra_ctx.fillText(max_dist.toFixed(0), max_x-5, 220);		 
+		ra_ctx.fillStyle = "#F00002";
+		var angle_md = Math.abs(Math.floor(Math.atan2((min_y-200),(max_x-5))*180/Math.PI));
+		ra_ctx.fillText(angle_md + "° ", 35, 198);		 		
 		ra_ctx.closePath();
 		ra_ctx.fill();
 
