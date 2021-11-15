@@ -20,7 +20,7 @@ function openCompany(company){
 			rows[i].style.display = "";
 		}
 	} else {
-		opened_company = "";
+		opened_company = "-";
 		var rows = document.getElementsByClassName("flt_"+company);
 		document.getElementById("hdr_" + company).innerHTML = " + "; 
 		for(i=0; i<rows.length; i++){
