@@ -269,7 +269,7 @@
 			text-align: left;
 		}
 		.receiver-circular-info-div {
-			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-top: 1px; padding-bottom: 1px;
+			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-top: 1px; padding-bottom: 1px; 
 		}
 		canvas.receiver-circular-canvas {
 			border: 1px solid #506084; padding: 5px; height: 300px; width: 300px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
@@ -284,13 +284,27 @@
 
 		td.receiver-circular-actions {
 			vertical-align: top;
-			padding-top: 5px;
+			padding-left: 10px;
+			padding-right: 10px;
+			padding-top: 15px;
+			border: 2px groove #506084; 
+			border-radius: 5px; 
+			background: #264647;
 		}
 		input[type="button"].btn-receiver-download {
 			color: #FFFFFF;
 		}
 		input[type="button"].btn-receiver-download:before {
 			color: #FFFFFF;
+		}
+		input[type="button"].btn-receiver-download:active {
+			transform: scale(1);
+			background-color: #990;
+			color: #fff;
+			transform-origin: bottom left;
+			transition: 120ms transform ease-in-out;
+			box-shadow: inset 1em 1em var(--form-control-color);
+			/* clip-path: polygon(90% 90% 90%); */
 		}
 
 		input[type="checkbox"].receiver-details-RSSI:checked:after {
