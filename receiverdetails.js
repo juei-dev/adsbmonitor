@@ -8,6 +8,8 @@
 	const max_cs_distance = 450;
 	const max_ca_altitude = 50000;
 
+	var receiver_details_RSSI_shown = true;
+
 	function receiverDetailsChange(){
 		if(document.getElementById("receiver-details-cb").checked){
 			document.getElementById("additional-page-right-id").style.display = "table-cell";
@@ -123,7 +125,7 @@
 					next_x = next_pos[0]; next_y = next_pos[1];
 					rc_ctx.lineTo(next_x, next_y);
 					// also mark the point if the angle is dividable by 18 and add rssi information (only if distance is more tha 100km)
-					if(((receiver_circular_stats[i][1]%18)==0) && true_dist >= 100){
+					if(((receiver_circular_stats[i][1]%18)==0) && true_dist >= 100 && receiver_details_RSSI_shown){
 						rc_ctx.fillStyle = "#FF5FFF";
 						rc_ctx.arc(next_x,next_y,3,0,2*Math.PI);
 						if(receiver_circular_stats[i][1]<=90){
@@ -294,10 +296,25 @@
 		ra_ctx.fillText("FL400",5,200-(40000/max_ca_altitude)*200);		 
 		ra_ctx.closePath();
 
-		// finally set the current array to cookie to preserve the stats for about the next 6 months
+		// finally set the current array to cookie to preserve the stats for about the next 6 months --> not going to work, too big for cookie
 		// setCookie("circular_stats", arrayToBase64(receiver_circular_stats), (6*30));
 
 	}
 	var refreshCircularAndAltitudeStatsInterval = setInterval(refreshCircularAndAltitudeStats, stats_refresh_rate);
 	initCircularStats();
 	initAltitudeStats();
+
+
+	function downloadReceiverChart(){
+		var dataUrl = rc_canvas.toDataURL("image/jpeg", 1.0);
+//		window.open(dataUrl.replace("image/jpeg","image/octet-stream"), "_blank");
+		document.getElementById("download-chart-url").setAttribute("download", "circular_chart.jpg");
+		document.getElementById("download-chart-url").setAttribute("href", dataUrl.replace("image/jpeg","image/octet-stream"));
+		document.getElementById("download-chart-url").click();
+	}
+
+	document.getElementById("receiver-details-RSSI-cb").checked = true;
+	function receiverDetailsRSSIChange(){
+		if( !document.getElementById("receiver-details-RSSI-cb").checked ) receiver_details_RSSI_shown = false; else receiver_details_RSSI_shown = true;
+		refreshCircularAndAltitudeStats();
+	}
