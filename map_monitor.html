@@ -74,7 +74,7 @@
 						<label class="form-control" id="airports-cb" value="RWYS">
 						</label>						
 						<label class="form-control">
-							<input type="checkbox" class="receiver-details" id="receiver-details-cb" value="RDE" onclick="receiverDetailsChange()"> RcvDet
+							<input type="checkbox" class="receiver-details" id="receiver-details-cb" value="RDE" onclick="receiverDetailsChange()" checked> RcvDet
 						</label>
 					</span>
 					</div>
@@ -92,8 +92,8 @@
 					<tbody><tr>
 						<td><canvas id="receiver-circular-canvas" height="300" width="300" class="receiver-circular-canvas"></canvas></td>
 						<td class="receiver-circular-actions">
-							<input type="button" id="btn-receiver-circular-download" class="btn-receiver-download" value="Download" onClick="downloadReceiverChart()"/>
-							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/><br/>
+							<input type="button" id="btn-receiver-circular-download" class="btn-receiver-download" value="Download" onClick="downloadReceiverChart()"/><br/>
+							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/>
 							<input type="checkbox" class="receiver-details-RSSI" id="receiver-details-RSSI-cb" value="RSSI" onclick="receiverDetailsRSSIChange()" checked>
 						</td>
 					</tr></tbody>

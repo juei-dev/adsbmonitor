@@ -334,7 +334,10 @@
 	var refreshCircularAndAltitudeStatsInterval = setInterval(refreshCircularAndAltitudeStats, stats_refresh_rate);
 	initCircularStats();
 	initAltitudeStats();
-
+	if(document.getElementById("receiver-details-cb").checked){
+		document.getElementById("additional-page-right-id").style.display = "table-cell";
+		receiver_details_shown=true; 
+	} else receiver_details_shown=false;
 
 	function downloadReceiverChart(){
 		var dataUrl = rc_canvas.toDataURL("image/jpeg", 1.0);
