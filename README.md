@@ -88,8 +88,11 @@ Nov 13, 2021:
 Nov 14, 2021:
   - Changes to style (map width scales hopefully now better with bigger monitors), companies flight lists are now collapsed and expandable by company and receiver url paths (for aircrafts and stats) are now able to be changed from config.js. There is still some known issues with company/flight list with unknown companies/call signs.
 
-Nov 15,2021:
+Nov 15, 2021:
   - Added a button for downloading the receiver circular chart and a toggle for RSSI values to be shown
+
+Nov 16, 2021:
+  - Added the supplementary receiver to the receiver details in Receiver Distances / Direction and also added toggle buttons for the main and supplementary receiver
 
 
 ## Current features
