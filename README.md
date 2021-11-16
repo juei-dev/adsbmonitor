@@ -93,6 +93,7 @@ Nov 15, 2021:
 
 Nov 16, 2021:
   - Added the supplementary receiver to the receiver details in Receiver Distances / Direction and also added toggle buttons for the main and supplementary receiver
+  - Added session timer to distance / direction chart in receiver details 
 
 
 ## Current features
