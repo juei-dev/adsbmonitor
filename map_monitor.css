@@ -274,7 +274,7 @@
 			margin-left: 1px; background-color: #204041; border: 1px solid #709091; border-radius: 3px; padding-top: 1px; padding-bottom: 1px; 
 		}
 		canvas.receiver-circular-canvas {
-			border: 1px solid #506084; padding: 5px; height: 300px; width: 300px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
+			border: 1px solid #506084; padding: 5px; height: 320px; width: 300px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
 		}
 
 		.receiver-altitude-info-div {

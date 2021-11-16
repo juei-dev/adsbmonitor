@@ -8,6 +8,8 @@
 	const max_cs_distance = 450;
 	const max_ca_altitude = 50000;
 
+	var started_timestamp = new Date();
+
 	var receiver_details_RSSI_shown = true;
 	var receiver_details_main_shown = true;
 	var receiver_details_supplementary_shown = true;
@@ -69,28 +71,52 @@
 		}
 		rc_ctx.closePath();
 		rc_ctx.fill();
-		rc_ctx.beginPath();
 		var receiver_snr = 0; 
 		if(receiver_noise<0) receiver_snr = receiver_noise - receiver_signal;
 		if(receiver_snr < receiver_snr_max && receiver_snr != 0) receiver_snr_max = receiver_snr;
 		if(receiver_snr > receiver_snr_min && receiver_snr != 0) receiver_snr_min = receiver_snr;
 		if(receiver_noise > receiver_noise_max && receiver_noise != 0) receiver_noise_max = receiver_noise;
 		if(receiver_noise < receiver_noise_min && receiver_noise != 0) receiver_noise_min = receiver_noise;
-		rc_ctx.fillStyle = "#AFAFFF";
+
+		// show session duration
+		rc_ctx.beginPath();
+		if(receiver_details_main_shown){
+			rc_ctx.fillStyle = "#AFAFFF";
+			rc_ctx.font = "normal 10px sans-serif"; // small-caps 
+			rc_ctx.fillText("SNR", 1,299);
+			rc_ctx.fillText(receiver_snr.toFixed(1) + " dBi",30,299);		 
+			rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+			rc_ctx.fillText("min", 6,310);
+			rc_ctx.fillText(receiver_snr_min.toFixed(1) + " dBi",30,310);		 
+			rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+			rc_ctx.fillText("max", 6,320);
+			rc_ctx.fillText(receiver_snr_max.toFixed(1) + " dBi",30,320);		 
+			rc_ctx.font = "normal 10px sans-serif"; // small-caps 
+			rc_ctx.fillText("Noise", 215,299);
+			rc_ctx.fillText(receiver_noise.toFixed(1) + " dBi",250,299);		 
+			rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+			rc_ctx.fillText("min", 220,310);
+			rc_ctx.fillText(receiver_noise_min.toFixed(1) + " dBi",250,310);		 
+			rc_ctx.font = "normal 8px sans-serif"; // small-caps 
+			rc_ctx.fillText("max", 220,320);
+			rc_ctx.fillText(receiver_noise_max.toFixed(1) + " dBi",250,320);		 
+		}
+		var current_timestamp = new Date();
+		var timespan = 0; // milliseconds from session start
+		timespan = current_timestamp - started_timestamp;
+		var timespan_date = new Date(timespan);
+		rc_ctx.fillStyle = "#FFFF0F";
 		rc_ctx.font = "normal 10px sans-serif"; // small-caps 
-		rc_ctx.fillText("SNR " + receiver_snr.toFixed(1) + " dBi",1,280);		 
-		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("min " + receiver_snr_min.toFixed(1) + " dBi",6,290);		 
-		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("max " + receiver_snr_max.toFixed(1) + " dBi",6,300);		 
-		rc_ctx.font = "normal 10px sans-serif"; // small-caps 
-		rc_ctx.fillText("Noise " + receiver_noise.toFixed(1) + " dBi",225,280);		 
-		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("min " + receiver_noise_min.toFixed(1) + " dBi",235,290);		 
-		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		rc_ctx.fillText("max " + receiver_noise_max.toFixed(1) + " dBi",235,300);		 
+		var timespan_text = "";
+		if(timespan_date.getUTCDate()>1)
+			timespan_text += (timespan_date.getUTCDate()-1).toFixed(0).padStart(2) + "d " + timespan_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCSeconds().toFixed(0).padStart(2,"0");
+		else
+			timespan_text += timespan_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCSeconds().toFixed(0).padStart(2,"0");
+		var timespan_center_x = 150-Math.floor(rc_ctx.measureText(timespan_text).width/2);
+		rc_ctx.fillText(timespan_text,timespan_center_x,315);		 
 		rc_ctx.closePath();
 		rc_ctx.fill();
+
 	}
 	function initAltitudeStats(){
 		ra_ctx.clearRect(0,0,ra_canvas.width,ra_canvas.height);
