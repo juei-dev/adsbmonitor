@@ -319,3 +319,25 @@
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
+
+		input[type="checkbox"].receiver-details-main:checked:after {
+			content: "MAIN";
+			position: relative;
+			top: 15px;
+			left: 2px;
+			transform: scale(1);
+			color: #00f;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+		input[type="checkbox"].receiver-details-supplementary:checked:after {
+			content: "SUPP";
+			position: relative;
+			top: 15px;
+			left: 2px;
+			transform: scale(1);
+			color: #0ff;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+

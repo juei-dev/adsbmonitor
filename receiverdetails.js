@@ -9,6 +9,8 @@
 	const max_ca_altitude = 50000;
 
 	var receiver_details_RSSI_shown = true;
+	var receiver_details_main_shown = true;
+	var receiver_details_supplementary_shown = true;
 
 	function receiverDetailsChange(){
 		if(document.getElementById("receiver-details-cb").checked){
@@ -47,9 +49,27 @@
 		rc_ctx.arc(150,150,5,0,2*Math.PI);
 		rc_ctx.closePath();
 		rc_ctx.fill();
-		rc_ctx.fillStyle = "#FFFFFF";
-		rc_ctx.font = "normal 16px sans-serif"; // small-caps 
-		rc_ctx.fillText(receiver_label,1,10);
+		rc_ctx.beginPath();
+		if(receiver_details_main_shown){
+			rc_ctx.fillStyle = "#FFFFFF";
+			rc_ctx.font = "normal 16px sans-serif"; // small-caps 
+			rc_ctx.fillText(receiver_label,1,12);
+			rc_ctx.fillStyle = "#5F5F9F";
+			rc_ctx.arc(7,20,4,0,2*Math.PI);
+		}
+		rc_ctx.closePath();
+		rc_ctx.fill();
+		rc_ctx.beginPath();
+		if(receiver_details_supplementary_shown){
+			rc_ctx.fillStyle = "#FFFFFF";
+			rc_ctx.font = "normal 16px sans-serif"; // small-caps 
+			rc_ctx.fillText(second_receiver_label[0],288,12);
+			rc_ctx.fillStyle = "#3F9F9F";
+			rc_ctx.arc(293,20,4,0,2*Math.PI);
+		}
+		rc_ctx.closePath();
+		rc_ctx.fill();
+		rc_ctx.beginPath();
 		var receiver_snr = 0; 
 		if(receiver_noise<0) receiver_snr = receiver_noise - receiver_signal;
 		if(receiver_snr < receiver_snr_max && receiver_snr != 0) receiver_snr_max = receiver_snr;
@@ -69,6 +89,8 @@
 		rc_ctx.fillText("min " + receiver_noise_min.toFixed(1) + " dBi",235,290);		 
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
 		rc_ctx.fillText("max " + receiver_noise_max.toFixed(1) + " dBi",235,300);		 
+		rc_ctx.closePath();
+		rc_ctx.fill();
 	}
 	function initAltitudeStats(){
 		ra_ctx.clearRect(0,0,ra_canvas.width,ra_canvas.height);
@@ -103,17 +125,46 @@
 		rc_ctx.fillStyle = "#5F5F9F";
 		rc_ctx.strokeStyle = "#9092FF";
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps 
-		ra_ctx.fillStyle = "#5F9F9F";
-		ra_ctx.strokeStyle = "#90F2FF";
-
-		rc_ctx.beginPath();
-		rc_ctx.moveTo(150, 150);
-		ra_ctx.beginPath();
-		ra_ctx.moveTo(5,200);
 
 		var alt_profile = [], max_dist = 0, max_dist_bearing = -1;
 		for(c=0; c<400; c++)alt_profile.push(-1);
-		for(i=0; i<360; i++){
+
+		// Secondary receiver only as a bit different color beneath the main receiver figure, if main receiver didn't reach as much distance and if it's enabled to be shown
+		rc_ctx.beginPath();
+		rc_ctx.moveTo(150, 150);
+		rc_ctx.fillStyle = "#3F9F9F";
+		rc_ctx.strokeStyle = "#40B2CF";
+		if(receiver_details_supplementary_shown){
+			//console.log(receiver_circular_stats);
+			for(i=360; i<receiver_circular_stats.length; i++){
+				if(receiver_circular_stats[i][0]==second_receiver_label){
+					if(receiver_circular_stats[i][4]!=99){
+						// update circular stats 
+						var true_dist = receiver_circular_stats[i][3];
+						var dist = (true_dist/max_cs_distance)*(140);
+						if(dist>140)dist=140;
+						var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
+						next_x = next_pos[0]; next_y = next_pos[1];
+						rc_ctx.lineTo(next_x, next_y);
+					}
+				}			
+			}
+		}
+		rc_ctx.lineTo(150, 150);
+		rc_ctx.closePath();
+		rc_ctx.fill();
+
+		// MAIN RECEIVER figure
+		next_x = -1, next_y = -1;
+		rc_ctx.beginPath();
+		rc_ctx.moveTo(150, 150);
+		rc_ctx.fillStyle = "#5F5F9F";
+		rc_ctx.strokeStyle = "#9092FF";
+		if(receiver_details_supplementary_shown){
+			rc_ctx.globalAlpha = 0.8;
+		}
+		if(receiver_details_main_shown)
+		for(i=0; i<360; i++){ // 360 for main only
 			// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
 			if(receiver_circular_stats[i][0]==receiver_label){
 				if(receiver_circular_stats[i][4]!=99){
@@ -181,25 +232,14 @@
 			}
 		}
 
-		// draw altitude profile
-		var max_x = 0, min_y = 300;
-		for(i=0; i<400; i++){
-			if(alt_profile[i]<0)continue;
-			next_alt_y = 200-Math.floor(200*(alt_profile[i]/max_ca_altitude));
-			if(next_alt_y < 5)next_alt_y = 5; // cut over max display altitudes off
-			next_alt_x = 5+i;
-			ra_ctx.lineTo(next_alt_x, next_alt_y);
-			if(max_x<next_alt_x){ 
-				max_x=next_alt_x;
-				min_y=next_alt_y;
-			}
-		}
-
 		// finish distance circle main distance image
 		rc_ctx.fillStyle = "#5F5F9F";
 		rc_ctx.lineTo(150, 150);
 		rc_ctx.closePath();
 		rc_ctx.fill();
+		if(receiver_details_supplementary_shown){
+			rc_ctx.globalAlpha = 1;
+		}
 
 		// draw red max lines for quardrants in distance circle
 		rc_ctx.beginPath();
@@ -213,59 +253,84 @@
 		rc_ctx.closePath();
 		rc_ctx.stroke();
 
-		// finish altitude profile
-		ra_ctx.lineTo(next_alt_x, 200);
-		ra_ctx.closePath();
-		ra_ctx.fill();
+		// strict lines to distance circle for main receiver
+		if(receiver_details_main_shown){
+			rc_ctx.fillStyle = "#EF8FFF";
+			rc_ctx.strokeStyle = "#9092FF";
+			rc_ctx.beginPath();
+			rc_ctx.moveTo(150, 150);
+			for(i=0; i<360; i++){
+				// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
+				if(receiver_circular_stats[i][0]==receiver_label){
+					var dist = (receiver_circular_stats[i][3]/max_cs_distance)*(140);
+					if(dist>140)dist=140;
+					var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
+					next_x = next_pos[0]; next_y = next_pos[1];
+					rc_ctx.lineTo(next_x, next_y);
+				}
+			}
+			rc_ctx.lineTo(150, 150);
+			rc_ctx.closePath();
+			rc_ctx.stroke();
+			rc_ctx.fillStyle = "#FFFFFF";
+			rc_ctx.strokeStyle = "white";
+			rc_ctx.beginPath();
+			rc_ctx.arc(150,150,5,0,2*Math.PI);
+			rc_ctx.closePath();
+			rc_ctx.fill();
+			//console.log(receiver_circular_stats);
+		}
 
-		// from receiver to max distance altitude red line, bearing and altitude of max distance and angle to max distance altitude
-		ra_ctx.strokeStyle = "#FF0002";
+		// draw altitude profile
+		ra_ctx.fillStyle = "#5F9F9F";
+		ra_ctx.strokeStyle = "#90F2FF";
+
 		ra_ctx.beginPath();
 		ra_ctx.moveTo(5,200);
-		ra_ctx.lineTo(max_x, min_y);
-		ra_ctx.closePath();
-		ra_ctx.stroke();
-		ra_ctx.fillStyle = "#E0E052";
-		ra_ctx.font = "normal 8px sans-serif"; // small-caps 
-		ra_ctx.beginPath();
-		ra_ctx.fillText("B:" + max_dist_bearing + "° ", max_x-20, min_y-6);		 
-		if(max_dist>=100)
-			ra_ctx.fillText(max_dist.toFixed(0), max_x-10, 220);		 
-		else
-			ra_ctx.fillText(max_dist.toFixed(0), max_x-5, 220);		 
-		ra_ctx.fillStyle = "#F00002";
-		var angle_md = Math.abs(Math.floor(Math.atan2((min_y-200),(max_x-5))*180/Math.PI));
-		ra_ctx.fillText(angle_md + "° ", 35, 198);		 		
-		ra_ctx.closePath();
-		ra_ctx.fill();
-
-		// strict lines to ditance circle
-		rc_ctx.fillStyle = "#EF8FFF";
-		rc_ctx.strokeStyle = "#9092FF";
-		rc_ctx.beginPath();
-		rc_ctx.moveTo(150, 150);
-		for(i=0; i<360; i++){
-			// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
-			if(receiver_circular_stats[i][0]==receiver_label){
-				var dist = (receiver_circular_stats[i][3]/max_cs_distance)*(140);
-				if(dist>140)dist=140;
-				var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
-				next_x = next_pos[0]; next_y = next_pos[1];
-				rc_ctx.lineTo(next_x, next_y);
+		var max_x = 0, min_y = 300;
+		for(i=0; i<400; i++){
+			if(alt_profile[i]<0)continue;
+			next_alt_y = 200-Math.floor(200*(alt_profile[i]/max_ca_altitude));
+			if(next_alt_y < 5)next_alt_y = 5; // cut over max display altitudes off
+			next_alt_x = 5+i;
+			ra_ctx.lineTo(next_alt_x, next_alt_y);
+			if(max_x<next_alt_x){ 
+				max_x=next_alt_x;
+				min_y=next_alt_y;
 			}
 		}
-		rc_ctx.lineTo(150, 150);
-		rc_ctx.closePath();
-		rc_ctx.stroke();
-		rc_ctx.fillStyle = "#FFFFFF";
-		rc_ctx.strokeStyle = "white";
-		rc_ctx.beginPath();
-		rc_ctx.arc(150,150,5,0,2*Math.PI);
-		rc_ctx.closePath();
-		rc_ctx.fill();
-		//console.log(receiver_circular_stats);
+
+		if(receiver_details_main_shown){
+			// finish altitude profile
+			ra_ctx.lineTo(next_alt_x, 200);
+			ra_ctx.closePath();
+			ra_ctx.fill();
+
+			// from receiver to max distance altitude red line, bearing and altitude of max distance and angle to max distance altitude
+			ra_ctx.strokeStyle = "#FF0002";
+			ra_ctx.beginPath();
+			ra_ctx.moveTo(5,200);
+			ra_ctx.lineTo(max_x, min_y);
+			ra_ctx.closePath();
+			ra_ctx.stroke();
+			ra_ctx.fillStyle = "#E0E052";
+			ra_ctx.font = "normal 8px sans-serif"; // small-caps 
+			ra_ctx.beginPath();
+			ra_ctx.fillText("B:" + max_dist_bearing + "° ", max_x-20, min_y-6);		 
+			if(max_dist>=100)
+				ra_ctx.fillText(max_dist.toFixed(0), max_x-10, 220);		 
+			else
+				ra_ctx.fillText(max_dist.toFixed(0), max_x-5, 220);		 
+			ra_ctx.fillStyle = "#F00002";
+			var angle_md = Math.abs(Math.floor(Math.atan2((min_y-200),(max_x-5))*180/Math.PI));
+			ra_ctx.fillText(angle_md + "° ", 35, 198);		 		
+			ra_ctx.closePath();
+			ra_ctx.fill();
+		}
+
 
 		// cross-hairs / measurement lines for circular stats
+		rc_ctx.fillStyle = "#FFFFFF";
 		rc_ctx.strokeStyle = "#505052";
 		rc_ctx.beginPath();
 		rc_ctx.moveTo(10, 150);
@@ -352,3 +417,12 @@
 		if( !document.getElementById("receiver-details-RSSI-cb").checked ) receiver_details_RSSI_shown = false; else receiver_details_RSSI_shown = true;
 		refreshCircularAndAltitudeStats();
 	}
+
+	function receiverDetailsMainChange(){
+		if( !document.getElementById("receiver-details-main-cb").checked ) receiver_details_main_shown = false; else receiver_details_main_shown = true;
+		refreshCircularAndAltitudeStats();
+	}	
+	function receiverDetailsSuppChange(){
+		if( !document.getElementById("receiver-details-supplementary-cb").checked ) receiver_details_supplementary_shown = false; else receiver_details_supplementary_shown = true;
+		refreshCircularAndAltitudeStats();
+	}		

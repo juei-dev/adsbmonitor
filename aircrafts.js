@@ -70,6 +70,25 @@
 						zoom_correction_lon = 0.02 * (36/Math.pow(zoom_level,2));
 					}					
 
+					// grawl through the secondary receiver data for circular graphs
+					if( second_ac_data )
+						for( var k2 in second_ac_data.aircraft ){
+							var tmp_aci = second_ac_data.aircraft[k2];
+							if(tmp_aci){ 
+								if(tmp_aci.lat && tmp_aci.lon){
+									var angle = Math.floor(getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,tmp_aci.lat,tmp_aci.lon));
+									var second_distance = getDistanceFromLatLonInKm(second_receiver_lat,second_receiver_lon,tmp_aci.lat,tmp_aci.lon,'km');								
+									for(i=360;i<receiver_circular_stats.length;i++){
+										if(receiver_circular_stats[i][0] == second_receiver_label && receiver_circular_stats[i][1] == angle){
+											if(second_distance < receiver_circular_stats[i][2] && tmp_aci.altitude){ receiver_circular_stats[i][2]=second_distance; receiver_circular_stats[i][5]=tmp_aci.altitude; }
+											if(second_distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=second_distance; receiver_circular_stats[i][4]=tmp_aci.rssi; receiver_circular_stats[i][6]=tmp_aci.altitude; }
+											break;
+										} 
+									}
+								}
+							}
+						}
+
 					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0; 
 					while( primary_icaos.length > 0 ) primary_icaos.pop(); // clear up primary icaos list
 					while( aircrafts_positions.length > 0 ) aircrafts_positions.pop(); // clear up aircraft positions
@@ -90,7 +109,7 @@
 
 						var second_aci = null;
 						// check secondary receiver data if this ac is in there
-						if( second_ac_data )
+						if( second_ac_data ){
 							for( var k2 in second_ac_data.aircraft ){
 								var tmp_aci = second_ac_data.aircraft[k2];
 								if(tmp_aci) 
@@ -99,7 +118,7 @@
 										break; 
 									}
 							}
-
+						}
 						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
 						if(flight)company_name = findCompany(flight);
 						if(!company_name) company_name = ""; 
@@ -277,17 +296,7 @@
 										break;
 									} 
 								}
-							}
-							if(position_received==second_receiver_label){
-								var angle = getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,lat,lon);
-								for(i=360;i<receiver_circular_stats.length;i++){
-									if(receiver_circular_stats[i][0] == second_receiver_label && receiver_circular_stats[i][1] == angle){
-										if(distance < receiver_circular_stats[i][2]){ receiver_circular_stats[i][2]=distance; receiver_circular_stats[i][5]=altitude; }
-										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; receiver_circular_stats[i][6]=altitude; }
-										break;
-									} 
-								}
-							}
+							} 
 						}
 
 						outHTML += "<td style='"+ pos_style + flight_style +"' onmouseover='showFD(\"" + flight + "\")' onmouseout='hideFD()'  onclick='clickOpenFD(\"" + flight + "\")' title='" + flight_title + "'>" + flight + "</td><td style='"+ pos_style +"' title='" + cat_explanation +"'>" + cat + "</td><td style='"+ pos_style +"' title='" + more_info + "'>" + track + "</td><td style='"+ pos_style + squawk_style +"' title='" + flight_title + "'>" + squawk + "</td><td style='"+ pos_style +"'>" + altitude + "</td><td style='"+ pos_style +"'>" + rate + "</td><td style='"+ pos_style +"'>" + Math.floor(gs) + "</td><td style='"+ pos_style +"'>" + Math.floor(tas) + "</td><td style='" + pos_style + distance_style + "'>" + Math.floor(distance) + "</td><td style='"+ pos_style + rssi_style + "'>" + rssi + "</td><td style='"+ pos_style + seen_style + "'>" + seen + "</td><td style='"+ pos_style + "'>" + msgs + "</td><td style='"+ pos_style + "'>" + avail + "</td><td style='"+ pos_style + ld_style + "' title='"+ ld_title +"'><a href='#" + near_airport + "'>" + landing_departing + "</a></td>"; 
