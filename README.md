@@ -2,7 +2,7 @@
 *Simple ADS-B monitor UI using dump1090-fa JSONs*
 
 A ~~very~~ quite simple, quick and dirty UI using Leaftlet and Mapbox for the map and HTML5 Canvas for the Flight Level indicator, FD mock up and Receiver Detailed information (distance/direction circle and altitude graph).
-All run in client browser, no server-side services / APIs included in this project.
+All run in client browser, no server-side services / APIs included in this project. But in order to get e.g. runways/airports working, it's recommended to place this to web server and access it from there. 
 
 
 
@@ -21,9 +21,10 @@ Just add your information to config.js -file:
 - openweathermap_apikey = place your OpenWeatherMap API key here, you can obtain one by creating an account at OpenWeatherMap.org - free plan should be enough providing that you're not manually refreshing the page constantly
 - map_complete_refresh_rate = timer setting to force refresh the OpenWeatherMap layers (just to be sure the layers are up-to-date - default every 15 minutes)
 - airport_aircraft_refresh_rate = how often the airport list's aircrafts nearby -field is updated - decrease this if you experience performance issues (default every 10 secs)
-- receiver_detais_shown = enable the distance / direction and alitude graphs
+- receiver_details_shown = enable the distance / direction and alitude graphs
 
 *Please note, that after creating an account at OpenWeatherMap, the API key might take over an hour to be in effect / enabled there.*
+
 
 
 ## History
@@ -96,6 +97,7 @@ Nov 16, 2021:
   - Added session timer to distance / direction chart in receiver details 
 
 
+
 ## Current features
 
 - OpenStreetMap (using Leaflet) displaying:
@@ -159,6 +161,14 @@ Nov 16, 2021:
 	
 - Receiver detailed information (per session)
 	- Distances / direction circle (like an antenna radiation pattern) with RSSI information for each 18 degree increment (if that exact degree has been recorded) and red line per each quadrant for maximum distances
+	- Distances / direction circle has following capabilities:
+		- Displaying main receiver SNR and Noise
+		- Download JPG -button
+		- Switch RSSI for main receiver on/off
+		- Switch main receiver pattern on/off
+		- Switch supplementary receiver pattern on/off
+		- If both patterns are on, main receiver pattern is displayed over supplementary receiver pattern, but with small transparency.
+		- Session timer showing time from last page refresh or initial load of the page
 	- Minimum altitude / distance graph
 
 
