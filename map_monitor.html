@@ -89,15 +89,20 @@
 			<div id="receiver-circular-info" class="receiver-circular-info-div">
 				<span class="section-title">Receiver Distances / Direction</span>
 				<table>
-					<tbody><tr>
+					<tbody style="color: #ffffff;"><tr>
 						<td><canvas id="receiver-circular-canvas" height="320" width="300" class="receiver-circular-canvas"></canvas></td>
 						<td class="receiver-circular-actions">
-							<input type="button" id="btn-receiver-circular-download" class="btn-receiver-download" value="Download" onClick="downloadReceiverChart()"/><br/>
+							<span style="font-size: 10px; font-variant: small-caps;">JPEG</span><br/>
+							<input type="button" id="btn-receiver-circular-download" class="btn-receiver-download" value="Download" onClick="downloadReceiverChart()"/>
 							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/>
+							<span style="font-size: 10px; font-variant: small-caps;">PNG</span><br/>
+							<input type="button" id="btn-receiver-circular-download-png" class="btn-receiver-download" value="Download" onClick="downloadReceiverChartPNG()"/><br/>
+							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/>
+							<span style="font-size: 10px; font-variant: small-caps;">Display</span><br/>
 							<input type="checkbox" class="receiver-details-RSSI" id="receiver-details-RSSI-cb" value="RSSI" onclick="receiverDetailsRSSIChange()" checked>
-							<br/><br/>
+							<br/>&darr;<br/>
 							<input type="checkbox" class="receiver-details-main" id="receiver-details-main-cb" value="MAIN" onclick="receiverDetailsMainChange()" checked>
-							<br/>
+							<br/>&#215;<br/>
 							<input type="checkbox" class="receiver-details-supplementary" id="receiver-details-supplementary-cb" value="SUPP" onclick="receiverDetailsSuppChange()" checked>
 						</td>
 					</tr></tbody>
@@ -143,7 +148,8 @@
 	//					- Added openweathermap.org functionality for winds, clouds and rain + opacity slider for it
 	//					- some appearance changes
 	// 2021 Nov 2nd		- Added airports (credits for list to ourairports.com - see ourairports.com/data for more lists)
-
+	// ...
+	// See readme for more history
 
 </script>
 </body>

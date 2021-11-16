@@ -105,15 +105,21 @@
 		var timespan = 0; // milliseconds from session start
 		timespan = current_timestamp - started_timestamp;
 		var timespan_date = new Date(timespan);
+		rc_ctx.fillStyle = "#CFCF0F";
+		rc_ctx.font = "normal 8px sans-serif"; // small-caps
+		var current_timestamp_text = current_timestamp.getFullYear() + "-" + (current_timestamp.getUTCMonth()+1).toFixed(0).padStart(2) + "-" + current_timestamp.getUTCDate().toFixed(0).padStart(2);
+		current_timestamp_text += " " + current_timestamp.getUTCHours().toFixed(0).padStart(2,"0") + ":" + current_timestamp.getUTCMinutes().toFixed(0).padStart(2,"0") + "Z";
+		var timestamp_center_x = 150-Math.floor(rc_ctx.measureText(current_timestamp_text).width/2);
+		rc_ctx.fillText(current_timestamp_text,timestamp_center_x,308);		 
 		rc_ctx.fillStyle = "#FFFF0F";
-		rc_ctx.font = "normal 10px sans-serif"; // small-caps 
+		rc_ctx.font = "normal 10px sans-serif"; // small-caps
 		var timespan_text = "";
 		if(timespan_date.getUTCDate()>1)
 			timespan_text += (timespan_date.getUTCDate()-1).toFixed(0).padStart(2) + "d " + timespan_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCSeconds().toFixed(0).padStart(2,"0");
 		else
 			timespan_text += timespan_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCSeconds().toFixed(0).padStart(2,"0");
 		var timespan_center_x = 150-Math.floor(rc_ctx.measureText(timespan_text).width/2);
-		rc_ctx.fillText(timespan_text,timespan_center_x,315);		 
+		rc_ctx.fillText(timespan_text,timespan_center_x,320);		 
 		rc_ctx.closePath();
 		rc_ctx.fill();
 
@@ -432,9 +438,14 @@
 
 	function downloadReceiverChart(){
 		var dataUrl = rc_canvas.toDataURL("image/jpeg", 1.0);
-//		window.open(dataUrl.replace("image/jpeg","image/octet-stream"), "_blank");
 		document.getElementById("download-chart-url").setAttribute("download", "circular_chart.jpg");
 		document.getElementById("download-chart-url").setAttribute("href", dataUrl.replace("image/jpeg","image/octet-stream"));
+		document.getElementById("download-chart-url").click();
+	}
+	function downloadReceiverChartPNG(){
+		var dataUrl = rc_canvas.toDataURL("image/png", 1.0);
+		document.getElementById("download-chart-url").setAttribute("download", "circular_chart.jpg");
+		document.getElementById("download-chart-url").setAttribute("href", dataUrl.replace("image/png","image/octet-stream"));
 		document.getElementById("download-chart-url").click();
 	}
 
