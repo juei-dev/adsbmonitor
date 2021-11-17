@@ -76,7 +76,7 @@ function refreshCompanyList(){
 				} else
 					outHTML += "<tr class='flt_" + current_company.replace(" ","_") + "' style='display: none'>";
 			}
-			outHTML += "<td colspan='2' style='padding-left: 10px;'><a href='https://flightaware.com/live/flight/" + company_flights[c][1].trim() + "' target='_blank'>" + company_flights[c][1].trim() + "</td>";
+			outHTML += "<td colspan='2' style='padding-left: 5px;'><a href='https://flightaware.com/live/flight/" + company_flights[c][1].trim() + "' target='_blank'>" + company_flights[c][1].trim() + "</td>";
 			if(seen_date.getUTCDate()>1)
 				outHTML += "<td>" + (seen_date.getUTCDate()-1).toFixed(0).padStart(2) + "d " + seen_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + seen_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + seen_date.getUTCSeconds().toFixed(0).padStart(2,"0") + "</td>";
 			else
