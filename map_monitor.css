@@ -220,7 +220,7 @@
 			left: 5px;
 			transform: scale(1);
 			background-color: #000;
-			color: #33f !important;
+			color: #66f !important;
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
@@ -260,7 +260,7 @@
 			left: 5px;
 			transform: scale(1);
 			background-color: #000;
-			color: #33f !important;
+			color: #66f !important;
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
@@ -326,7 +326,7 @@
 			top: 15px;
 			left: 2px;
 			transform: scale(1);
-			color: #00f;
+			color: #66f;
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
