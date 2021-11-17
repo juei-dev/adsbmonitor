@@ -201,5 +201,5 @@ Example (Nov 6th 2021) runway list with some commercial ACs take-off approximate
 Example (Nov 7th 2021) new button / checkbox styles:
 ![Example_new_filter_buttonss](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_new_filter_buttons.jpg?raw=true)
 
-Example (Nov 8th 2021) receiver reach:
+Example (Nov 17th 2021) receiver reach:
 ![Example_receiver_reach](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_receiver_reach.jpg?raw=true)
