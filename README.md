@@ -195,9 +195,9 @@ Example (Nov 18th 2021) with FD (slightly modified overall visuals):
 Example (Nov 18th 2021) runway list with some commercial ACs take-off approximated capabilities in MTOW:
 ![Example_runway_list_and_TO_length_approximations](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_runway_list_and_TO_length_approximations.jpg?raw=true)
 
-Example (Nov 17th 2021) receiver reach:
+Example (Nov 18th 2021) receiver reach:
 ![Example_receiver_reach](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_receiver_reach.jpg?raw=true)
 
 Example (Nov 18th 2021) downloadable receiver distance / direction JPG image:
 
-![Example_circular_chart](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_circular_chart.jpg?raw=true)
+![Example_circular_chart](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_circular_chart.jpg?raw=true)8
