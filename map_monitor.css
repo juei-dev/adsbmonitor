@@ -17,7 +17,7 @@
 		html { scrollbar-color: #209290 !important; }
 		a { text-decoration: none; color: inherit; }
 		body { background-color: #102023; font: Tahoma, sans-serif, arial; margin: 0px; padding: 0px; }
-		h3 { color: #e0e2e3; font-variant: small-caps; padding-top: 1px; margin-top: 0px; padding-bottom: 8px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000071); border-bottom: 1px solid #3030df; border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px #000000; border-radius: 5px; font-size: 12px; text-align: center; width: 99.9%; position: absolute; top: -20px; z-index: 1000;}
+		h3 { color: #e0e2e3; font-variant: small-caps; padding-top: 5px; margin-top: 0px; padding-bottom: 8px; margin-bottom: 0px; background-image: linear-gradient(#000000,#000071); border-bottom: 1px solid #3030df; border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px #000000; border-radius: 5px; font-size: 12px; text-align: center; width: 99.9%; position: absolute; top: -24px; z-index: 1000;}
 		h3:hover { top: 0px; transition-property: top; transition-duration: 1.5s; transition-delay: 0s;}
 		.main-table { margin: 0px; padding: 0px; background: #102023;  }
 		td.main-left { vertical-align: top; padding: 0px; margin: 0px; background: #00101f; width: 100%; min-width: 600px; }
@@ -30,7 +30,7 @@
 		td.additional-page-left { vertical-align: top; padding: 0px; margin: 0px; display: none; }
 		td.additional-page-right { vertical-align: top; padding: 0px; margin: 0px; width: 420px; display: none; }
 		#main { text-align: center; vertical-align: top; margin-top: 3px; }
-		#mapid { height: 550px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border: 2px solid #30307a; border-radius: 3px; }
+		#mapid { height: 800px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border-radius: 5px; border: 2px groove #011079; } /*  border: 2px solid #30307a; */
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 
@@ -296,7 +296,7 @@
 		}
 		.section-title {
 			font-variant: small-caps;
-			font-size: 11px;
+			font-size: 0.8em;
 			color: #fff;
 			text-align: left;
 		}
@@ -306,7 +306,7 @@
 			background-color: #204041; 
 		}
 		canvas.receiver-circular-canvas {
-			border: 1px solid #506084; padding: 5px; height: 320px; width: 300px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
+			border: 4px groove #012020; padding: 4px; height: 320px; width: 300px; border-radius: 5px; border-top-left-radius: 5px; border-top-right-radius: 5px; background: #000013; margin: 5px; margin-left: 8px;
 		}
 
 		.receiver-altitude-info-div {
@@ -315,7 +315,7 @@
 			background-color: #204041; 
 		}
 		canvas.receiver-altitude-canvas {
-			border: 1px solid #506084; padding: 5px; height: 220px; width: 415px; border-radius: 5px; border-top-left-radius: 0px; border-top-right-radius: 0px; background: #000013; margin: 5px;
+			border: 4px groove #012020; padding: 5px; height: 220px; width: 415px; border-radius: 5px; border-top-left-radius: 5px; border-top-right-radius: 5px; background: #000013; margin: 5px;
 		}
 
 		td.receiver-circular-actions {
@@ -323,9 +323,10 @@
 			padding-left: 10px;
 			padding-right: 10px;
 			padding-top: 15px;
-			border: 2px groove #506084; 
+			border: 2px groove #508084; 
 			border-radius: 5px; 
-			background: #264647;
+			background-image: linear-gradient(to right, #202041, #20203c, #282840 70%);
+			background: #2E4E4F;
 		}
 		input[type="button"].btn-receiver-download {
 			color: #FFFFFF;
