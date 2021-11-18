@@ -96,6 +96,9 @@ Nov 16, 2021:
   - Added the supplementary receiver to the receiver details in Receiver Distances / Direction and also added toggle buttons for the main and supplementary receiver
   - Added session timer to distance / direction chart in receiver details 
 
+Nov 18, 2021:
+  - The map position and zoom level is set to cookies every time the map is scrolled or zoomed. These values are fetched when the page is loaded or refreshed. This doesn't work without running this on web server since the cookies cannot be set to file -resources.
+
 
 
 ## Current features
