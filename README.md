@@ -186,19 +186,16 @@ Juho
 
 ### Examples
 
-Example (Nov 1st 2021) without weather:
+Example (Nov 18th 2021):
 ![Example screenshot](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_screenshot.jpg?raw=true)
 
-Example (Nov 1st 2021) with weather:
-![Example screenshot with weather](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_screenshot_weather.jpg?raw=true)
-
-Example (Nov 4th 2021) with FD (slightly modified overall visuals):
+Example (Nov 18th 2021) with FD (slightly modified overall visuals):
 ![Example screenshot with FD](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_fd.jpg?raw=true)
 
 Example (Nov 4th 2021) with runways and landing/departing note:
 ![Example screenshot with runways_and_landing_departing](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_runways_and_landing_departing.jpg?raw=true)
 
-Example (Nov 6th 2021) runway list with some commercial ACs take-off approximated capabilities in MTOW:
+Example (Nov 18th 2021) runway list with some commercial ACs take-off approximated capabilities in MTOW:
 ![Example_runway_list_and_TO_length_approximations](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_runway_list_and_TO_length_approximations.jpg?raw=true)
 
 Example (Nov 7th 2021) new button / checkbox styles:
