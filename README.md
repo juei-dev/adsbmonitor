@@ -207,5 +207,6 @@ Example (Nov 7th 2021) new button / checkbox styles:
 Example (Nov 17th 2021) receiver reach:
 ![Example_receiver_reach](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_receiver_reach.jpg?raw=true)
 
-Example (Nov 17th 2021) downloadable receiver distance / direction JPG image:
+Example (Nov 18th 2021) downloadable receiver distance / direction JPG image:
+
 ![Example_circular_chart](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_circular_chart.jpg?raw=true)
