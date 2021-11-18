@@ -129,10 +129,11 @@
 
 	function setCookie(cname, cvalue, exdays) {
 		const d = new Date();
+		if(!exdays)exdays=3*30;
 		d.setTime(d.getTime() + (exdays*24*60*60*1000));
 		var expires = "expires=" + d.toUTCString();
 		var domain = "domain=" + window.location.hostname;
-		document.cookie = cname + "=" + cvalue + ";" + domain + ";path=/;" + expires + ";path=/";  // let's keep path always "/" so assumption is that this is located in the root of the domain
+		document.cookie = cname + "=" + cvalue + ";" + domain + ";path=/;" + expires + ";path=/;SameSite=Strict";  // let's keep path always "/" so assumption is that this is located in the root of the domain
 	}
 	function getCookie(cname) {
 		var name = cname + "=";
