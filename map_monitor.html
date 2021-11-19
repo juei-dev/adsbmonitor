@@ -74,7 +74,7 @@
 						<label class="form-control" id="airports-cb" value="RWYS">
 						</label>						
 						<label class="form-control">
-							<input type="checkbox" class="receiver-details" id="receiver-details-cb" value="RDE" onclick="receiverDetailsChange()" checked> RcvDet
+							<input type="checkbox" class="receiver-details" id="receiver-details-cb" value="RDE" onclick="receiverDetailsChange()" checked> Details&nearr;
 						</label>
 					</span>
 					</div>
@@ -92,13 +92,13 @@
 					<tbody style="color: #ffffff;"><tr>
 						<td><canvas id="receiver-circular-canvas" height="320" width="300" class="receiver-circular-canvas"></canvas></td>
 						<td class="receiver-circular-actions">
-							<span style="font-size: 10px; font-variant: small-caps;">JPEG</span><br/>
+							<span class="circular-action-text">JPEG</span><br/>
 							<input type="button" id="btn-receiver-circular-download" class="btn-receiver-download" value="Download" onClick="downloadReceiverChart()"/>
 							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/>
-							<span style="font-size: 10px; font-variant: small-caps;">PNG</span><br/>
+							<span class="circular-action-text">PNG</span><br/>
 							<input type="button" id="btn-receiver-circular-download-png" class="btn-receiver-download" value="Download" onClick="downloadReceiverChartPNG()"/><br/>
 							<a id="download-chart-url" href="" style="display: none;" target="_blank"></a><br/>
-							<span style="font-size: 10px; font-variant: small-caps;">Display</span><br/>
+							<span class="circular-action-text">Display</span><br/>
 							<input type="checkbox" class="receiver-details-RSSI" id="receiver-details-RSSI-cb" value="RSSI" onclick="receiverDetailsRSSIChange()" checked>
 							<br/>&darr;<br/>
 							<input type="checkbox" class="receiver-details-main" id="receiver-details-main-cb" value="MAIN" onclick="receiverDetailsMainChange()" checked>
