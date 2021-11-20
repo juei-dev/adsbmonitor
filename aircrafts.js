@@ -34,11 +34,35 @@
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
 
+	var receiver_ok = true, second_receiver_ok = true;
+
 	function refreshAircrafts(){
+		if(JSONError=="http://" + receiver_domain + receiver_url_path){
+			JSONError="";
+			receiver_ok = false;
+		}
+		if(JSONError=="http://" + second_receiver_domain + second_receiver_url_path){
+			JSONError="";
+			second_receiver_ok = false;
+		}
+		if(receiver_ok){
+			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
+				document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL","");
+		} else {
+			if(!document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
+				document.getElementById("ecam-display").value += "  ADSB 1 FAIL";
+		}
+		if(second_receiver_ok){
+			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
+			document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
+		} else {
+			if(!document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
+			document.getElementById("ecam-display").value += "  ADSB 2 FAIL";			
+		}
 		getJSON("http://" + receiver_domain + receiver_url_path,
 			function(err,data){
 				if(err==null){
-					document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL",""); 
+					receiver_ok = true;
 					// fetch secondary receiver data json, if enabled
 					if( second_receiver_enabled ){
 						getJSON("http://" + second_receiver_domain + second_receiver_url_path,
@@ -46,9 +70,12 @@
 								second_ac_data = null;
 								if(err==null){ 
 									second_ac_data = data;
-				 					document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
+									receiver_ok = true;
+				 					//document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
 								} else {
-									document.getElementById("ecam-display").value += "  ADSB 2 FAIL";  
+									// document.getElementById("ecam-display").value += "  ADSB 2 FAIL";  
+									receiver_ok = false;
+									JSONError = "http://" + second_receiver_domain + second_receiver_url_path; 
 				 				}
 							});
 					}
@@ -395,7 +422,8 @@
 					footHTML += "</tr>";
 					document.getElementById("stats-footer").innerHTML = footHTML;					
 				} else {
-					document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
+					JSONError=="http://" + receiver_domain + receiver_url_path; // treat every error as timeout - no difference in alerting user
+					// document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
 				}
 			}
 		);

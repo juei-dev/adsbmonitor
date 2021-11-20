@@ -115,17 +115,46 @@
 		al.innerHTML += outHTML;
 	}
 
+	var JSONError = ""; // to contain the url of the timed out request, set empty after processing
+
 	var getJSON = function(url, callback) {
 		var xhr = new XMLHttpRequest();
 			xhr.open('GET', url, true);
 			xhr.responseType='json';
+			xhr.timeout = 2000;
 			xhr.onload = function() {
 				var status=xhr.status;
 					if(status==200) callback(null, xhr.response);
-						else callback(status, xhr.response);
+						else { 
+							callback(status, xhr.response);
+						}
 			};
+			xhr.ontimeout = function () {
+				console.log("JSON timeout: " + url);
+				JSONError = url;
+			}
+			xhr.onerror = function () {
+				console.log("JSON error: " + url);
+				JSONError = url;
+			}
+			xhr.onabort = function () {
+				console.log("JSON abort: " + url);
+				JSONError = url;
+			}
 			xhr.send();
 	}
+/*
+	async function getJSON(url,callback) {
+		try{
+			const response = await fetch(url);
+			const data = await response.json();
+			const status = response.status;
+			return { status, data };
+		} catch(error){
+			JSONError = url;
+		}
+	}
+*/
 
 	function setCookie(cname, cvalue, exdays) {
 		const d = new Date();
