@@ -99,6 +99,9 @@ Nov 16, 2021:
 Nov 18, 2021:
   - The map position and zoom level is set to cookies every time the map is scrolled or zoomed. These values are fetched when the page is loaded or refreshed. This doesn't work without running this on web server since the cookies cannot be set to file -resources.
 
+Nov 21, 2021:
+  - Added an Airbus ECAM / Engine parameter -styled receiver statistics gauge display for both receivers having 3 gauges: messages / minute percentage from maximum detected, SNR and PSNR. Also some minor fixes at receiver details have been made.
+
 
 
 ## Current features
