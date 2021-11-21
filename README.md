@@ -206,3 +206,6 @@ Example (Nov 18th 2021) receiver reach:
 Example (Nov 18th 2021) downloadable receiver distance / direction JPG image:
 
 ![Example_circular_chart](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_circular_chart.jpg?raw=true)
+
+Example (Nov 21th 2021) statistics gauge display:
+![Example_stats_display](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_stats_display.jpg?raw=true)
