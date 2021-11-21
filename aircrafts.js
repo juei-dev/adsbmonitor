@@ -51,17 +51,17 @@
 		}
 		if(receiver_ok){
 			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
-				document.getElementById("ecam-display").value.replaceAll("  ADSB 1 FAIL","");
+				{ document.getElementById("ecam-display").value.replaceAll("  ADSB 1 FAIL",""); }
 		} else {
 			if(!document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
-				document.getElementById("ecam-display").value += "  ADSB 1 FAIL";
+				{ document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; }
 		}
 		if(second_receiver_ok){
 			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-				document.getElementById("ecam-display").value.replaceAll("  ADSB 2 FAIL","");
+				{ document.getElementById("ecam-display").value.replaceAll("  ADSB 2 FAIL",""); }
 		} else {
 			if(!document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-				document.getElementById("ecam-display").value += "  ADSB 2 FAIL";			
+				{ document.getElementById("ecam-display").value += "  ADSB 2 FAIL"; }			
 		}
 		getJSON("http://" + receiver_domain + receiver_url_path,
 			function(err,data){
@@ -73,12 +73,12 @@
 							function(err,data){
 								second_ac_data = null;
 								if(err==null){ 
-									second_ac_data = data;
 									second_receiver_ok = true;
+									second_ac_data = data;
 				 					//document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
 								} else {
 									// document.getElementById("ecam-display").value += "  ADSB 2 FAIL";  
-									receiver_ok = false;
+									second_receiver_ok = false;
 									JSONError = "http://" + second_receiver_domain + second_receiver_url_path; 
 				 				}
 							});
@@ -440,7 +440,8 @@
 					footHTML += "</tr>";
 					document.getElementById("stats-footer").innerHTML = footHTML;					
 				} else {
-					JSONError=="http://" + receiver_domain + receiver_url_path; // treat every error as timeout - no difference in alerting user
+					JSONError=="http://" + receiver_domain + receiver_url_path; 
+					receiver_ok = false;
 					// document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
 				}
 			}
