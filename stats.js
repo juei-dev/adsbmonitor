@@ -7,9 +7,18 @@
 	var second_receiver_msgs_1min = 0, second_receiver_msgs_1min_max = 0;
 
 	function refreshStats(){
+		if(JSONError=="http://" + receiver_domain + receiver_stats_url_path){
+			JSONError="";
+			receiver_ok = false;
+		}
+		if(JSONError=="http://" + second_receiver_domain + second_receiver_stats_url_path){
+			JSONError="";
+			second_receiver_ok = false;
+		}
 		getJSON("http://" + receiver_domain + receiver_stats_url_path,
 			function(err,data){
 				if(err==null){
+					receiver_ok = true;
 					var sh = document.getElementById("stats-head");
 					var label_style = "background: #206061; text-align: center; color: #FFFFFF;";
 					var hrate_style = "background: #206071; text-align: center; color: #FFFFFF;";
@@ -69,7 +78,10 @@
 						getJSON("http://" + second_receiver_domain + second_receiver_stats_url_path,
 								function(err,data){
 									second_stat_data = null;
-									if(err==null) second_stat_data = data;
+									if(err==null){
+										second_receiver_ok = true;
+										second_stat_data = data;
+									}
 								});
 					}
 					if( second_stat_data )

@@ -20,6 +20,10 @@
 
 	var ac_count = 0, ac_with_pos_count = 0, ac_msgs = 0, ac_max_distance = 0, ac_max_distance_all_time = 0;
 
+	// session maximums [value, flight, timestamp, heading, bearing, distance]
+	var session_max_distance = [0,"","",0,0,0], session_max_altitude = [0,"","",0,0,0], session_max_gs = [0,"","",0,0,0], session_max_tas = [0,"","",0,0,0];
+	var session_max_climb_rate = [0,"","",0,0,0], session_max_descent_rate = [0,"","",0,0,0];
+
 	// circular and altitude reception statistics
 	// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
 	var receiver_circular_stats = [];
@@ -240,6 +244,20 @@
 								if( ac_distance_to_center > filters_map_distance ) continue;
 							} else continue;
 						}
+
+						// Calculate session maximums
+						// [value, flight, timestamp, heading, bearing, distance]
+						if(position_received == receiver_label)
+							var s_bearing = Math.floor(getAngleBetweenTwoLatLon(receiver_lat,receiver_lon,lat,lon));
+						else
+							var s_bearing = Math.floor(getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,lat,lon));
+						var s_date = new Date();
+						if(session_max_distance < distance)session_max_distance = [distance, flight, s_date, heading, s_bearing, distance]; 
+						if(session_max_altitude < altitude)session_max_altitude = [altitude, flight, s_date, heading, s_bearing, distance];
+						if(session_max_gs < gs)session_max_gs = [gs, flight, s_date, heading, s_bearing, distance];
+						if(session_max_tas < tas)session_max_tas = [tas, flight, s_date, heading, s_bearing, distance];
+						if(session_max_climb_rate < rate)session_max_climb_rate = [rate, flight, s_date, heading, s_bearing, distance];
+						if(session_max_descent_rate > rate)session_max_descent_rate = [rate, flight, s_date, heading, s_bearing, distance];
 
 						//console.log(flight + " " + lat + "," + lon + " " + altitude);
 						outHTML += "<tr>";
