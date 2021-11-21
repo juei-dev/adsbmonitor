@@ -264,6 +264,18 @@
 			/* outline-offset: max(1px,0.10em); */
 			outline-offset: 0px;
 		}
+
+		.stats-display-place{
+			text-align: center;
+			width: 574px;
+			margin-left: 0px; margin-bottom: 0px; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 0px;
+			background-image: radial-gradient(circle, #204041, #335457, #436467, #204041);
+			background-color: #204041; 			
+		}
+		canvas.stats-display-canvas {
+			border: 4px groove #012020; padding: 5px; height: 80px; width: 450px; border-radius: 5px; border-top-left-radius: 5px; border-top-right-radius: 5px; background: #000013; margin-top: 2px;
+		}
+
 		.ecam-display-place{
 			text-align: center;
 			width: 574px;

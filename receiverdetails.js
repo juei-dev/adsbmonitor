@@ -14,6 +14,11 @@
 	var receiver_details_main_shown = true;
 	var receiver_details_supplementary_shown = true;
 
+	if(!second_receiver_enabled){
+		document.getElementById("receiver-details-supplementary-cb").checked = false;
+		document.getElementById("receiver-details-supplementary-cb").enabled = false;
+	}
+
 	function receiverDetailsChange(){
 		if(document.getElementById("receiver-details-cb").checked){
 			document.getElementById("additional-page-right-id").style.display = "table-cell";
@@ -21,16 +26,13 @@
 			var left = window.innerWidth;
 			//console.log(left);
 			window.scrollTo(left,0);
+			if(!second_receiver_enabled){
+				receiver_details_supplementary_shown = false;
+			}
 		} else {
 			document.getElementById("additional-page-right-id").style.display = "none";
 			receiver_details_shown = false;			
 		}
-	}
-
-	function getAngleEndpoint(x,y,r,angle){  // in degrees
-		angle = angle - 90;
-		var rad_angle = (angle*Math.PI)/180;
-		return [Math.floor(x+Math.cos(rad_angle)*r),Math.floor(y+Math.sin(rad_angle)*r)];
 	}
 
 	function initCircularStats(){
@@ -62,7 +64,7 @@
 		rc_ctx.closePath();
 		rc_ctx.fill();
 		rc_ctx.beginPath();
-		if(receiver_details_supplementary_shown){
+		if(receiver_details_supplementary_shown && second_receiver_enabled){
 			rc_ctx.fillStyle = "#FFFFFF";
 			rc_ctx.font = "normal 16px sans-serif"; // small-caps 
 			rc_ctx.fillText(second_receiver_label[0],288,12);
@@ -162,29 +164,31 @@
 		for(c=0; c<400; c++)alt_profile.push(-1);
 
 		// Secondary receiver only as a bit different color beneath the main receiver figure, if main receiver didn't reach as much distance and if it's enabled to be shown
-		rc_ctx.beginPath();
-		rc_ctx.moveTo(150, 150);
-		rc_ctx.fillStyle = "#3F9F9F";
-		rc_ctx.strokeStyle = "#40B2CF";
-		if(receiver_details_supplementary_shown){
-			//console.log(receiver_circular_stats);
-			for(i=360; i<receiver_circular_stats.length; i++){
-				if(receiver_circular_stats[i][0]==second_receiver_label){
-					if(receiver_circular_stats[i][4]!=99){
-						// update circular stats 
-						var true_dist = receiver_circular_stats[i][3];
-						var dist = (true_dist/max_cs_distance)*(140);
-						if(dist>140)dist=140;
-						var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
-						next_x = next_pos[0]; next_y = next_pos[1];
-						rc_ctx.lineTo(next_x, next_y);
-					}
-				}			
+		if(second_receiver_enabled){
+			rc_ctx.beginPath();
+			rc_ctx.moveTo(150, 150);
+			rc_ctx.fillStyle = "#3F9F9F";
+			rc_ctx.strokeStyle = "#40B2CF";
+			if(receiver_details_supplementary_shown){
+				//console.log(receiver_circular_stats);
+				for(i=360; i<receiver_circular_stats.length; i++){
+					if(receiver_circular_stats[i][0]==second_receiver_label){
+						if(receiver_circular_stats[i][4]!=99){
+							// update circular stats 
+							var true_dist = receiver_circular_stats[i][3];
+							var dist = (true_dist/max_cs_distance)*(140);
+							if(dist>140)dist=140;
+							var next_pos = getAngleEndpoint(150,150,dist,receiver_circular_stats[i][1]);
+							next_x = next_pos[0]; next_y = next_pos[1];
+							rc_ctx.lineTo(next_x, next_y);
+						}
+					}			
+				}
 			}
+			rc_ctx.lineTo(150, 150);
+			rc_ctx.closePath();
+			rc_ctx.fill();
 		}
-		rc_ctx.lineTo(150, 150);
-		rc_ctx.closePath();
-		rc_ctx.fill();
 
 		// MAIN RECEIVER figure
 		next_x = -1, next_y = -1;
@@ -460,6 +464,8 @@
 		refreshCircularAndAltitudeStats();
 	}	
 	function receiverDetailsSuppChange(){
-		if( !document.getElementById("receiver-details-supplementary-cb").checked ) receiver_details_supplementary_shown = false; else receiver_details_supplementary_shown = true;
-		refreshCircularAndAltitudeStats();
+		if(second_receiver_enabled){
+			if( !document.getElementById("receiver-details-supplementary-cb").checked ) receiver_details_supplementary_shown = false; else receiver_details_supplementary_shown = true;
+			refreshCircularAndAltitudeStats();
+		} else document.getElementById("receiver-details-supplementary-cb").checked = false;
 	}		

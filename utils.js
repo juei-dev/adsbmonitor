@@ -55,6 +55,12 @@
 		return angle; 
 	}
 
+	function getAngleEndpoint(x,y,r,angle){  // in degrees
+		angle = angle - 90;
+		var rad_angle = (angle*Math.PI)/180;
+		return [Math.floor(x+Math.cos(rad_angle)*r),Math.floor(y+Math.sin(rad_angle)*r)];
+	}
+
 	function sortTable(tbl,col,ascending,numeric) {
 		var table, rows, switching, i, x, y, shouldSwitch;
 		table = document.getElementById(tbl);
@@ -121,7 +127,7 @@
 		var xhr = new XMLHttpRequest();
 			xhr.open('GET', url, true);
 			xhr.responseType='json';
-			xhr.timeout = 2000;
+			xhr.timeout = 3000;
 			xhr.onload = function() {
 				var status=xhr.status;
 					if(status==200) callback(null, xhr.response);
@@ -143,18 +149,6 @@
 			}
 			xhr.send();
 	}
-/*
-	async function getJSON(url,callback) {
-		try{
-			const response = await fetch(url);
-			const data = await response.json();
-			const status = response.status;
-			return { status, data };
-		} catch(error){
-			JSONError = url;
-		}
-	}
-*/
 
 	function setCookie(cname, cvalue, exdays) {
 		const d = new Date();
