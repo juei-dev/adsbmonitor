@@ -4,6 +4,8 @@
 A ~~very~~ quite simple, quick and dirty UI using Leaftlet and Mapbox for the map and HTML5 Canvas for the Flight Level indicator, FD mock up and Receiver Detailed information (distance/direction circle and altitude graph).
 All run in client browser, no server-side services / APIs included in this project. But in order to get e.g. runways/airports working, it's recommended to place this to web server and access it from there. 
 
+Beofre updating your environment, please backup your config.js and, providing that there has not been any changes in the new version to the config.js, copy that config.js of yours over the default one after the update. If there's been some changes/additions to config.js in the updated version, modify manually your config.js accordingly.
+
 
 
 ## Quick info
