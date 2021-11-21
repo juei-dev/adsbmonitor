@@ -127,7 +127,7 @@
 		var xhr = new XMLHttpRequest();
 			xhr.open('GET', url, true);
 			xhr.responseType='json';
-			xhr.timeout = 3000;
+			xhr.timeout = 5000;
 			xhr.onload = function() {
 				var status=xhr.status;
 					if(status==200) callback(null, xhr.response);

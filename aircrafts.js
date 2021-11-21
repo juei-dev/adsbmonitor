@@ -70,7 +70,7 @@
 								second_ac_data = null;
 								if(err==null){ 
 									second_ac_data = data;
-									receiver_ok = true;
+									second_receiver_ok = true;
 				 					//document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
 								} else {
 									// document.getElementById("ecam-display").value += "  ADSB 2 FAIL";  
