@@ -310,8 +310,8 @@
 			sd_ctx.beginPath();
 			var second_percent = ((second_receiver_msgs_1min/second_receiver_msgs_1min_max)*100);
 			if(!second_percent)second_percent = 0;
-			var second_percent_str = percent.toFixed(0);
-			var second_percent_dec_str = ((percent - Math.floor(percent))*10).toFixed(0);
+			var second_percent_str = second_percent.toFixed(0);
+			var second_percent_dec_str = ((second_percent - Math.floor(second_percent))*10).toFixed(0);
 			sd_ctx.fillText(second_percent_str,400,60);
 			sd_ctx.font = "normal 10px sans-serif"; // small-caps
 			sd_ctx.fillText("." + second_percent_dec_str + "%", 400+sd_ctx.measureText(second_percent_str).width+3,60);
@@ -375,7 +375,7 @@
 			sd_ctx.strokeStyle = "#E0E012";
 			sd_ctx.lineWidth = 3;
 			sd_ctx.beginPath();
-			snr_angle = -90+((-receiver_snr/40)*180);
+			snr_angle = -90+((-second_receiver_snr/40)*180);
 			snr_pos = getAngleEndpoint(300,40,26,snr_angle);
 			sd_ctx.moveTo(300, 35);
 			sd_ctx.lineTo(snr_pos[0], snr_pos[1]);
