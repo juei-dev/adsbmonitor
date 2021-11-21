@@ -144,8 +144,8 @@
 				JSONError = url;
 			}
 			xhr.onabort = function () {
-				console.log("JSON abort: " + url);
-				JSONError = url;
+				console.log("JSON abort (not counted as error): " + url);
+				// JSONError = url;
 			}
 			xhr.send();
 	}

@@ -51,17 +51,17 @@
 		}
 		if(receiver_ok){
 			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
-				document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL","");
+				document.getElementById("ecam-display").value.replaceAll("  ADSB 1 FAIL","");
 		} else {
 			if(!document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
 				document.getElementById("ecam-display").value += "  ADSB 1 FAIL";
 		}
 		if(second_receiver_ok){
 			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-			document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL","");
+				document.getElementById("ecam-display").value.replaceAll("  ADSB 2 FAIL","");
 		} else {
 			if(!document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-			document.getElementById("ecam-display").value += "  ADSB 2 FAIL";			
+				document.getElementById("ecam-display").value += "  ADSB 2 FAIL";			
 		}
 		getJSON("http://" + receiver_domain + receiver_url_path,
 			function(err,data){
