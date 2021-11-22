@@ -448,7 +448,7 @@
 	}
 	function downloadReceiverChartPNG(){
 		var dataUrl = rc_canvas.toDataURL("image/png", 1.0);
-		document.getElementById("download-chart-url").setAttribute("download", "circular_chart.jpg");
+		document.getElementById("download-chart-url").setAttribute("download", "circular_chart.png");
 		document.getElementById("download-chart-url").setAttribute("href", dataUrl.replace("image/png","image/octet-stream"));
 		document.getElementById("download-chart-url").click();
 	}

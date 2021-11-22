@@ -721,10 +721,10 @@
 		}
 		// handle download button
 		if( x>=440 && y>=60 && x<=460 && y<=90 ){	// right button
-			var dataUrl = sd_canvas.toDataURL("image/png", 1.0);
+			var dataUrl = sd_canvas.toDataURL("image/jpeg", 1.0);
 			var link = document.createElement("a");
 			link.download = "stats-display-nr" + stats_display_page + ".jpg";
-			link.href = dataUrl.replace("image/png","image/octet-stream");
+			link.href = dataUrl.replace("image/jpeg","image/octet-stream");
 			link.click();
 			link.remove();			
 		}
