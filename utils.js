@@ -182,3 +182,15 @@
 		return JSON.parse(atob(str));
 	}
 
+	function dateToReadableStr(time){
+		var return_str = "";
+		if(!time) return "";
+		var timestamp = new Date(time);
+		return_str += timestamp.getFullYear() + "-";
+		return_str += timestamp.getUTCMonth().toFixed(0).padStart(2,"0") + "-";
+		return_str += timestamp.getUTCDate().toFixed(0).padStart(2,"0") + " ";
+		return_str += timestamp.getUTCHours().toFixed(0).padStart(2,"0") + ":";
+		return_str += timestamp.getUTCMinutes().toFixed(0).padStart(2,"0") + ":";
+		return_str += timestamp.getUTCSeconds().toFixed(0).padStart(2,"0") + "Z";
+		return return_str;
+	}

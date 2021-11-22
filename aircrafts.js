@@ -50,18 +50,30 @@
 			second_receiver_ok = false;
 		}
 		if(receiver_ok){
-			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
-				{ document.getElementById("ecam-display").value.replaceAll("  ADSB 1 FAIL",""); }
+			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL")){ 
+				document.getElementById("ecam-display").readOnly=false;
+				document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL",""); 
+				document.getElementById("ecam-display").readOnly=true;
+			}
 		} else {
-			if(!document.getElementById("ecam-display").value.includes("ADSB 1 FAIL"))
-				{ document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; }
+			if(!document.getElementById("ecam-display").value.includes("ADSB 1 FAIL")){ 
+				document.getElementById("ecam-display").readOnly=false;
+				document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
+				document.getElementById("ecam-display").readOnly=true;
+			}
 		}
 		if(second_receiver_ok){
-			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-				{ document.getElementById("ecam-display").value.replaceAll("  ADSB 2 FAIL",""); }
+			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL")){ 
+				document.getElementById("ecam-display").readOnly=false;
+				document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL",""); 
+				document.getElementById("ecam-display").readOnly=true;
+			}
 		} else {
-			if(!document.getElementById("ecam-display").value.includes("ADSB 2 FAIL"))
-				{ document.getElementById("ecam-display").value += "  ADSB 2 FAIL"; }			
+			if(!document.getElementById("ecam-display").value.includes("ADSB 2 FAIL")){
+				document.getElementById("ecam-display").readOnly=false;
+				document.getElementById("ecam-display").value += "  ADSB 2 FAIL"; 
+				document.getElementById("ecam-display").readOnly=true;
+			}			
 		}
 		getJSON("http://" + receiver_domain + receiver_url_path,
 			function(err,data){
@@ -252,12 +264,12 @@
 						else
 							var s_bearing = Math.floor(getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,lat,lon));
 						var s_date = new Date();
-						if(session_max_distance < distance)session_max_distance = [distance, flight, s_date, heading, s_bearing, distance]; 
-						if(session_max_altitude < altitude)session_max_altitude = [altitude, flight, s_date, heading, s_bearing, distance];
-						if(session_max_gs < gs)session_max_gs = [gs, flight, s_date, heading, s_bearing, distance];
-						if(session_max_tas < tas)session_max_tas = [tas, flight, s_date, heading, s_bearing, distance];
-						if(session_max_climb_rate < rate)session_max_climb_rate = [rate, flight, s_date, heading, s_bearing, distance];
-						if(session_max_descent_rate > rate)session_max_descent_rate = [rate, flight, s_date, heading, s_bearing, distance];
+						if(session_max_distance[0] < distance)session_max_distance = [distance.toFixed(0), flight, s_date, track, s_bearing, distance.toFixed(0)]; 
+						if(session_max_altitude[0] < altitude)session_max_altitude = [altitude, flight, s_date, track, s_bearing, distance.toFixed(0)];
+						if(session_max_gs[0] < gs)session_max_gs = [Math.floor(gs), flight, s_date, track, s_bearing, distance.toFixed(0)];
+						if(session_max_tas[0] < tas)session_max_tas = [Math.floor(tas), flight, s_date, track, s_bearing, distance.toFixed(0)];
+						if(session_max_climb_rate[0] < rate)session_max_climb_rate = [Math.floor(rate), flight, s_date, track, s_bearing, distance.toFixed(0)];
+						if(session_max_descent_rate[0] > rate)session_max_descent_rate = [Math.floor(rate), flight, s_date, track, s_bearing, distance.toFixed(0)];
 
 						//console.log(flight + " " + lat + "," + lon + " " + altitude);
 						outHTML += "<tr>";
