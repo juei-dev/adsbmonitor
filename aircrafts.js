@@ -31,7 +31,7 @@
 	for(i=0;i<360;i++)receiver_circular_stats.push([second_receiver_label,i,999,0,99,99999,0]);
 
 	// company data
-	var companies = []; // company_name, last seen (not used for now)
+	var companies = []; // company_name, last seen (not used for now), flights seen
 	var company_flights = []; // company_name, flight, last seen (Date object)
 
 	// table sorting variables
@@ -171,7 +171,7 @@
 							var company_index = 0;
 							for( c=0; c<companies.length; c++ ) 
 								if(companies[c][0]==selected_company_name){ company_index = c; company_already_added = true; break; }
-							if(!company_already_added) companies.push([selected_company_name,current_date]);
+							if(!company_already_added) companies.push([selected_company_name,current_date,1]);
 							else { companies[company_index][1] = current_date; }
 							var company_flight_already_added = false, company_flight_index = 0;
 							for( c=0; c<company_flights.length; c++ )
@@ -181,6 +181,8 @@
 								}
 							//console.log("company '" + company_name + "' flight '" + flight + "'"); 
 							if(!company_flight_already_added){
+								var previously_seen = companies[company_index][2];
+								if(flight.trim()!="" && company_already_added)companies[company_index][2] = previously_seen+1;
 								company_flights.push([selected_company_name,flight,current_date]);
 							} else {
 								//console.log("updated cflight " + flight + " to " + current_date);

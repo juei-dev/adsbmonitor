@@ -7,7 +7,7 @@
 	var second_receiver_msgs_1min = 0, second_receiver_msgs_1min_max = 0;
 
 	var stats_display_page = 1;
-	const max_stats_display_page = 2;
+	const max_stats_display_page = 3;
 
 	function refreshStats(){
 		if(JSONError=="http://" + receiver_domain + receiver_stats_url_path){
@@ -522,7 +522,7 @@
 		if(stats_display_page==2){
 			sd_ctx.fillStyle = "#8F8FFF";
 			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
-			sd_ctx.fillText("Maximums during session",1,10);			
+			sd_ctx.fillText("Maximums During Session",1,10);			
 
 			sd_ctx.lineWidth = 0.5;
 			sd_ctx.beginPath();
@@ -598,6 +598,69 @@
 			sd_ctx.fillText(session_max_descent_rate[5],col6_x,80);			
 		}
 
+		if(stats_display_page==3){
+			sd_ctx.fillStyle = "#8F8FFF";
+			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
+			sd_ctx.fillText("Top 10 Companies",1,10);			
+
+			sd_ctx.lineWidth = 0.5;
+			sd_ctx.beginPath();
+			sd_ctx.moveTo(1,11);
+			sd_ctx.lineTo(449,11);
+			sd_ctx.closePath();
+			sd_ctx.stroke();
+
+			var company_list_sorted = Array.from(companies);
+			company_list_sorted.sort(function (a,b){	// sort a copy of companies array by number of flights
+				if(a[2]==b[2])return 0;
+				else return (a[2]>b[2])?-1:1; 
+			});
+
+			sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
+			sd_ctx.fillStyle = "#1FFF1F";
+			sd_ctx.fillText("Company",20,20);
+			sd_ctx.fillText("Flights",160,20);
+			sd_ctx.fillText("Company",210,20);
+			sd_ctx.fillText("Flights",350,20);
+
+			var col1_x = 20, col2_x = 190, col3_x = 210, col4_x = 380;
+			var y=30;
+			var company = "";
+			for(i=0; i<company_list_sorted.length; i++){
+				if(i==10)break;
+				if(i<=5){
+					sd_ctx.font = "normal 10px sans-serif"; // small-caps
+					sd_ctx.fillStyle = "#FFFFFF";
+					if( company_list_sorted[i][0].length > 22 )
+						company = company_list_sorted[i][0].substring(0,22) + "..";
+					else
+						company = company_list_sorted[i][0];
+					if( company == "" ) company = "* unknown *";						
+					sd_ctx.fillText(company,col1_x,y);
+					sd_ctx.font = "normal 10px sans-serif"; // small-caps
+					sd_ctx.fillStyle = "#FFFF1F";
+					sd_ctx.fillText(company_list_sorted[i][2],col2_x-sd_ctx.measureText(company_list_sorted[i][2]).width,y);
+					y+=10;			
+					if(i==5)y=30;
+				} else {
+					sd_ctx.font = "normal 10px sans-serif"; // small-caps
+					sd_ctx.fillStyle = "#FFFFFF";
+					if( company_list_sorted[i][0].length > 22 )
+						company = company_list_sorted[i][0].substring(0,22) + "..";
+					else
+						company = company_list_sorted[i][0];
+					if( company == "" ) company = "* Unknown *";						
+					sd_ctx.fillText(company,col3_x,y);
+					sd_ctx.font = "normal 10px sans-serif"; // small-caps
+					sd_ctx.fillStyle = "#FFFF1F";
+					sd_ctx.fillText(company_list_sorted[i][2],col4_x-sd_ctx.measureText(company_list_sorted[i][2]).width,y);
+					y+=10;			
+				}
+			}
+			//console.log(company_list_sorted);
+
+		}
+
 	}
 
 	function refreshStatsDisplay(){
@@ -621,7 +684,7 @@
 		}
 		if( x>=440 && y>=20 && x<=460 && y<=60 ){	// right button
 			stats_display_page++;
-			if(stats_display_page>2) stats_display_page=1;
+			if(stats_display_page>max_stats_display_page) stats_display_page=1;
 		}
 		refreshStatsDisplay();
 	}
