@@ -107,6 +107,7 @@ Nov 21, 2021:
 Nov 22, 2021:
   - Added paging to stats display part and a new page with maximum values of distance, altitude, gs, tas, climb and descent during the session instead of just stats gauges. Also some bugfixes.
   - Added new page to stats display with top 10 companies and number of their flights during the session.
+  - Modified stats display company top to top 12 instead of just 10. Also added download -button to stats display.
 
 
 
