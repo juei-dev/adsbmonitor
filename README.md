@@ -104,6 +104,9 @@ Nov 18, 2021:
 Nov 21, 2021:
   - Added an Airbus ECAM / Engine parameter -styled receiver statistics gauge display for both receivers having 3 gauges: messages / minute percentage from maximum detected, SNR and PSNR. Also some minor fixes at receiver details have been made.
 
+Nov 22, 2021:
+  - Added paging to stats display part and a new page with maximum values of distance, altitude, gs, tas, climb and descent during the session instead of just stats gauges. Also some bugfixes.
+
 
 
 ## Current features
