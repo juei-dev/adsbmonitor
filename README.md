@@ -184,6 +184,11 @@ Nov 22, 2021:
 		- Session timer showing time from last page refresh or initial load of the page
 	- Minimum altitude / distance graph
 
+- Statistics display
+	- Page 1: Gauges for both receivers - M1% (messages/min % from maximum this session), SNR and PSVR
+	- Page 2: Maximum values during session - Distance, altitude, GS, TAS, Climb rate and Descent rate
+	- Page 3: Top 12 companies during the session and number of flights 
+	- Download option for all of the displays
 
 
 ---
