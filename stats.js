@@ -554,6 +554,11 @@
 			sd_ctx.closePath();
 			sd_ctx.stroke();
 
+			sd_ctx.font = "small-caps 9px sans-serif"; 
+			sd_ctx.fillStyle = "#FFFF8F";
+			var now = new Date();
+			sd_ctx.fillText(dateToReadableStr(now),449-sd_ctx.measureText(dateToReadableStr(now)).width,10);			
+
 /* 	var session_max_distance = [0,"","",0,0,0], session_max_altitude = [0,"","",0,0,0], session_max_gs = [0,"","",0,0,0], session_max_tas = [0,"","",0,0,0];
 	var session_max_climb_rate = [0,"","",0,0,0], session_max_descent_rate = [0,"","",0,0,0];
 */
@@ -633,6 +638,11 @@
 			sd_ctx.closePath();
 			sd_ctx.stroke();
 
+			sd_ctx.font = "small-caps 9px sans-serif"; 
+			sd_ctx.fillStyle = "#FFFF8F";
+			var now = new Date();
+			sd_ctx.fillText(dateToReadableStr(now),449-sd_ctx.measureText(dateToReadableStr(now)).width,10);			
+
 			var company_list_sorted = Array.from(companies);
 			company_list_sorted.sort(function (a,b){	// sort a copy of companies array by number of flights
 				if(a[2]==b[2])return 0;
@@ -710,7 +720,7 @@
 			if(stats_display_page>max_stats_display_page) stats_display_page=1;
 		}
 		// handle download button
-		if( x>=440 && y>=60 && x<=460 && y<=80 ){	// right button
+		if( x>=440 && y>=60 && x<=460 && y<=90 ){	// right button
 			var dataUrl = sd_canvas.toDataURL("image/png", 1.0);
 			var link = document.createElement("a");
 			link.download = "stats-display-nr" + stats_display_page + ".jpg";
