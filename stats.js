@@ -726,7 +726,7 @@
 			link.download = "stats-display-nr" + stats_display_page + ".jpg";
 			link.href = dataUrl.replace("image/png","image/octet-stream");
 			link.click();
-			line.remove();			
+			link.remove();			
 		}
 
 
