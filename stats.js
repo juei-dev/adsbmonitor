@@ -153,7 +153,7 @@
 
 		// common pager symbols
 		sd_ctx.lineWidth = 0.5;
-		sd_ctx.fillStyle = "#AFAFFF";
+		sd_ctx.fillStyle = "#BFBFFF";
 		sd_ctx.strokeStyle = "white";
 		sd_ctx.beginPath();
 		sd_ctx.moveTo(0,30);
@@ -185,10 +185,33 @@
 		sd_ctx.stroke();
 
 		sd_ctx.lineWidth = 1;
+		sd_ctx.fillStyle = "#BFBFFF";
 		sd_ctx.beginPath();
 		sd_ctx.moveTo(446,35);
 		sd_ctx.lineTo(450,40);
 		sd_ctx.lineTo(446,45);
+		sd_ctx.closePath();
+		sd_ctx.fill();
+
+		sd_ctx.lineWidth = 0.5;
+		sd_ctx.fillStyle = "#AFAFFF";
+		sd_ctx.strokeStyle = "white";
+		sd_ctx.beginPath();
+		sd_ctx.moveTo(450,60);
+		sd_ctx.lineTo(444,60);
+		sd_ctx.lineTo(444,80);
+		sd_ctx.lineTo(450,80);
+		sd_ctx.moveTo(450,60);
+		sd_ctx.closePath();
+		sd_ctx.stroke();
+
+		sd_ctx.lineWidth = 1;
+		sd_ctx.fillStyle = "#FF1F1F";
+		sd_ctx.beginPath();
+		sd_ctx.moveTo(450,67);
+		sd_ctx.lineTo(446,67);
+		sd_ctx.lineTo(446,73);
+		sd_ctx.lineTo(450,73);
 		sd_ctx.closePath();
 		sd_ctx.fill();
 
@@ -601,7 +624,7 @@
 		if(stats_display_page==3){
 			sd_ctx.fillStyle = "#8F8FFF";
 			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
-			sd_ctx.fillText("Top 10 Companies",1,10);			
+			sd_ctx.fillText("Top 12 Companies",1,10);			
 
 			sd_ctx.lineWidth = 0.5;
 			sd_ctx.beginPath();
@@ -627,7 +650,7 @@
 			var y=30;
 			var company = "";
 			for(i=0; i<company_list_sorted.length; i++){
-				if(i==10)break;
+				if(i==12)break;
 				if(i<=5){
 					sd_ctx.font = "normal 10px sans-serif"; // small-caps
 					sd_ctx.fillStyle = "#FFFFFF";
@@ -686,6 +709,17 @@
 			stats_display_page++;
 			if(stats_display_page>max_stats_display_page) stats_display_page=1;
 		}
+		// handle download button
+		if( x>=440 && y>=60 && x<=460 && y<=80 ){	// right button
+			var dataUrl = sd_canvas.toDataURL("image/png", 1.0);
+			var link = document.createElement("a");
+			link.download = "stats-display-nr" + stats_display_page + ".jpg";
+			link.href = dataUrl.replace("image/png","image/octet-stream");
+			link.click();
+			line.remove();			
+		}
+
+
 		refreshStatsDisplay();
 	}
 	sd_canvas.addEventListener("click", onStatsDisplayClick, false);
