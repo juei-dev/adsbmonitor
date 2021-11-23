@@ -50,9 +50,12 @@
 			second_receiver_ok = false;
 		}
 		if(receiver_ok){
-			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL")){ 
+//			if(document.getElementById("ecam-display").value.includes("ADSB 1 FAIL")){ 
+			if(document.getElementById("ecam-display").value != ""){ 
 				document.getElementById("ecam-display").readOnly=false;
-				document.getElementById("ecam-display").value.replace("  ADSB 1 FAIL",""); 
+				var ecam_content = document.getElementById("ecam-display").value;
+				ecam_content = ecam_content.replace("  ADSB 1 FAIL","");
+				document.getElementById("ecam-display").value = ecam_content; 
 				document.getElementById("ecam-display").readOnly=true;
 			}
 		} else {
@@ -63,9 +66,12 @@
 			}
 		}
 		if(second_receiver_ok){
-			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL")){ 
+//			if(document.getElementById("ecam-display").value.includes("ADSB 2 FAIL")){ 
+			if(document.getElementById("ecam-display").value != ""){ 
 				document.getElementById("ecam-display").readOnly=false;
-				document.getElementById("ecam-display").value.replace("  ADSB 2 FAIL",""); 
+				var ecam_content = document.getElementById("ecam-display").value;
+				ecam_content = ecam_content.replace("  ADSB 2 FAIL",""); 
+				document.getElementById("ecam-display").value = ecam_content; 
 				document.getElementById("ecam-display").readOnly=true;
 			}
 		} else {
