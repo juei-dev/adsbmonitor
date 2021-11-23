@@ -279,7 +279,7 @@
 		.ecam-display-place{
 			text-align: center;
 			width: 574px;
-			margin-left: 0px; margin-bottom: 1px; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px;
+			margin-left: 0px; margin-bottom: 1px; margin-top: 1px; border: 1px solid #709091; border-radius: 3px; padding-left: 4px; padding-top: 2px; padding-bottom: 2px;
 			background-image: radial-gradient(circle, #204041, #335457, #436467, #204041);
 			background-color: #204041; 
 		}
@@ -287,7 +287,7 @@
 			width: 80%; height: 30px;
 			background-color: #000;
 			color: #0f0;
-			border: 2px groove #404041;
+			border: 4px groove #012020;
 			border-radius: 6px;
 			margin-bottom: 1px;
 		}
