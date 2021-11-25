@@ -7,7 +7,7 @@
 	var second_receiver_msgs_1min = 0, second_receiver_msgs_1min_max = 0;
 
 	var stats_display_page = 1;
-	const max_stats_display_page = 3;
+	const max_stats_display_page = 4;
 
 	function refreshStats(){
 		if(JSONError=="http://" + receiver_domain + receiver_stats_url_path){
@@ -702,7 +702,61 @@
 				}
 			}
 		}
+		if(stats_display_page==4){
+			sd_ctx.fillStyle = "#8F8FFF";
+			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
+			sd_ctx.fillText("Emergency Flights Seen (first 6)",1,10);			
 
+			sd_ctx.lineWidth = 0.5;
+			sd_ctx.beginPath();
+			sd_ctx.moveTo(1,11);
+			sd_ctx.lineTo(449,11);
+			sd_ctx.closePath();
+			sd_ctx.stroke();
+
+			sd_ctx.font = "small-caps 9px sans-serif"; 
+			sd_ctx.fillStyle = "#FFFF8F";
+			var now = new Date();
+			sd_ctx.fillText(dateToReadableStr(now),449-sd_ctx.measureText(dateToReadableStr(now)).width,10);			
+
+			// company_name, flight, last seen, squawk, lat, lon, altitude, gs, tas, rssi
+			sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
+			sd_ctx.fillStyle = "#1FFF1F";
+			sd_ctx.fillText("Company",20,20);
+			sd_ctx.fillText("Flight",90,20);
+			sd_ctx.fillText("Squawk",140,20);
+			sd_ctx.fillText("Lat",180,20);
+			sd_ctx.fillText("Lon",220,20);
+			sd_ctx.fillText("Altitude",260,20);
+			sd_ctx.fillText("GS",300,20);
+			sd_ctx.fillText("TAS",330,20);
+			sd_ctx.fillText("Seen",360,20);
+			var ef_y = 30;
+			sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
+			sd_ctx.fillStyle = "#FFFFFF";
+			if(emergency_flights)
+				for(ef=0; ef<emergency_flights.length; ef++){
+					var current_timestamp = new Date();
+					var seen_timestamp = new Date(emergency_flights[ef][2]);
+					var difference_timestamp = new Date(current_timestamp - seen_timestamp);
+					var difference_timestamp_str = "";
+					if((difference_timestamp.getUTCDate()-1)>0)difference_timestamp_str+=(difference_timestamp.getUTCDate()-1).toFixed(0).padStart(2,"0") + "d ";
+					difference_timestamp_str += difference_timestamp.getUTCHours().toFixed(0).padStart(2,"0") + ":" + difference_timestamp.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + difference_timestamp.getUTCSeconds().toFixed(0).padStart(2,"0");
+					if(emergency_flights[ef][0])sd_ctx.fillText(emergency_flights[ef][0].substring(0,15),20,ef_y);
+						else sd_ctx.fillText("*Unknown*",20,ef_y);
+					if(emergency_flights[ef][1])sd_ctx.fillText(emergency_flights[ef][1],90,ef_y);
+					if(emergency_flights[ef][3])sd_ctx.fillText(emergency_flights[ef][3],140,ef_y);
+					if(emergency_flights[ef][4])sd_ctx.fillText(emergency_flights[ef][4].toFixed(3),180,ef_y);
+					if(emergency_flights[ef][5])sd_ctx.fillText(emergency_flights[ef][5].toFixed(3),220,ef_y);
+					if(emergency_flights[ef][6])sd_ctx.fillText(emergency_flights[ef][6].toFixed(0),260,ef_y);
+					if(emergency_flights[ef][7])sd_ctx.fillText(emergency_flights[ef][7].toFixed(0),300,ef_y);
+					if(emergency_flights[ef][8])sd_ctx.fillText(emergency_flights[ef][8].toFixed(0),330,ef_y);
+					sd_ctx.fillText(difference_timestamp_str,360,ef_y);
+					ef_y+=10;
+					if(ef>=5)break; // hopefully no more than 6 emergencies in this session (or any actually)...
+				}							
+
+		}
 
 	}
 

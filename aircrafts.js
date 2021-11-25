@@ -34,6 +34,8 @@
 	var companies = []; // company_name, last seen (not used for now), flights seen
 	var company_flights = []; // company_name, flight, last seen (Date object)
 
+	var emergency_flights = []; // company_name, flight, squawk, last seen, lat, lon, altitude, gs, tas, rssi
+
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
@@ -230,6 +232,26 @@
 						if(lat && lon)
 							aircrafts_positions.push([flight,lat,lon]);
 
+						// Add emergency flights
+						// company_name, flight, last seen, squawk, lat, lon, altitude, gs, tas, rssi
+						if(squawk=="7700" || squawk=="7600" || squawk=="7500"){
+							var ef_index_found = -1;
+							for(ef=0; ef<emergency_flights.length; ef++){
+								if(emergency_flights[ef][1] == flight){ ef_index_found = ef; break; }
+							}
+							var timestamp_now = new Date();
+							if( ef_index_found >= 0 ){
+								emergency_flights[ef_index_found][2] = timestamp_now;
+								if(lat)emergency_flights[ef_index_found][4] = lat; else emergency_flights[ef_index_found][4] = "";
+								if(lon)emergency_flights[ef_index_found][5] = lon; else emergency_flights[ef_index_found][5] = "";
+								if(altitude)emergency_flights[ef_index_found][6] = altitude; else emergency_flights[ef_index_found][6] ="";
+								if(gs)emergency_flights[ef_index_found][7] = gs; else emergency_flights[ef_index_found][7] = "";
+								if(tas)emergency_flights[ef_index_found][8] = tas; else emergency_flights[ef_index_found][8] = "";
+								emergency_flights[ef_index_found][9] = rssi;								
+							} else
+								emergency_flights.push([company_name, flight, timestamp_now, squawk, lat, lon, altitude, gs, tas, rssi]);
+						}
+
 						// FD update
 						if(flight == FD_flight){
 		 					FD_tas = -1; FD_gs = -1; FD_altitude = -1; FD_rate = 0; FD_track = 0; FD_roll = 0; FD_mach = -1; FD_nav_altitude = -1; FD_nav_heading = -1;
@@ -273,7 +295,7 @@
 							var s_bearing = Math.floor(getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,lat,lon));
 						var s_date = new Date();
 						if(session_max_distance[0] < distance)session_max_distance = [distance.toFixed(0), flight, s_date, track, s_bearing, distance.toFixed(0)]; 
-						if(session_max_altitude[0] < altitude)session_max_altitude = [altitude, flight, s_date, track, s_bearing, distance.toFixed(0)];
+						if((session_max_altitude[0] < altitude) && (altitude <= 60000))session_max_altitude = [altitude, flight, s_date, track, s_bearing, distance.toFixed(0)];
 						if(session_max_gs[0] < gs)session_max_gs = [Math.floor(gs), flight, s_date, track, s_bearing, distance.toFixed(0)];
 						if(session_max_tas[0] < tas)session_max_tas = [Math.floor(tas), flight, s_date, track, s_bearing, distance.toFixed(0)];
 						if(session_max_climb_rate[0] < rate)session_max_climb_rate = [Math.floor(rate), flight, s_date, track, s_bearing, distance.toFixed(0)];
@@ -470,3 +492,25 @@
 	
 	refreshAircrafts();
 	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
+
+	// NOT STARTED YET - Pending approval from OpenSky Network (Sep 23rd 2021)
+	//
+	// Predictive map entries to be fetched from OpenSky public API
+	// Fetching every 30 seconds - there's an internal limit in their API of 10 seconds, but
+	// limiting the call frequency won't hurt this and definitely will be better for OpenSky Network point of view.
+	//
+	// ATTN! This is sort of a silent feature since OpenSky prohibits all the commerical usage of their API usage
+	// so please do not enable this for other than just own personal research use!
+	//
+	// It can be enabled by adding the OpenSky REST API url to config.js
+	// var openSkyRestAPIUrl = "https://opensky-network.org/api/states/all";
+	//
+	// Please read more from The OpenSky Network, https://www.opensky-network.org
+	// and https://opensky-network.org/about/terms-of-use
+/*
+	var openSkyRestAPIUrl = "";
+	if(openSkyRestAPIUrl){
+
+
+	}
+*/
