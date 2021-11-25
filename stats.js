@@ -156,11 +156,11 @@
 		sd_ctx.fillStyle = "#BFBFFF";
 		sd_ctx.strokeStyle = "white";
 		sd_ctx.beginPath();
-		sd_ctx.moveTo(0,30);
+		sd_ctx.moveTo(0,29);
 		sd_ctx.lineTo(6,30);
 		sd_ctx.lineTo(6,50);
-		sd_ctx.lineTo(0,50);
-		sd_ctx.moveTo(0,30);
+		sd_ctx.lineTo(0,51);
+		sd_ctx.moveTo(0,29);
 		sd_ctx.closePath();
 		sd_ctx.stroke();
 
@@ -176,11 +176,11 @@
 		sd_ctx.fillStyle = "#AFAFFF";
 		sd_ctx.strokeStyle = "white";
 		sd_ctx.beginPath();
-		sd_ctx.moveTo(450,30);
+		sd_ctx.moveTo(450,29);
 		sd_ctx.lineTo(444,30);
 		sd_ctx.lineTo(444,50);
-		sd_ctx.lineTo(450,50);
-		sd_ctx.moveTo(450,30);
+		sd_ctx.lineTo(450,51);
+		sd_ctx.moveTo(450,29);
 		sd_ctx.closePath();
 		sd_ctx.stroke();
 
@@ -197,7 +197,7 @@
 		sd_ctx.fillStyle = "#AFAFFF";
 		sd_ctx.strokeStyle = "white";
 		sd_ctx.beginPath();
-		sd_ctx.moveTo(450,60);
+		sd_ctx.moveTo(450,59);
 		sd_ctx.lineTo(444,60);
 		sd_ctx.lineTo(444,80);
 		sd_ctx.lineTo(450,80);
@@ -326,14 +326,14 @@
 			sd_ctx.strokeStyle = "#FFFFFF";
 			sd_ctx.beginPath();
 			sd_ctx.lineWidth = 1;
-			sd_ctx.moveTo(222,50);
-			sd_ctx.lineTo(222,10);
-			sd_ctx.moveTo(220,10);
-			sd_ctx.lineTo(224,10);
-			sd_ctx.moveTo(220,30);
-			sd_ctx.lineTo(224,30);
-			sd_ctx.moveTo(220,50);
-			sd_ctx.lineTo(224,50);
+			sd_ctx.moveTo(225,50);
+			sd_ctx.lineTo(225,10);
+			sd_ctx.moveTo(223,10);
+			sd_ctx.lineTo(227,10);
+			sd_ctx.moveTo(223,30);
+			sd_ctx.lineTo(227,30);
+			sd_ctx.moveTo(223,50);
+			sd_ctx.lineTo(227,50);
 			sd_ctx.stroke();
 
 			// Labels
@@ -372,7 +372,7 @@
 
 			sd_ctx.fillStyle = "#FFFFFF";
 			sd_ctx.font = "normal 10px sans-serif"; // small-caps
-			sd_ctx.fillText("PSNR",210,80);
+			sd_ctx.fillText("PSNR",213,80);
 
 			// Message-rate percentage (against max value detected)
 			sd_ctx.fillStyle = "#FFFF0F";
@@ -420,7 +420,7 @@
 			sd_ctx.fillText(receiver_psnr.toFixed(1),(218-sd_ctx.measureText(receiver_psnr.toFixed(1)).width),60);
 			if(second_receiver_enabled){
 				if(second_receiver_noise<0) second_receiver_psnr = second_receiver_noise - second_receiver_peak;
-				sd_ctx.fillText(second_receiver_psnr.toFixed(1),(243-sd_ctx.measureText(second_receiver_psnr.toFixed(1)).width),60);
+				sd_ctx.fillText(second_receiver_psnr.toFixed(1),(248-sd_ctx.measureText(second_receiver_psnr.toFixed(1)).width),60);
 			}
 
 			// Msg percent needle
@@ -506,42 +506,43 @@
 				sd_ctx.strokeStyle = "#909092";
 				sd_ctx.lineWidth = 5;
 				sd_ctx.beginPath();
-				sd_ctx.moveTo(235, 50);
+				sd_ctx.moveTo(240, 50);
 				noise_y = Math.floor(10-(second_receiver_noise));
 				if(noise_y>50) noise_y=50;
-				sd_ctx.lineTo(235, noise_y);
+				sd_ctx.lineTo(240, noise_y);
 				sd_ctx.stroke();
 
 				sd_ctx.strokeStyle = "#10E012";
 				sd_ctx.lineWidth = 5;
 				sd_ctx.beginPath();
-				sd_ctx.moveTo(235, noise_y);
+				sd_ctx.moveTo(240, noise_y);
 				signal_y = Math.floor(10-(second_receiver_signal));
 				if(second_receiver_signal==0) signal_y=noise_y;
-				sd_ctx.lineTo(235, signal_y);
+				sd_ctx.lineTo(240, signal_y);
 				sd_ctx.stroke();
 
 				sd_ctx.strokeStyle = "#E0E012";
 				sd_ctx.lineWidth = 5;
 				sd_ctx.beginPath();
-				sd_ctx.moveTo(235, signal_y);
+				sd_ctx.moveTo(240, signal_y);
 				peak_y = Math.floor(10-(second_receiver_peak));
 				if(second_receiver_peak>-3.0){
 					peak_y = 13;
 				}
-				sd_ctx.lineTo(235, peak_y);
+				sd_ctx.lineTo(240, peak_y);
 				sd_ctx.stroke();
 
 				if( second_receiver_peak> -3.0 ){
 					sd_ctx.strokeStyle = "#F01012";
 					sd_ctx.lineWidth = 5;
 					sd_ctx.beginPath();
-					sd_ctx.moveTo(235, 13);
-					sd_ctx.lineTo(235, Math.floor(10-(receiver_peak)));
+					sd_ctx.moveTo(240, 13);
+					sd_ctx.lineTo(240, Math.floor(10-(receiver_peak)));
 					sd_ctx.stroke();			
 				}
 			}
 		}
+
 		if(stats_display_page==2){
 			sd_ctx.fillStyle = "#8F8FFF";
 			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
@@ -651,24 +652,29 @@
 
 			sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
 			sd_ctx.fillStyle = "#1FFF1F";
-			sd_ctx.fillText("Company",20,20);
+			sd_ctx.fillText("Company",30,20);
 			sd_ctx.fillText("Flights",160,20);
-			sd_ctx.fillText("Company",210,20);
+			sd_ctx.fillText("Company",220,20);
 			sd_ctx.fillText("Flights",350,20);
 
-			var col1_x = 20, col2_x = 190, col3_x = 210, col4_x = 380;
+			var col1_x = 30, col2_x = 190, col3_x = 220, col4_x = 380;
 			var y=30;
 			var company = "";
 			for(i=0; i<company_list_sorted.length; i++){
 				if(i==12)break;
 				if(i<=5){
-					sd_ctx.font = "normal 10px sans-serif"; // small-caps
+					sd_ctx.font = "normal 10px sans-serif"; 
 					sd_ctx.fillStyle = "#FFFFFF";
 					if( company_list_sorted[i][0].length > 22 )
 						company = company_list_sorted[i][0].substring(0,22) + "..";
 					else
 						company = company_list_sorted[i][0];
 					if( company == "" ) company = "* unknown *";						
+					sd_ctx.font = "normal 9px sans-serif"; 
+					sd_ctx.fillStyle = "#2FFF2F";
+					sd_ctx.fillText((i+1),col1_x-2-sd_ctx.measureText((i+1).toFixed(0)).width,y);
+					sd_ctx.font = "normal 10px sans-serif"; 
+					sd_ctx.fillStyle = "#FFFFFF";
 					sd_ctx.fillText(company,col1_x,y);
 					sd_ctx.font = "normal 10px sans-serif"; // small-caps
 					sd_ctx.fillStyle = "#FFFF1F";
@@ -683,6 +689,11 @@
 					else
 						company = company_list_sorted[i][0];
 					if( company == "" ) company = "* Unknown *";						
+					sd_ctx.font = "normal 9px sans-serif"; 
+					sd_ctx.fillStyle = "#2FFF2F";
+					sd_ctx.fillText((i+1),col3_x-2-sd_ctx.measureText((i+1).toFixed(0)).width,y);
+					sd_ctx.font = "normal 10px sans-serif"; 
+					sd_ctx.fillStyle = "#FFFFFF";
 					sd_ctx.fillText(company,col3_x,y);
 					sd_ctx.font = "normal 10px sans-serif"; // small-caps
 					sd_ctx.fillStyle = "#FFFF1F";
@@ -690,9 +701,8 @@
 					y+=10;			
 				}
 			}
-			//console.log(company_list_sorted);
-
 		}
+
 
 	}
 
