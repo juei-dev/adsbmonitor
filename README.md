@@ -109,6 +109,9 @@ Nov 22, 2021:
   - Added new page to stats display with top 10 companies and number of their flights during the session.
   - Modified stats display company top to top 12 instead of just 10. Also added download -button to stats display.
 
+Nov 25th, 2021:
+  - Added 4th screen to stats display for the first 6 emergency aircraft (squawk 7700, 7600, 7500) seen during the session.
+
 
 
 ## Current features
