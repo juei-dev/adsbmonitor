@@ -109,13 +109,15 @@
 		var timespan_date = new Date(timespan);
 		rc_ctx.fillStyle = "#CFCF0F";
 		rc_ctx.font = "normal 8px sans-serif"; // small-caps
-		var current_timestamp_text = current_timestamp.getFullYear() + "-" + (current_timestamp.getUTCMonth()+1).toFixed(0).padStart(2) + "-" + current_timestamp.getUTCDate().toFixed(0).padStart(2);
+		var current_timestamp_text = current_timestamp.getFullYear() + "-" + (current_timestamp.getUTCMonth()+1).toFixed(0).padStart(2,"0") + "-" + current_timestamp.getUTCDate().toFixed(0).padStart(2,"0");
 		current_timestamp_text += " " + current_timestamp.getUTCHours().toFixed(0).padStart(2,"0") + ":" + current_timestamp.getUTCMinutes().toFixed(0).padStart(2,"0") + "Z";
 		var timestamp_center_x = 150-Math.floor(rc_ctx.measureText(current_timestamp_text).width/2);
 		rc_ctx.fillText(current_timestamp_text,timestamp_center_x,308);		 
 		rc_ctx.fillStyle = "#FFFF0F";
 		rc_ctx.font = "normal 10px sans-serif"; // small-caps
 		var timespan_text = "";
+		if(timespan_date.getUTCMonth()>0)
+			timespan_text += (timespan_date.getUTCMonth()).toFixed(0).padStart(2) + "m ";
 		if(timespan_date.getUTCDate()>1)
 			timespan_text += (timespan_date.getUTCDate()-1).toFixed(0).padStart(2) + "d " + timespan_date.getUTCHours().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCMinutes().toFixed(0).padStart(2,"0") + ":" + timespan_date.getUTCSeconds().toFixed(0).padStart(2,"0");
 		else
