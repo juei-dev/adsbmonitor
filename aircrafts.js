@@ -446,6 +446,8 @@
 								} else { 
 									ctx.strokeStyle = "blue";
 								}
+								if(selected_icao == icao)
+									ctx.strokeStyle = "magenta";
 								ctx.font = "small-caps normal 9px sans-serif";
 								if( seen < 20 ){
 									ctx.strokeText(rate_prefix + " " + flight,74,500-(altitude/100)+4);
