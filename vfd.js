@@ -256,7 +256,24 @@
 	}
 
 	function clickOpenFD(flight){
-		if(!document.getElementById("cb-FD-enabled").checked){		
+		// first of all, select that flight or deselect if already selected
+		var clicked_icao = "";
+		for(f=0; f<all_icao_flights.length; f++){
+			if(all_icao_flights[f][1] == flight){ clicked_icao = all_icao_flights[f][0]; break; }
+		}
+		if(!selected_icao){
+			selected_icao = clicked_icao;
+			selected_flight = flight;
+		} else if(selected_icao != clicked_icao) {
+			selected_icao = clicked_icao;
+			selected_flight = flight;
+		} else if(selected_icao == clicked_icao) {
+			selected_icao = "";
+			selected_flight = "";			
+		}
+
+		// handle the VFD		
+		if(!document.getElementById("cb-FD-enabled").checked){
 			// in case FD is disabled, focus to flight clicked
 			for(i=0; i<aircrafts_positions.length; i++){
 				if(aircrafts_positions[i][0]==flight){ 
@@ -265,8 +282,11 @@
 					break;
 				}
 			}
+		} else {
+			// if FD is enabled, remove selection
+			selected_icao = ""; selected_flight = "";					
 		}
-		// otherwise, lock the FD to the selected flight
+		// if enabled, lock the FD to the selected flight when clicked
 		if(FD_locked_flight){ FD_flight = flight; FD_locked_flight = ""; hideFD(); return; }
 		FD_locked_flight = flight;
 		showFD();

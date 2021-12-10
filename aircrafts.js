@@ -18,6 +18,8 @@
 	var second_ac_data = null; // supplementary / secondary receiver aircraft json - null if error
 	var second_stat_data = null; // supplementary / secondary receiver statistics json - null if error
 
+	var all_icao_flights = []; // icao, flight
+
 	var ac_count = 0, ac_with_pos_count = 0, ac_msgs = 0, ac_max_distance = 0, ac_max_distance_all_time = 0;
 
 	// session maximums [value, flight, timestamp, heading, bearing, distance]
@@ -35,6 +37,11 @@
 	var company_flights = []; // company_name, flight, last seen (Date object)
 
 	var emergency_flights = []; // company_name, flight, squawk, last seen, lat, lon, altitude, gs, tas, rssi
+
+	// distances
+	var selected_icao = "", selected_flight = "";
+	var selected_lat = 0, selected_lon = 0, selected_altitude = 0;
+	var distance_to_selected = []; // icao, flight, distance, altitude difference, true distance, bearing, lat, lon, track
 
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
@@ -143,6 +150,7 @@
 					ac_count = 0; ac_with_pos_count = 0; ac_msgs = 0; ac_max_distance = 0; 
 					while( primary_icaos.length > 0 ) primary_icaos.pop(); // clear up primary icaos list
 					while( aircrafts_positions.length > 0 ) aircrafts_positions.pop(); // clear up aircraft positions
+					while( distance_to_selected.length > 0 ) distance_to_selected.pop(); // clear up the distances to selected aircraft
 					// parse through all the primary receiver aircrafts
 					for(var key in data.aircraft)
 					{
@@ -171,6 +179,7 @@
 							}
 						}
 						if(aci.flight)flight = aci.flight; else if(second_aci) if(second_aci.flight) flight = second_aci.flight;
+						if(flight)all_icao_flights.push([icao,flight]);
 						if(flight)company_name = findCompany(flight);
 						if(!company_name) company_name = ""; 
 						if(selected_company_name!=flight && flight!=""){
@@ -227,6 +236,32 @@
 						if(gs<0)gs="";
 						if(seen<0)seen="";
 						if(seen>=100)seen = Math.floor(seen); 
+
+						// Add distance to selected aircraft
+						if(selected_icao ){ // && flight
+							if(selected_icao != icao){
+								if(lat && lon && altitude){ // icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track
+									var lateral_distance_between = getDistanceFromLatLonInKm(selected_lat,selected_lon,lat,lon,'km');
+									var true_distance_between = Math.sqrt(lateral_distance_between**2, (selected_altitude - altitude)**2);
+									var bearing_to = getAngleBetweenTwoLatLon(selected_lat,selected_lon,lat,lon);
+									distance_to_selected.push([icao, flight, lateral_distance_between, (selected_altitude - altitude), true_distance_between, bearing_to, lat, lon, track]);
+								} else if (lat & lon){
+									var lateral_distance_between = getDistanceFromLatLonInKm(selected_lat,selected_lon,lat,lon,'km');
+									var true_distance_between = lateral_distance_between;
+									var bearing_to = getAngleBetweenTwoLatLon(selected_lat,selected_lon,lat,lon);
+									distance_to_selected.push([icao, flight, lateral_distance_between, selected_altitude, true_distance_between, bearing_to, lat, lon, track]);
+								}
+							} else { // if this is selected flight
+								if(flight)selected_flight = flight; else { selected_flight = ""; }
+								if(lat && lon){
+									selected_lat = lat; selected_lon = lon;
+									if(altitude)selected_altitude = altitude; else selected_altitude=0;
+									distance_to_selected.push([icao, flight, 0, selected_altitude, 0, -1, lat, lon, track]);
+								} else { // if selected icao doesn't have position information, remove selection completely
+									selected_icao = ""; selected_flight = ""; 
+								}								
+							}
+						}
 
 						// Add flight to aircrafts_positions
 						if(lat && lon)
@@ -317,6 +352,8 @@
 						if( distance < 0 ) { distance = " "; distance_style = " color: #000000:"; }
 						var squawk_style = "";
 						if( squawk == "7700" || squawk == "7600" || squawk == "7500" ) squawk_style = " background: #FF0000; color: #FFFFFF; font-weight: bold;";
+
+						if(selected_icao == icao) flight_style += " border: 1px solid #E01011;";
 
 						var cat_explanation = "";
 						switch(cat){
@@ -421,27 +458,36 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-							if(cat.substring(0,1)=="A" || cat.substring(0,1) == "")
+							if(cat.substring(0,1)=="A" || cat.substring(0,1) == ""){
 								var ac = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
 									color: '#00FF00',
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 2300
-								}).addTo(layerGroup);
-							else
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								ac.icaoHex = icao;
+								ac.flight = flight;
+							} else {
 								var ac = L.rectangle([[lat-0.00001, lon-0.00002], [lat+0.0001,lon+0.00002]], {
 									color: '#FF00FF',
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 100
-								}).addTo(layerGroup);
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								ac.icaoHex = icao;
+								ac.flight = flight;
+							}
 							// add heading line, variable by ground speed - indicating the ac position in the next 1 min if speed and heading are preserved
 							var speed_km = gs *1.852;
 							var headline_len = speed_km / 60;                           
 							nextpoint_lat = 0; nextpoint_lon = 0;
 							if( track ) calcNextPoint(lat,lon,track,headline_len); // indicator with km distance calculated from gs
 							if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
-							var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+								var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+							}
+							// add selected circle if selected aircraft
+							if(selected_icao==icao){
+								var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection
 							}
 							// add tooltip text
 							var st_track = "-";
@@ -460,7 +506,28 @@
 							else
 								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
 						}
+
+
 					}
+
+					// sort by the true distance, column 4 [icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track]
+					distance_to_selected.sort(sort_distance_to_selected);
+
+					// Add distance lines to (nearest) other aircraft
+					if(selected_icao){
+						if(distance_to_selected.length > 1){
+							// [icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track]
+							var closest_selected_lat = distance_to_selected[0][6];
+							var closest_selected_lon = distance_to_selected[0][7];
+							var closest_lat = distance_to_selected[1][6];
+							var closest_lon = distance_to_selected[1][7];
+							var closest_true_distance = distance_to_selected[1][4]; // in km
+							var closest_line = L.polyline([ [closest_selected_lat,closest_selected_lon],[closest_lat,closest_lon] ], { color: 'red', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+							closest_line.bindTooltip(closest_true_distance.toFixed(1) + " km", { permanent: true, direction: 'center', offset: [0,0] });
+						}
+					}
+
+
 					al.innerHTML = outHTML; // populate aircraft table
 					sortTable("aircrafts",aircrafts_table_sort_col,aircrafts_table_sort_ascending,aircrafts_table_sort_numeric); // sort by column 8 = distance, ascending, numeric information
 					//debugTable();
@@ -481,11 +548,13 @@
 					footHTML += "<td colspan='2'>km this session</td>";					
 					footHTML += "</tr>";
 					document.getElementById("stats-footer").innerHTML = footHTML;					
+
 				} else {
 					JSONError=="http://" + receiver_domain + receiver_url_path; 
 					receiver_ok = false;
 					// document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
 				}
+
 			}
 		);
 	}

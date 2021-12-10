@@ -194,3 +194,13 @@
 		return_str += timestamp.getUTCSeconds().toFixed(0).padStart(2,"0") + "Z";
 		return return_str;
 	}
+
+	function sort_distance_to_selected(a,b){
+		// icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track
+		/*
+		if(a[4] < b[4]) return -1;
+		if(a[4] > b[4]) return 1;
+		return 0;
+		*/
+		return (a[4] - b[4]);
+	}
