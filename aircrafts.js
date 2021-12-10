@@ -522,8 +522,9 @@
 							var closest_lat = distance_to_selected[1][6];
 							var closest_lon = distance_to_selected[1][7];
 							var closest_true_distance = distance_to_selected[1][4]; // in km
+							var closest_true_distance_nm = closest_true_distance * 0.539957 // in nautical miles
 							var closest_line = L.polyline([ [closest_selected_lat,closest_selected_lon],[closest_lat,closest_lon] ], { color: 'red', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
-							closest_line.bindTooltip(closest_true_distance.toFixed(1) + " km", { permanent: true, direction: 'center', offset: [0,0] });
+							closest_line.bindTooltip(closest_true_distance.toFixed(1) + " km<br>" + closest_true_distance_nm.toFixed(1) + " nm", { permanent: true, direction: 'center', offset: [0,0] });
 						}
 					}
 
