@@ -112,6 +112,8 @@ Nov 22, 2021:
 Nov 25th, 2021:
   - Added 4th screen to stats display for the first 6 emergency aircraft (squawk 7700, 7600, 7500) seen during the session.
 
+Dec 10th, 2021:
+  - Added selection feature for the aircrafts. Aircraft can be selected from the list or clicking icon on the map. Map will then show the true distance (altitude difference taken into account - straight vector distance) to the nearest aircraft.
 
 
 ## Current features
