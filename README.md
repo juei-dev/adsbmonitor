@@ -115,6 +115,10 @@ Nov 25th, 2021:
 Dec 10th, 2021:
   - Added selection feature for the aircrafts. Aircraft can be selected from the list or clicking icon on the map. Map will then show the true distance (altitude difference taken into account - straight vector distance) to the nearest aircraft.
 
+Dec 11th, 2021:
+  - Added orange extra rectangle for heavy aircraft and light blue circle for helicopters to map markers. Also changed blinking EM to map marker for the emergency squawks. Fine tuned the location of information tooltip of map marker to adapt to the zoom level.    
+
+
 
 ## Current features
 
