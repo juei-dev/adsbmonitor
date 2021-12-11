@@ -353,7 +353,7 @@
 						var squawk_style = "";
 						if( squawk == "7700" || squawk == "7600" || squawk == "7500" ) squawk_style = " background: #FF0000; color: #FFFFFF; font-weight: bold;";
 
-						if(selected_icao == icao) flight_style += " border: 1px solid #E01011;";
+						if(selected_icao == icao) flight_style += " border: 1px solid #F01011; border-radius: 3px;";
 
 						var cat_explanation = "";
 						switch(cat){
@@ -460,7 +460,39 @@
 						if( lat!=null && lon!=null ) 
 						{
 							// add position marker
-							if(cat.substring(0,1)=="A" || cat.substring(0,1) == ""){
+							if(cat=="A4" || cat == "A5" || cat == "A6"){ // High vortex, heavy and high performance/super heavy
+								var ac = L.rectangle([[lat-(zoom_correction_lat*1.5), lon-(zoom_correction_lon*1.5)], [lat+(zoom_correction_lat*1.5),lon+(zoom_correction_lon*1.5)]], {
+									color: '#00FF00',
+									fillColor: '#000',
+									fillOpacity: 0.9,
+									radius: 2300
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								var ac_inner = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
+									color: '#F09F00',
+									fillColor: '#000',
+									fillOpacity: 0.9,
+									radius: 2300
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								ac.icaoHex = icao;
+								ac.flight = flight;
+							}
+							else if(cat=="A7"){  // Helicopter
+								var ac = L.circle([lat, lon], {
+									color: '#00F0FF',
+									fillColor: '#000',
+									fillOpacity: 0.7,
+									radius: 1500
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								var ac_inner = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
+									color: '#00FF00',
+									fillColor: '#000',
+									fillOpacity: 0.9,
+									radius: 2300
+								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								ac.icaoHex = icao;
+								ac.flight = flight;
+							}
+							else if(cat.substring(0,1)=="A" || cat.substring(0,1) == ""){ // small, medium, large
 								var ac = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
 									color: '#00FF00',
 									fillColor: '#000',
@@ -469,7 +501,8 @@
 								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
 								ac.icaoHex = icao;
 								ac.flight = flight;
-							} else {
+							} 
+							else { // other (should not be availble, but for failsafe)
 								var ac = L.rectangle([[lat-0.00001, lon-0.00002], [lat+0.0001,lon+0.00002]], {
 									color: '#FF00FF',
 									fillColor: '#000',
@@ -499,14 +532,23 @@
 								st_squawk = "[<span style='color: #9092e0;'>" + squawk + "</span>]";
 							if( !aci.squawk )st_squawk = ""; 
 							if( (squawk == "7700") || (squawk == "7600") || (squawk == "7500") )
-								st_squawk = "<span style='color: #ff0000; font-size: 1.2em;'><b> EM </b> [" + squawk + "]</span>";
+								st_squawk = "<span style='background-color: #ff0000; color: #ffffff; font-size: 1.1em; animation: blinker 1s linear infinite;'><b> EM </b> [" + squawk + "]</span>";
 							if( altitude < 5000 ) st_alt = altitude;
 							if( rate > 0 ) st_rate = "&uarr;<span style='color:#40c041;'>" + rate + "</span>";
 							if( rate < 0 ) st_rate = "&darr;<span style='color:#c04041;'>" + (-rate) + "</span>";
+							if( cat == "A7" )
+								st_squawk += "<i> helo </i>";
+							var tt_offset = [40,13];
+							if( mymap.getZoom() == 9 ) tt_offset = [40,17];
+							if( mymap.getZoom() == 10 ) tt_offset = [40,20];
+							if( mymap.getZoom() == 11 ) tt_offset = [40,23];
+							if( mymap.getZoom() == 12 ) tt_offset = [40,29];
+							if( mymap.getZoom() == 13 ) tt_offset = [40,34];
+							if( mymap.getZoom() >= 14 ) tt_offset = [40,52];
 							if( !flight && !squawk )
-								ac.bindTooltip(" " + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
+								ac.bindTooltip(" " + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: tt_offset });
 							else
-								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: [35,19] });
+								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: tt_offset });
 						}
 
 

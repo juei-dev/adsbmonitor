@@ -14,6 +14,9 @@
 		::-webkit-scrollbar-thumb:hover {
 			background: #20A0F0;
 		}
+		@keyframes blinker {
+			50% { opacity: 0; }
+		}
 		html { scrollbar-color: #209290 !important; }
 		a { text-decoration: none; color: inherit; }
 		body { background-color: #102023; font: Tahoma, sans-serif, arial; margin: 0px; padding: 0px; }
@@ -30,8 +33,9 @@
 		td.additional-page-left { vertical-align: top; padding: 0px; margin: 0px; display: none; }
 		td.additional-page-right { vertical-align: top; padding: 0px; margin: 0px; width: 420px; display: none; }
 		#main { text-align: center; vertical-align: top; margin-top: 3px; }
-		#mapid { height: 800px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border-radius: 5px; border: 2px groove #011079; } /*  border: 2px solid #30307a; */
+		#mapid { height: 800px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border-radius: 5px; border: 2px groove #011079;  } /*  border: 2px solid #30307a; */
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
+		.leaflet-container { background: #101011; }
 		.leaflet-tooltip { 
 			color: #e0ef00; 
 			background: rgba(155,155,155,0); 
@@ -40,6 +44,7 @@
 			text-align: left; 
 			border: none !important;
 			box-shadow: none !important;
+			line-height: 9px;
 		}
 		.leafleft-popup-tip-container { 
 			display: none;
@@ -397,4 +402,6 @@
 			transform-origin: bottom left;
 			/* clip-path: polygon(90% 90% 90%); */
 		}
+
+
 
