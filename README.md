@@ -119,7 +119,7 @@ Dec 11th, 2021:
   - Added orange extra rectangle for heavy aircraft and light blue circle for helicopters to map markers. Also changed blinking EM to map marker for the emergency squawks. Fine tuned the location of information tooltip of map marker to adapt to the zoom level.    
 
 Dec 12th, 2021:
-  - Added list of 6 closest aircrafts of selected aircraft to the stats display page 5
+  - Added list of 5 closest aircrafts of selected aircraft to the stats display page 5
 
 
 
