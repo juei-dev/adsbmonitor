@@ -7,7 +7,7 @@
 	var second_receiver_msgs_1min = 0, second_receiver_msgs_1min_max = 0;
 
 	var stats_display_page = 1;
-	const max_stats_display_page = 4;
+	const max_stats_display_page = 5;
 
 	function refreshStats(){
 		if(JSONError=="http://" + receiver_domain + receiver_stats_url_path){
@@ -757,6 +757,73 @@
 				}							
 
 		}
+
+		if(stats_display_page==5){
+			sd_ctx.fillStyle = "#8F8FFF";
+			sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
+			sd_ctx.fillText("Closest To Selected Flight",1,10);			
+
+			sd_ctx.lineWidth = 0.5;
+			sd_ctx.beginPath();
+			sd_ctx.moveTo(1,11);
+			sd_ctx.lineTo(449,11);
+			sd_ctx.closePath();
+			sd_ctx.stroke();
+
+			sd_ctx.font = "small-caps 9px sans-serif"; 
+			sd_ctx.fillStyle = "#FFFF8F";
+			var now = new Date();
+			sd_ctx.fillText(dateToReadableStr(now),449-sd_ctx.measureText(dateToReadableStr(now)).width,10);			
+
+			// var distance_to_selected = []; // icao, flight, distance, altitude difference, true distance, bearing, lat, lon, track
+
+			if(selected_icao){
+				sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
+				sd_ctx.fillStyle = "#1FFF1F";
+				sd_ctx.fillText("ICAO",20,20);
+				sd_ctx.fillText("Flight",70,20);
+				sd_ctx.fillText("TrueDist",140,20);
+				sd_ctx.fillText("Lat",200,20);
+				sd_ctx.fillText("Lon",240,20);
+				sd_ctx.fillText("AltDelta",280,20);
+				sd_ctx.fillText("Bearing",320,20);
+				sd_ctx.fillText("Track",380,20);
+				var ds_y = 30;
+				sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
+				sd_ctx.fillStyle = "#FFFFFF";
+				for(ds=0; ds<distance_to_selected.length; ds++){
+					if(ds==0){
+						sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
+						sd_ctx.fillStyle = "#FF1F1F";
+						if(distance_to_selected[ds][0])sd_ctx.fillText(distance_to_selected[ds][0].toUpperCase(),20,ds_y);
+						if(distance_to_selected[ds][1])sd_ctx.fillText(distance_to_selected[ds][1].substring(0,10).toUpperCase(),70,ds_y);
+						if(distance_to_selected[ds][6])sd_ctx.fillText(distance_to_selected[ds][6].toFixed(3),200,ds_y);
+						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),240,ds_y);
+						sd_ctx.fillText("Selected aircraft",280,ds_y);
+						if(distance_to_selected[ds][8])sd_ctx.fillText(distance_to_selected[ds][8].toFixed(0),380,ds_y);
+					} else {
+						sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
+						sd_ctx.fillStyle = "#1FFF1F";
+						if(distance_to_selected[ds][0])sd_ctx.fillText(distance_to_selected[ds][0].toUpperCase(),20,ds_y);
+						if(distance_to_selected[ds][1])sd_ctx.fillText(distance_to_selected[ds][1].substring(0,10).toUpperCase(),70,ds_y);
+							else sd_ctx.fillText("*Unknown*",70,ds_y);
+						if(distance_to_selected[ds][4])sd_ctx.fillText(distance_to_selected[ds][4].toFixed(2) + " km",140,ds_y);
+						if(distance_to_selected[ds][6])sd_ctx.fillText(distance_to_selected[ds][6].toFixed(3),200,ds_y);
+						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),240,ds_y);
+						if(distance_to_selected[ds][3])sd_ctx.fillText(-distance_to_selected[ds][3].toFixed(0),280,ds_y);
+						if(distance_to_selected[ds][5])sd_ctx.fillText(distance_to_selected[ds][5].toFixed(0),320,ds_y);
+						if(distance_to_selected[ds][8])sd_ctx.fillText(distance_to_selected[ds][8].toFixed(0),380,ds_y);
+					}
+					ds_y+=10;
+					if(ds>=5)break; // no more than 6 closest
+				}							
+			} else {
+				sd_ctx.font = "small-caps 12px sans-serif"; // small-caps
+				sd_ctx.fillStyle = "#1FFF1F";
+				sd_ctx.fillText("< Select a flight from map or list >",90,50);				
+			}
+		}
+
 
 	}
 
