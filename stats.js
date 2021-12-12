@@ -784,9 +784,9 @@
 				sd_ctx.fillText("Flight",70,20);
 				sd_ctx.fillText("TrueDist",140,20);
 				sd_ctx.fillText("Lat",200,20);
-				sd_ctx.fillText("Lon",240,20);
-				sd_ctx.fillText("AltDelta",280,20);
-				sd_ctx.fillText("Bearing",320,20);
+				sd_ctx.fillText("Lon",250,20);
+				sd_ctx.fillText("AltDelta",300,20);
+				sd_ctx.fillText("Bearing",340,20);
 				sd_ctx.fillText("Track",380,20);
 				var ds_y = 30;
 				sd_ctx.font = "small-caps 9px sans-serif"; // small-caps
@@ -798,8 +798,8 @@
 						if(distance_to_selected[ds][0])sd_ctx.fillText(distance_to_selected[ds][0].toUpperCase(),20,ds_y);
 						if(distance_to_selected[ds][1])sd_ctx.fillText(distance_to_selected[ds][1].substring(0,10).toUpperCase(),70,ds_y);
 						if(distance_to_selected[ds][6])sd_ctx.fillText(distance_to_selected[ds][6].toFixed(3),200,ds_y);
-						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),240,ds_y);
-						sd_ctx.fillText("Selected aircraft",280,ds_y);
+						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),250,ds_y);
+						sd_ctx.fillText("Selected AC",300,ds_y);
 						if(distance_to_selected[ds][8])sd_ctx.fillText(distance_to_selected[ds][8].toFixed(0),380,ds_y);
 					} else {
 						sd_ctx.font = "small-caps 10px sans-serif"; // small-caps
@@ -809,9 +809,9 @@
 							else sd_ctx.fillText("*Unknown*",70,ds_y);
 						if(distance_to_selected[ds][4])sd_ctx.fillText(distance_to_selected[ds][4].toFixed(2) + " km",140,ds_y);
 						if(distance_to_selected[ds][6])sd_ctx.fillText(distance_to_selected[ds][6].toFixed(3),200,ds_y);
-						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),240,ds_y);
-						if(distance_to_selected[ds][3])sd_ctx.fillText(-distance_to_selected[ds][3].toFixed(0),280,ds_y);
-						if(distance_to_selected[ds][5])sd_ctx.fillText(distance_to_selected[ds][5].toFixed(0),320,ds_y);
+						if(distance_to_selected[ds][7])sd_ctx.fillText(distance_to_selected[ds][7].toFixed(3),250,ds_y);
+						if(distance_to_selected[ds][3])sd_ctx.fillText(-distance_to_selected[ds][3].toFixed(0),300,ds_y);
+						if(distance_to_selected[ds][5])sd_ctx.fillText(distance_to_selected[ds][5].toFixed(0),340,ds_y);
 						if(distance_to_selected[ds][8])sd_ctx.fillText(distance_to_selected[ds][8].toFixed(0),380,ds_y);
 					}
 					ds_y+=10;
