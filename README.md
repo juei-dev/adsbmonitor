@@ -238,6 +238,6 @@ Example (Nov 21th 2021) statistics gauge display:
 Example (Dec 11th 2021) selected aircraft with true distance to closest aircraft:
 ![Example_distance](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/Example_distance.JPG?raw=true)
 
-Example (Nov 12th 2021) selected aircraft 6 closest aircrafts list in stats display:
+Example (Nov 12th 2021) selected aircraft 5 closest aircrafts list in stats display:
 ![Example_distance_list](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/Example_distance_list.JPG?raw=true)
 
