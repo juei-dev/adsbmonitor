@@ -122,7 +122,7 @@ Dec 12th, 2021:
   - Added list of 5 closest aircrafts of selected aircraft to the stats display page 5
 
 Dec 14th, 2021:
-  - Added an option to change between 4 different Mapbox map styles (dark, satellite, satellite with streets and dark navigation). On the map there is now a small preview of the next style and by clicking that the map style changes. It also sets the selection to the cookies, so the setting will be remembered.  
+  - Added an option to change between 4 different Mapbox map styles (dark, satellite, satellite with streets and dark navigation). On the map there is now a small preview icon at the top right corner of the next style and by clicking that the map style changes. It also sets the selection to the cookies, so the setting will be remembered.  
 
 
 
