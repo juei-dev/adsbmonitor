@@ -1,5 +1,12 @@
+//	import "https://api.tiles.mapbox.com/mapbox.js/plugins/geo-viewport/v0.2.1/geo-viewport.js";
 
 	var set_lat = receiver_lat, set_lon = receiver_lon, set_zoom = 6;
+
+	var mapbox_map_id = "mapbox/dark-v8";
+	var mapbox_map_id_sat = "mapbox/satellite-v9";
+	var mapbox_map_id_street = "mapbox/satellite-streets-v11";
+	var mapbox_map_id_nav = "mapbox/navigation-night-v1";
+	var current_mapbox_map_id = mapbox_map_id;
 
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
@@ -9,14 +16,41 @@
 	}
 
 	var mymap = L.map('mapid').setView([set_lat, set_lon], set_zoom);
-	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-    		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    		maxZoom: 18,
-    		id: 'mapbox/dark-v8', /* mapbox/streets-v11 */
-    		tileSize: 512,
-    		zoomOffset: -1,
-    		accessToken: mapbox_accessToken
+	var tileLayer_normal = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: mapbox_map_id, /* mapbox/streets-v11 mapbox/dark-v8 */
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: mapbox_accessToken
 	}).addTo(mymap);
+
+	var tileLayer_satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: mapbox_map_id_sat,
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: mapbox_accessToken
+	});
+
+	var tileLayer_street = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: mapbox_map_id_street,
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: mapbox_accessToken
+	});
+
+	var tileLayer_nav = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: mapbox_map_id_nav,
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: mapbox_accessToken
+	});
 
 	mymap.on('zoomend', function() {
 		filters_map_center = mymap.getCenter();
@@ -32,8 +66,72 @@
 		setCookie("set_lat",filters_map_center.lat);
 		setCookie("set_lon",filters_map_center.lng);
 		setCookie("set_zoom",mymap.getZoom());
+		// update preview / view setting box
+		showSmallMap();		
 	});
 	mymap.addControl(new L.Control.Fullscreen());
+
+	function smallMapEvent(){
+		showSmallMap();
+	}
+	mymap.whenReady(smallMapEvent);
+
+	function showSmallMap(){
+		var map_center = mymap.getCenter();
+		//console.log(map_center);
+		var preview_size = [50,50];
+		if(current_mapbox_map_id == mapbox_map_id)
+			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_sat + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
+		else if(current_mapbox_map_id == mapbox_map_id_sat)
+			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_street + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
+		else if(current_mapbox_map_id == mapbox_map_id_street)
+			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_nav + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
+		else if(current_mapbox_map_id == mapbox_map_id_nav)
+			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
+		document.getElementById('map-preview').onclick = changeMapStyle;
+		document.getElementById('map-preview').title = "Click to change the map style";
+	}
+
+	function changeMapStyle(){
+		if(current_mapbox_map_id == mapbox_map_id){
+			mymap.addLayer(tileLayer_satellite);
+			mymap.removeLayer(tileLayer_normal);
+			current_mapbox_map_id = mapbox_map_id_sat;
+		} else if (current_mapbox_map_id == mapbox_map_id_sat){
+			mymap.addLayer(tileLayer_street);
+			mymap.removeLayer(tileLayer_satellite);
+			current_mapbox_map_id = mapbox_map_id_street;
+		} else if (current_mapbox_map_id == mapbox_map_id_street){
+			mymap.addLayer(tileLayer_nav);
+			mymap.removeLayer(tileLayer_street);
+			current_mapbox_map_id = mapbox_map_id_nav;
+		} else if (current_mapbox_map_id == mapbox_map_id_nav){
+			mymap.addLayer(tileLayer_normal);
+			mymap.removeLayer(tileLayer_nav);
+			current_mapbox_map_id = mapbox_map_id;
+		}
+		setCookie("selectedMapLayer",current_mapbox_map_id,365);
+		showSmallMap();
+	}
+
+	// get previous selection from a cookie
+	function initMap(){
+		if(getCookie("selectedMapLayer")){
+			current_mapbox_map_id = getCookie("selectedMapLayer");
+			if(current_mapbox_map_id == mapbox_map_id){
+				mymap.addLayer(tileLayer_normal);
+			} else if (current_mapbox_map_id == mapbox_map_id_sat){
+				mymap.addLayer(tileLayer_satellite);
+			} else if (current_mapbox_map_id == mapbox_map_id_street){
+				mymap.addLayer(tileLayer_street);
+			} else if (current_mapbox_map_id == mapbox_map_id_nav){
+				mymap.addLayer(tileLayer_nav);
+			} else mymap.addLayer(tileLayer_normal);
+			mymap.removeLayer(tileLayer_normal);
+			showSmallMap();
+		} else mymap.addLayer(tileLayer_normal);
+	}
+	initMap();
 
 	function goToMapPoint(lat, lon, zoom){
 		mymap.flyTo([lat,lon],zoom);
