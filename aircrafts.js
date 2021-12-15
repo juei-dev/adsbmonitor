@@ -43,6 +43,11 @@
 	var selected_lat = 0, selected_lon = 0, selected_altitude = 0;
 	var distance_to_selected = []; // icao, flight, distance, altitude difference, true distance, bearing, lat, lon, track
 
+	// selected aircraft - glide range: extremely rough approximation to map using 1:15 glide ratio, altitude and max azimuth of +-45 degrees towards heading
+	var selected_glide_range_enabled = true;
+	var selected_glide_range_ratio = 15; // 1:15
+	var selected_glide_azimuth = 45; // +- 45 degrees towards ac heading
+
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
@@ -473,8 +478,8 @@
 									fillOpacity: 0.9,
 									radius: 2300
 								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
-								ac.icaoHex = icao;
-								ac.flight = flight;
+								ac.icaoHex = icao; ac_inner.icaoHex = icao;
+								ac.flight = flight; ac_inner.flight = flight;
 							}
 							else if(cat=="A7"){  // Helicopter
 								var ac = L.circle([lat, lon], {
@@ -523,6 +528,21 @@
 							// add selected circle if selected aircraft
 							if(selected_icao==icao){
 								var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection
+							}
+							// add glide range, if showing enabled and selected
+							if(selected_icao==icao && selected_glide_range_enabled && altitude && track){
+								var glide_range = ((altitude*0.3048)/1000) * selected_glide_range_ratio;
+								var azimuth1 = track - selected_glide_azimuth;
+								if(azimuth1<0)azimuth1=360+azimuth1;
+								var azimuth2 = track + selected_glide_azimuth;
+								if(azimuth2>360)azimuth2 = azimuth2-360;
+								console.log(azimuth1 + " - " + azimuth2 + " : " + glide_range);
+								nextpoint_lat = 0; nextpoint_lon = 0;
+								if( track ) calcNextPoint(lat,lon,azimuth1,glide_range);
+								var gr_a1 = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: '#8080F1', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+								nextpoint_lat = 0; nextpoint_lon = 0;
+								if( track ) calcNextPoint(lat,lon,azimuth2,glide_range);
+								var gr_a2 = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: '#8080F1', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
 							}
 							// add tooltip text
 							var st_track = "-";
