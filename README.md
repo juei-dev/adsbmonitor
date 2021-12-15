@@ -124,6 +124,9 @@ Dec 12th, 2021:
 Dec 14th, 2021:
   - Added an option to change between 4 different Mapbox map styles (dark, satellite, satellite with streets and dark navigation). On the map there is now a small preview icon at the top right corner of the next style and by clicking that the map style changes. It also sets the selection to the cookies, so the setting will be remembered.  
 
+Dec 15th, 2021:
+  - Added glide range marker lines to the map for selected aircraft in assumption of 1:15 glide-ratio and using ac current altitude. Range marker angle is +-45 degrees from the ac current track. So a very rough estimate of all-engine failure absolute maximum glide range for bigger commercial aircraft (having glide ratios of 1:15 - 1:20). Also fixed bug with A4-A6 category aircraft selection from the map (mouse click should select those a bit better now).
+
 
 
 ## Current features
