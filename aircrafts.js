@@ -536,7 +536,7 @@
 								if(azimuth1<0)azimuth1=360+azimuth1;
 								var azimuth2 = track + selected_glide_azimuth;
 								if(azimuth2>360)azimuth2 = azimuth2-360;
-								console.log(azimuth1 + " - " + azimuth2 + " : " + glide_range);
+								// console.log(azimuth1 + " - " + azimuth2 + " : " + glide_range);
 								nextpoint_lat = 0; nextpoint_lon = 0;
 								if( track ) calcNextPoint(lat,lon,azimuth1,glide_range);
 								var gr_a1 = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: '#8080F1', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
