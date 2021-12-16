@@ -6,6 +6,7 @@
 	var mapbox_map_id_sat = "mapbox/satellite-v9";
 	var mapbox_map_id_street = "mapbox/satellite-streets-v11";
 	var mapbox_map_id_nav = "mapbox/navigation-night-v1";
+	var mapbox_map_id_blank = "blank";
 	var current_mapbox_map_id = mapbox_map_id;
 
 	// get map position and zoom from the cookies, if those are set
@@ -52,6 +53,16 @@
 			accessToken: mapbox_accessToken
 	});
 
+	var tileLayer_blank = L.tileLayer('', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: mapbox_map_id_blank,
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: mapbox_accessToken
+	});
+
+
 	mymap.on('zoomend', function() {
 		filters_map_center = mymap.getCenter();
 		filters_map_distance = Math.floor(filters_map_center.distanceTo(L.latLng(filters_map_center.lat, mymap.getBounds().getEast()))/1000);  
@@ -80,17 +91,32 @@
 		var map_center = mymap.getCenter();
 		//console.log(map_center);
 		var preview_size = [50,50];
-		if(current_mapbox_map_id == mapbox_map_id)
+		var next_image_name = "-";
+		if(current_mapbox_map_id == mapbox_map_id){
 			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_sat + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
-		else if(current_mapbox_map_id == mapbox_map_id_sat)
+			next_image_name = "satellite";
+		}
+		else if(current_mapbox_map_id == mapbox_map_id_sat){
 			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_street + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
-		else if(current_mapbox_map_id == mapbox_map_id_street)
+			next_image_name = "satellite with streets";
+		}
+		else if(current_mapbox_map_id == mapbox_map_id_street){
 			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id_nav + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
-		else if(current_mapbox_map_id == mapbox_map_id_nav)
+			next_image_name = "dark navigation";
+		}
+		else if(current_mapbox_map_id == mapbox_map_id_nav){
+			document.getElementById('map-preview').src = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAAyADIDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD+H+v0g/PwoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgD/9k=";
+			next_image_name = "completely blank";
+		}
+		else if(current_mapbox_map_id == mapbox_map_id_blank){
 			document.getElementById('map-preview').src = "https://api.mapbox.com/styles/v1/" + mapbox_map_id + "/static/" + map_center.lng + "," + map_center.lat + ",1,0,0/" + preview_size.join("x") + "?attribution=false&logo=false&access_token=" + mapbox_accessToken;
+			next_image_name = "normal dark";
+		} 
 		document.getElementById('map-preview').onclick = changeMapStyle;
-		document.getElementById('map-preview').title = "Click to change the map style";
+		document.getElementById('map-preview').title = "Click to change the map style to " + next_image_name;
 	}
+
+	var circleLayerGroup = L.layerGroup().addTo(mymap);
 
 	function changeMapStyle(){
 		if(current_mapbox_map_id == mapbox_map_id){
@@ -106,17 +132,60 @@
 			mymap.removeLayer(tileLayer_street);
 			current_mapbox_map_id = mapbox_map_id_nav;
 		} else if (current_mapbox_map_id == mapbox_map_id_nav){
-			mymap.addLayer(tileLayer_normal);
 			mymap.removeLayer(tileLayer_nav);
+			current_mapbox_map_id = mapbox_map_id_blank;
+			// add radius circles for blank map
+			showRadiusCircles();
+		} else if (current_mapbox_map_id == mapbox_map_id_blank){
+			circleLayerGroup.clearLayers();
+			mymap.addLayer(tileLayer_normal);
 			current_mapbox_map_id = mapbox_map_id;
 		}
 		setCookie("selectedMapLayer",current_mapbox_map_id,365);
 		showSmallMap();
 	}
 
+	function showRadiusCircles(){
+			var radius_circle_100km = L.circle([receiver_lat, receiver_lon], 100000, {
+					color: '#30315F',
+					weight: 1,
+					fillColor: '#005',
+					fillOpacity: 0.1,
+					radius: 100000
+			}).addTo(circleLayerGroup);
+			var radius_circle_200km = L.circle([receiver_lat, receiver_lon], 200000, {
+					color: '#30315F',
+					weight: 1,
+					fillColor: '#004',
+					fillOpacity: 0.1,
+					radius: 200000
+			}).addTo(circleLayerGroup);
+			var radius_circle_300km = L.circle([receiver_lat, receiver_lon], 300000, {
+					color: '#30315F',
+					weight: 1,
+					fillColor: '#003',
+					fillOpacity: 0.1,
+					radius: 300000
+			}).addTo(circleLayerGroup);
+			var radius_circle_400km = L.circle([receiver_lat, receiver_lon], 400000, {
+					color: '#30315F',
+					weight: 1,
+					fillColor: '#002',
+					fillOpacity: 0.1,
+					radius: 400000
+			}).addTo(circleLayerGroup);
+			if(airports_enabled) {
+				if(document.getElementById("airports-enabled")) {
+					if(document.getElementById("airports-enabled").checked){ layerGroupRunways.clearLayers(); findNearestRunways(); }
+				} else { // layerGroupRunways.clearLayers(); findNearestRunways(); 
+				}
+			}
+	}
+
 	// get previous selection from a cookie
 	function initMap(){
 		if(getCookie("selectedMapLayer")){
+			mymap.removeLayer(tileLayer_normal);
 			current_mapbox_map_id = getCookie("selectedMapLayer");
 			if(current_mapbox_map_id == mapbox_map_id){
 				mymap.addLayer(tileLayer_normal);
@@ -126,10 +195,17 @@
 				mymap.addLayer(tileLayer_street);
 			} else if (current_mapbox_map_id == mapbox_map_id_nav){
 				mymap.addLayer(tileLayer_nav);
-			} else mymap.addLayer(tileLayer_normal);
-			mymap.removeLayer(tileLayer_normal);
-			showSmallMap();
-		} else mymap.addLayer(tileLayer_normal);
+			} else if (current_mapbox_map_id == mapbox_map_id_blank){
+				showRadiusCircles(); // Show radius circles (in 100 km steps to 400km)
+			} else {
+				mymap.addLayer(tileLayer_normal);
+				current_mapbox_map_id = mapbox_map_id;
+			}
+		} else {
+			mymap.addLayer(tileLayer_normal);
+			current_mapbox_map_id = mapbox_map_id;
+		}
+		showSmallMap();
 	}
 	initMap();
 
@@ -163,7 +239,7 @@
 
 	/* Mark supplementary receiver location, if enabled */
 	if( second_receiver_enabled ){
-		var circle = L.circle([second_receiver_lat, second_receiver_lon], {
+		var second_circle = L.circle([second_receiver_lat, second_receiver_lon], {
 			color: 'red',
 			fillColor: '#f00',
 			fillOpacity: 0.2,
