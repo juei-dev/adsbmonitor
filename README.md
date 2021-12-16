@@ -127,6 +127,9 @@ Dec 14th, 2021:
 Dec 15th, 2021:
   - Added glide range marker lines to the map for selected aircraft in assumption of 1:15 glide-ratio and using ac current altitude. Range marker angle is +-45 degrees from the ac current track. So a very rough estimate of all-engine failure absolute maximum glide range for bigger commercial aircraft (having glide ratios of 1:15 - 1:20). Also fixed bug with A4-A6 category aircraft selection from the map (mouse click should select those a bit better now).
 
+Dec 16th, 2021:
+  - Added fifth "map" as blank map. When displaying the blank map, the distance circles are added per each 100km up to 400km.
+
 
 
 ## Current features
