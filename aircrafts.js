@@ -577,7 +577,7 @@
 					// sort by the true distance, column 4 [icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track]
 					distance_to_selected.sort(sort_distance_to_selected);
 
-					// Add distance lines to (nearest) other aircraft
+					// Add distance line to (nearest) other aircraft
 					if(selected_icao){
 						if(distance_to_selected.length > 1){
 							// [icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track]
@@ -592,6 +592,13 @@
 						}
 					}
 
+					// Add distance line to selected runway threshold
+					if(selectedAirportRunway_lat && selectedAirportRunway_lon && selected_lat && selected_lon){
+						var selected_runway_line = L.polyline([ [selected_lat,selected_lon],[selectedAirportRunway_lat,selectedAirportRunway_lon] ], { color: '#20F12F', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
+						var distance_to_runway = getDistanceFromLatLonInKm(selected_lat,selected_lon,selectedAirportRunway_lat,selectedAirportRunway_lon,'km');
+					 	var distance_to_runway_nm = distance_to_runway * 0.539957; // in nautical miles
+						selected_runway_line.bindTooltip(distance_to_runway.toFixed(1) + " km<br>" + distance_to_runway_nm.toFixed(1) + " nm", { permanent: true, direction: 'center', offset: [0,0] });
+					 }
 
 					al.innerHTML = outHTML; // populate aircraft table
 					sortTable("aircrafts",aircrafts_table_sort_col,aircrafts_table_sort_ascending,aircrafts_table_sort_numeric); // sort by column 8 = distance, ascending, numeric information

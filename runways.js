@@ -1,10 +1,37 @@
 
 	var layerGroupRunways = new L.layerGroup().addTo(mymap);
 
+	var selectedAirport = "", selectedAirportRunway = "", selectedAirportRunwayLine = null;
+	var selectedAirportRunway_lat = 0, selectedAirportRunway_lon = 0;
+	var selectedAirportRunway_direction = 0;
+
 	function addRunwayToMap(airport,num1,lat1,lon1,num2,lat2,lon2,len){
 		var point1 = new L.LatLng(lat1,lon1);
 		var point2 = new L.LatLng(lat2,lon2);
 		var pointlist = [point1,point2];
+		var num1_str = num1, num2_str = num2;
+		var currentSelectedAirportRunway_num = "";
+		if(selectedAirport && selectedAirportRunway){
+			if((selectedAirport==airport) && (selectedAirportRunway==num1)){
+				selectedAirportRunway_lat = lat1; selectedAirportRunway_lon = lon1;
+				//selectedAirportRunway_direction = getAngleBetweenTwoLatLon(lat2,lon2,lat1,lon1);
+				selectedAirportRunway_direction = num2_str.replace(/\D/g, '') *10;
+				//selectedAirportRunway_direction = L.GeometryUtil.calcAngle(point1,point2);
+				num1_str = "<span style='color: red'>" + num1 + "</span>";
+				currentSelectedAirportRunway_num = num1;
+			}
+			if((selectedAirport==airport) && (selectedAirportRunway==num2)){
+				selectedAirportRunway_lat = lat2; selectedAirportRunway_lon = lon2;
+				//selectedAirportRunway_direction = getAngleBetweenTwoLatLon(lat1,lon1,lat2,lon2);
+				selectedAirportRunway_direction = num1_str.replace(/\D/g, '') *10;
+				//selectedAirportRunway_direction = L.GeometryUtil.calcAngle(point1,point2);
+				num2_str = "<span style='color: red'>" + num2 + "</span>";
+				currentSelectedAirportRunway_num = num2;
+			}			
+		} else { // clear selection values if nothing is selected
+			selectedAirportRunway_lat = 0, selectedAirportRunway_lon = 0;
+			selectedAirportRunway_direction = 0;			
+		}
 		if(len<8000) // smaller runways
 			var runway_line = new L.polyline(pointlist, {
 				color: '#1010C1',
@@ -19,8 +46,77 @@
 				opacity: 0.4,
 				smoothFactor: 1
 			});
-		runway_line.addTo(layerGroupRunways);
-		runway_line.bindTooltip(airport + " " + num1 + " / " + num2, { permanent: false, direction: 'center', offset: [0,0], opacity: 1 });
+		runway_line.addTo(layerGroupRunways).on('click', function(e) { selectedAirport = airport; selectedAirportRunway = num1 + "," + num2; selectedAirportRunwayLine = runway_line; selectRunway(e); });
+		if(currentSelectedAirportRunway_num==num1){
+			var selected_circle = L.circle([lat1,lon1], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selectedAirport = ""; selectedAirportRunway = ""; });; // add 1km radius circle to selected runway, click to remove the selection
+			selected_circle.addTo(layerGroupRunways);
+			//console.log(num1 + "circle to " + lat1 + ", " + lon1);
+			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: true, direction: 'center', offset: [0,0], opacity: 1 });
+/*
+			point1 = new L.LatLng(lat1,lon1);
+			//console.log("angle " + selectedAirportRunway_direction);
+			calcNextPoint(lat1, lon1, selectedAirportRunway_direction, (10*1.852)); // 10 nm = 18.52km approach line
+			point2 = new L.LatLng(nextpoint_lat,nextpoint_lon);
+			pointlist = [point1,point2];
+			var approach_line = new L.polyline(pointlist, {
+				color: '#707071',
+				weight: 2,
+				opacity: 0.4,
+				smoothFactor: 1
+			});
+			approach_line.addTo(layerGroupRunways);
+*/
+		} else
+		if(currentSelectedAirportRunway_num==num2){
+			var selected_circle = L.circle([lat2,lon2], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selectedAirport = ""; selectedAirportRunway = ""; });; // add 1km radius circle to selected runway, click to remove the selection
+			selected_circle.addTo(layerGroupRunways);
+			//console.log(num2 + "circle to " + lat2 + ", " + lon2);
+			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: true, direction: 'center', offset: [0,0], opacity: 1 });
+/*
+			point1 = new L.LatLng(lat2,lon2);
+			//console.log("angle " + selectedAirportRunway_direction);
+			calcNextPoint(lat2, lon2, selectedAirportRunway_direction, (10*1.852)); // 10 nm = 18.52km approach line
+			point2 = new L.LatLng(nextpoint_lat,nextpoint_lon);
+			pointlist = [point1,point2];
+			var approach_line = new L.polyline(pointlist, {
+				color: '#707071',
+				weight: 2,
+				opacity: 0.4,
+				smoothFactor: 1
+			});
+			approach_line.addTo(layerGroupRunways);
+*/
+		} else {
+			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: false, direction: 'center', offset: [0,0], opacity: 1 });
+		}
+	}
+
+	function selectRunway(e){
+		// determine which end of the runway to select by calculating using click lat and lon
+		var c_lat = e.latlng.lat, c_lon = e.latlng.lng;
+		if(!selectedAirportRunwayLine){ console.log("Incorrect selected runway line"); return; }
+		var line_latlons = selectedAirportRunwayLine.getLatLngs();
+		if(!line_latlons){ console.log("Incorrect runway"); return; }
+		var r1_lat = line_latlons[0].lat, r1_lon = line_latlons[0].lng;
+		var r2_lat = line_latlons[1].lat, r2_lon = line_latlons[1].lng;
+		//console.log(line_latlons);
+
+		var c_dist1 = getDistanceFromLatLonInKm(c_lat,c_lon,r1_lat,r1_lon,"km");
+		var c_dist2 = getDistanceFromLatLonInKm(c_lat,c_lon,r2_lat,r2_lon,"km");
+
+		var combined_runways = selectedAirportRunway.split(","); 
+
+		if(c_dist1<=c_dist2){
+			selectedAirportRunway = combined_runways[0];
+		} else {
+			selectedAirportRunway = combined_runways[1];
+		}
+
+		//console.log("Runway1 : " + combined_runways[0] + " (" + c_dist1 + " km) - Runway2 : " + combined_runways[1] + " (" + c_dist2 + " km)" );
+		//console.log("Selected airport: " + selectedAirport + " Runway: " + selectedAirportRunway);
+		// refreshAirportdata();
+		layerGroupRunways.clearLayers();
+		findNearestRunways();
 	}
 
 	function parseRunwayData(text, delimeter = ","){
