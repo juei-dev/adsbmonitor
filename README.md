@@ -130,6 +130,9 @@ Dec 15th, 2021:
 Dec 16th, 2021:
   - Added fifth "map" as blank map. When displaying the blank map, the distance circles are added per each 100km up to 400km.
 
+Dec 17th, 2021:
+  - Airport runways / runway thresholds are now able to be selected. Click the airport's runway and the closest threshold will be selected. If an aircraft is also selected, a green direct line is drawn to this selected runway threshold and distance is shown (currently it's not actual, but lateral distance). 
+
 
 
 ## Current features
