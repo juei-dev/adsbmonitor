@@ -1,9 +1,26 @@
 
 	var layerGroupRunways = new L.layerGroup().addTo(mymap);
+	var layerGroupRunwaySelection = new L.layerGroup().addTo(mymap);
 
 	var selectedAirport = "", selectedAirportRunway = "", selectedAirportRunwayLine = null;
 	var selectedAirportRunway_lat = 0, selectedAirportRunway_lon = 0;
 	var selectedAirportRunway_direction = 0;
+
+	var previous_selectedAirport = "", previous_selectedAirportRunway = "";
+
+	var selectedAirportRunway_weather_ok = false; // all weather information in metric units
+	var selectedAirportRunway_weather_lat = 0; //
+	var selectedAirportRunway_weather_lon = 0; //
+	var selectedAirportRunway_weather_pressure = -1;
+	var selectedAirportRunway_weather_wind_dir = -1;
+	var selectedAirportRunway_weather_wind_speed = -1;
+	var selectedAirportRunway_weather_wind_gusts = -1;
+	var selectedAirportRunway_weather_temp = -99; // temps in celcius
+	var selectedAirportRunway_weather_temp_dew = -99;
+	var selectedAirportRunway_weather_humidity = -1;
+	var selectedAirportRunway_weather_clouds = -1;
+	var selectedAirportRunway_weather_visibility = -1;
+	var selectedAirportRunway_weather_str = "";
 
 	function addRunwayToMap(airport,num1,lat1,lon1,num2,lat2,lon2,len){
 		var point1 = new L.LatLng(lat1,lon1);
@@ -11,13 +28,14 @@
 		var pointlist = [point1,point2];
 		var num1_str = num1, num2_str = num2;
 		var currentSelectedAirportRunway_num = "";
+		var selection_weather_str = "";
 		if(selectedAirport && selectedAirportRunway){
 			if((selectedAirport==airport) && (selectedAirportRunway==num1)){
 				selectedAirportRunway_lat = lat1; selectedAirportRunway_lon = lon1;
 				//selectedAirportRunway_direction = getAngleBetweenTwoLatLon(lat2,lon2,lat1,lon1);
 				selectedAirportRunway_direction = num2_str.replace(/\D/g, '') *10;
 				//selectedAirportRunway_direction = L.GeometryUtil.calcAngle(point1,point2);
-				num1_str = "<span style='color: red'>" + num1 + "</span>";
+				num1_str = "<span style='color: red; font-weight: bold; font-size: 11px;'>" + num1 + "</span>";
 				currentSelectedAirportRunway_num = num1;
 			}
 			if((selectedAirport==airport) && (selectedAirportRunway==num2)){
@@ -25,7 +43,7 @@
 				//selectedAirportRunway_direction = getAngleBetweenTwoLatLon(lat1,lon1,lat2,lon2);
 				selectedAirportRunway_direction = num1_str.replace(/\D/g, '') *10;
 				//selectedAirportRunway_direction = L.GeometryUtil.calcAngle(point1,point2);
-				num2_str = "<span style='color: red'>" + num2 + "</span>";
+				num2_str = "<span style='color: red; font-weight: bold; font-size: 11px'>" + num2 + "</span>";
 				currentSelectedAirportRunway_num = num2;
 			}			
 		} else { // clear selection values if nothing is selected
@@ -46,12 +64,39 @@
 				opacity: 0.4,
 				smoothFactor: 1
 			});
-		runway_line.addTo(layerGroupRunways).on('click', function(e) { selectedAirport = airport; selectedAirportRunway = num1 + "," + num2; selectedAirportRunwayLine = runway_line; selectRunway(e); });
+		runway_line.addTo(layerGroupRunways).on('click', function(e) {
+			previous_selectedAirport = selectedAirport; previous_selectedAirportRunway = selectedAirportRunway;
+			selectedAirport = airport; selectedAirportRunway = num1 + "," + num2; selectedAirportRunwayLine = runway_line; 
+			selectRunway(e); 
+		});
+		if(currentSelectedAirportRunway_num==num1 || currentSelectedAirportRunway_num==num2){
+			//console.log(selectedAirportRunway_weather_ok);
+			if(selectedAirportRunway_weather_ok){
+				var wind_speed = selectedAirportRunway_weather_wind_speed * 1.94384; // m/s to knots
+				if(selectedAirportRunway_weather_wind_gusts>-1)
+					selection_weather_str+="Wind: " + selectedAirportRunway_weather_wind_dir + " @ " + wind_speed.toFixed(0) + " kn, gusting " + selectedAirportRunway_weather_wind_gusts.toFixed(0) + " kn";
+				else
+					selection_weather_str+="Wind: " + selectedAirportRunway_weather_wind_dir + " @ " + wind_speed.toFixed(0) + " kn";
+				selection_weather_str+="<br/>Temp: " + selectedAirportRunway_weather_temp;
+				selection_weather_str+="<br/>QNH: " + selectedAirportRunway_weather_pressure + " hPa";
+				selection_weather_str+="<br/>Clouds: " + selectedAirportRunway_weather_clouds + "%";
+				selection_weather_str+="<br/>Hum: " + selectedAirportRunway_weather_humidity + "%";
+				selection_weather_str+="<br/>" + selectedAirportRunway_weather_str;
+			}
+		}
 		if(currentSelectedAirportRunway_num==num1){
-			var selected_circle = L.circle([lat1,lon1], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selectedAirport = ""; selectedAirportRunway = ""; });; // add 1km radius circle to selected runway, click to remove the selection
-			selected_circle.addTo(layerGroupRunways);
-			//console.log(num1 + "circle to " + lat1 + ", " + lon1);
-			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: true, direction: 'center', offset: [0,0], opacity: 1 });
+			var selected_circle = L.circle([lat1,lon1], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroupRunwaySelection).on('click', function(e) { 
+				selectedAirport = ""; selectedAirportRunway = ""; 
+				selectedAirportRunway_direction = 0;
+				layerGroupRunwaySelection.clearLayers();
+				layerGroupRunways.clearLayers();
+				findNearestRunways();			
+			}); // add 1km radius circle to selected runway, click to remove the selection
+			var tooltip_offset = [0,0];
+			if(selection_weather_str)
+				runway_line.bindTooltip("<span style='font-size: 11px; font-weight: bold;'>" + airport + "</span> " + num1_str + " / " + num2_str + "<br/>" + selection_weather_str, { permanent: true, direction: 'bottom', offset: tooltip_offset, opacity: 1 });
+			else
+				runway_line.bindTooltip("<span style='font-size: 11px; font-weight: bold;'>" + airport + "</span> " + num1_str + " / " + num2_str, { permanent: true, direction: 'bottom', offset: tooltip_offset, opacity: 1 });
 /*
 			point1 = new L.LatLng(lat1,lon1);
 			//console.log("angle " + selectedAirportRunway_direction);
@@ -64,14 +109,22 @@
 				opacity: 0.4,
 				smoothFactor: 1
 			});
-			approach_line.addTo(layerGroupRunways);
+			approach_line.addTo(layerGroupRunwaySelection);
 */
 		} else
 		if(currentSelectedAirportRunway_num==num2){
-			var selected_circle = L.circle([lat2,lon2], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selectedAirport = ""; selectedAirportRunway = ""; });; // add 1km radius circle to selected runway, click to remove the selection
-			selected_circle.addTo(layerGroupRunways);
-			//console.log(num2 + "circle to " + lat2 + ", " + lon2);
-			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: true, direction: 'center', offset: [0,0], opacity: 1 });
+			var selected_circle = L.circle([lat2,lon2], { radius: 1000, color: '#FF0002', weight: 2 }).addTo(layerGroupRunwaySelection).on('click', function(e) { 
+				selectedAirport = ""; selectedAirportRunway = ""; 
+				selectedAirportRunway_direction = 0;
+				layerGroupRunwaySelection.clearLayers();
+				layerGroupRunways.clearLayers();
+				findNearestRunways();			
+			}); // add 1km radius circle to selected runway, click to remove the selection
+			var tooltip_offset = [0,0];
+			if(selection_weather_str)
+				runway_line.bindTooltip("<span style='font-size: 11px; font-weight: bold;'>" + airport + "</span> " + num1_str + " / " + num2_str + "<br/>" + selection_weather_str, { permanent: true, direction: 'bottom', offset: tooltip_offset, opacity: 1 });
+			else
+				runway_line.bindTooltip("<span style='font-size: 11px; font-weight: bold;'>" + airport + "</span> " + num1_str + " / " + num2_str, { permanent: true, direction: 'bottom', offset: tooltip_offset, opacity: 1 });
 /*
 			point1 = new L.LatLng(lat2,lon2);
 			//console.log("angle " + selectedAirportRunway_direction);
@@ -84,7 +137,7 @@
 				opacity: 0.4,
 				smoothFactor: 1
 			});
-			approach_line.addTo(layerGroupRunways);
+			approach_line.addTo(layerGroupRunwaySelection);
 */
 		} else {
 			runway_line.bindTooltip(airport + " " + num1_str + " / " + num2_str, { permanent: false, direction: 'center', offset: [0,0], opacity: 1 });
@@ -106,17 +159,33 @@
 
 		var combined_runways = selectedAirportRunway.split(","); 
 
-		if(c_dist1<=c_dist2){
-			selectedAirportRunway = combined_runways[0];
+		// deselect the runway if previously already selected, otherwise detect correct runway threshold
+		if(previous_selectedAirport==selectedAirport && previous_selectedAirportRunway==selectedAirportRunway){
+			selectedAirport = ""; selectedAirportRunway = ""; 
+			selectedAirportRunway_direction = 0;
+			layerGroupRunwaySelection.clearLayers();
+			layerGroupRunways.clearLayers();
+			findNearestRunways();			
+			return;
 		} else {
-			selectedAirportRunway = combined_runways[1];
+			if(c_dist1<=c_dist2){
+				selectedAirportRunway = combined_runways[0];
+				selectedAirportRunway_lat = r1_lat; selectedAirportRunway_lon = r1_lon;
+			} else {
+				selectedAirportRunway = combined_runways[1]; 
+				selectedAirportRunway_lat = r2_lat; selectedAirportRunway_lon = r2_lon; 
+			}
+			// store as previous selection
+			previous_selectedAirport=selectedAirport; previous_selectedAirportRunway=selectedAirportRunway;
 		}
 
-		//console.log("Runway1 : " + combined_runways[0] + " (" + c_dist1 + " km) - Runway2 : " + combined_runways[1] + " (" + c_dist2 + " km)" );
-		//console.log("Selected airport: " + selectedAirport + " Runway: " + selectedAirportRunway);
-		// refreshAirportdata();
-		layerGroupRunways.clearLayers();
-		findNearestRunways();
+		getWeatherAt(selectedAirportRunway_lat, selectedAirportRunway_lon);
+		var preselected_circle = L.circle([selectedAirportRunway_lat,selectedAirportRunway_lon], { radius: 1000, color: '#CF0072', weight: 1 }).addTo(layerGroupRunwaySelection);
+		setTimeout(function(){ // update map after a second to give time for weather information
+			layerGroupRunwaySelection.clearLayers();
+			layerGroupRunways.clearLayers();
+			findNearestRunways();			
+		},1000);
 	}
 
 	function parseRunwayData(text, delimeter = ","){
@@ -169,6 +238,9 @@
 			findNearestRunways();
 		} else {
 			layerGroupRunways.clearLayers();
+			selectedAirport = ""; selectedAirportRunway = ""; selectedAirportRunwayLine = null;
+			selectedAirportRunway_lat = 0; selectedAirportRunway_lon = 0;
+			selectedAirportRunway_direction = 0;
 		}
 	}
 
@@ -478,3 +550,52 @@
 		//console.log("Airport aircrafts updated (" + num_of_runways + " runways checked)");
 	}
 	var refreshAirportAircraftsInterval = setInterval(refreshAirportAircraftdata, airport_aircraft_refresh_rate);
+
+
+
+	function getWeatherAt(lat,lon){
+/*
+	var selectedAirportRunway_weather_ok = false;
+	var selectedAirportRunway_weather_pressure = -1;
+	var selectedAirportRunway_weather_wind_dir = -1;
+	var selectedAirportRunway_weather_wind_speed = -1;
+	var selectedAirportRunway_weather_wind_gusts = -1;
+	var selectedAirportRunway_weather_temp = -99; // temps in celcius
+	var selectedAirportRunway_weather_temp_dew = -99;
+	var selectedAirportRunway_weather_humidity = -1;
+	var selectedAirportRunway_weather_clouds = -1;
+	var selectedAirportRunway_weather_visibility = -1;
+	selectedAirportRunway_weather_str
+	openweathermap_apikey
+*/	
+		// selectedAirportRunway_weather_ok = false; // mark weather fetch pessimisticly to false before fetch
+		if(!openweathermap_apikey){
+			selectedAirportRunway_weather_ok = false;
+			return; // do nothing if OpenWeatherMap api key is not set
+		}
+		fetch("https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + lon + "&appid=" + openweathermap_apikey)
+		.then(function(resp) { return resp.json(); })
+		.then(function(data) {
+			selectedAirportRunway_weather_ok = true;
+			if(data.coord)selectedAirportRunway_weather_lat = data.coord.lat; 
+			if(data.coord)selectedAirportRunway_weather_lon = data.coord.lon; 
+			if(data.main.pressure)selectedAirportRunway_weather_pressure=data.main.pressure; else selectedAirportRunway_weather_pressure=-1;
+			if(data.main.temp)selectedAirportRunway_weather_temp=data.main.temp; else selectedAirportRunway_weather_temp=-99;
+			if(data.main.humidity)selectedAirportRunway_weather_humidity=data.main.humidity; else selectedAirportRunway_weather_humidity=-1;
+			if(data.wind){if(data.wind.deg)selectedAirportRunway_weather_wind_dir=data.wind.deg; else selectedAirportRunway_weather_wind_dir=-1;}
+			if(data.wind){if(data.wind.speed)selectedAirportRunway_weather_wind_speed=data.wind.speed; else selectedAirportRunway_weather_wind_speed=-1;}
+			if(data.wind){if(data.wind.gust)selectedAirportRunway_weather_wind_gusts=data.wind.gust; else selectedAirportRunway_weather_wind_gusts=-1;}
+			if(data.clouds)if(data.clouds.all)selectedAirportRunway_weather_clouds=data.clouds.all; else selectedAirportRunway_weather_clouds=-1;
+			if(data.weather){
+				if(data.weather[0].description){
+					selectedAirportRunway_weather_str = data.weather[0].description; 
+				} else selectedAirportRunway_weather_str = "";
+			}
+			//console.log(data);
+		})
+		.catch(function(error) {
+			selectedAirportRunway_weather_ok = false;
+			console.error("Couldn't fetch weather information for airport: " + error);
+		});
+
+	}
