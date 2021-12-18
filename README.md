@@ -133,6 +133,9 @@ Dec 16th, 2021:
 Dec 17th, 2021:
   - Airport runways / runway thresholds are now able to be selected. Click the airport's runway and the closest threshold will be selected. If an aircraft is also selected, a green direct line is drawn to this selected runway threshold and distance is shown (currently it's not actual, but lateral distance). 
 
+Dec 18th, 2021:
+  - Added weather information to the runway selected. Selecting runway is delayed for 1 sec to allow weather data fetch to be completed.
+
 
 
 ## Current features
@@ -211,8 +214,15 @@ Dec 17th, 2021:
 - Statistics display
 	- Page 1: Gauges for both receivers - M1% (messages/min % from maximum this session), SNR and PSVR
 	- Page 2: Maximum values during session - Distance, altitude, GS, TAS, Climb rate and Descent rate
-	- Page 3: Top 12 companies during the session and number of flights 
+	- Page 3: Top 12 companies during the session and number of flights
+	- Page 4: Emergency flights recorded during the session
+	- Page 5: 5 nearest aircrafts to the selected aircraft
 	- Download option for all of the displays
+
+- Selectable aircraft and runway
+	- If aircraft is selected, the true distance (vector distance) to closest aircraft is shown. Also +-45 degree gray guidelines are shown to approximate the glide distance of the aircraft (just 15:1 glide ratio and ac altitude used, so only as a reference)  
+	- If runway (threshold) is selected, weather information is fethced from OpenWeatherMap
+	- If both aircraft and runway is selected, the lateral distance is shown from the runway threshold to the selected aircraft
 
 
 ---
