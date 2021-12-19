@@ -471,13 +471,13 @@
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 2300
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								var ac_inner = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
 									color: '#F09F00',
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 2300
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao; ac_inner.icaoHex = icao;
 								ac.flight = flight; ac_inner.flight = flight;
 							}
@@ -487,13 +487,13 @@
 									fillColor: '#000',
 									fillOpacity: 0.7,
 									radius: 1500
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								var ac_inner = L.rectangle([[lat-zoom_correction_lat, lon-zoom_correction_lon], [lat+zoom_correction_lat,lon+zoom_correction_lon]], {
 									color: '#00FF00',
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 2300
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							}
@@ -503,7 +503,7 @@
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 2300
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							} 
@@ -513,7 +513,7 @@
 									fillColor: '#000',
 									fillOpacity: 0.9,
 									radius: 100
-								}).addTo(layerGroup).on('click', function(e) { selected_icao = this.icaoHex; selected_flight = this.flight; });
+								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							}
@@ -593,12 +593,12 @@
 					}
 
 					// Add distance line to selected runway threshold
-					if(selectedAirportRunway_lat && selectedAirportRunway_lon && selected_lat && selected_lon){
+					if(selectedAirportRunway_lat && selectedAirportRunway_lon && selected_lat && selected_lon && selected_icao){
 						var selected_runway_line = L.polyline([ [selected_lat,selected_lon],[selectedAirportRunway_lat,selectedAirportRunway_lon] ], { color: '#20F12F', weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
 						var distance_to_runway = getDistanceFromLatLonInKm(selected_lat,selected_lon,selectedAirportRunway_lat,selectedAirportRunway_lon,'km');
 					 	var distance_to_runway_nm = distance_to_runway * 0.539957; // in nautical miles
 						selected_runway_line.bindTooltip(distance_to_runway.toFixed(1) + " km<br>" + distance_to_runway_nm.toFixed(1) + " nm", { permanent: true, direction: 'center', offset: [0,0] });
-					 }
+					 } 
 
 					al.innerHTML = outHTML; // populate aircraft table
 					sortTable("aircrafts",aircrafts_table_sort_col,aircrafts_table_sort_ascending,aircrafts_table_sort_numeric); // sort by column 8 = distance, ascending, numeric information
@@ -629,6 +629,15 @@
 
 			}
 		);
+	}
+
+	function selectAircraft(icao, flight){
+		if(icao!=selected_icao){
+			selected_icao = icao; selected_flight = flight;
+		}
+		else{
+			selected_icao = ""; selected_flight = "";
+		}
 	}
 	
 	refreshAircrafts();
