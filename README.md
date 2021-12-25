@@ -136,6 +136,9 @@ Dec 17th, 2021:
 Dec 18th, 2021:
   - Added weather information to the runway selected. Selecting runway is delayed for 1 sec to allow weather data fetch to be completed.
 
+Dec 25th, 2021:
+  - Added double click feature to the map which is locking on to the selected aircraft and keeps it always in the center ("travels" with the aircraft). Double click again to disable lock on.
+
 
 
 ## Current features
