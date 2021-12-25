@@ -48,6 +48,9 @@
 	var selected_glide_range_ratio = 15; // 1:15
 	var selected_glide_azimuth = 45; // +- 45 degrees towards ac heading
 
+	// selected aircraft lock on - following the selected aircraft - double click to engage / disengage
+	var selected_lock_on = false;
+
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
@@ -478,6 +481,8 @@
 									fillOpacity: 0.9,
 									radius: 2300
 								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
+								ac.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
+								ac_inner.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao; ac_inner.icaoHex = icao;
 								ac.flight = flight; ac_inner.flight = flight;
 							}
@@ -494,6 +499,8 @@
 									fillOpacity: 0.9,
 									radius: 2300
 								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
+								ac.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
+								ac_inner.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							}
@@ -504,6 +511,7 @@
 									fillOpacity: 0.9,
 									radius: 2300
 								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
+								ac.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							} 
@@ -514,6 +522,7 @@
 									fillOpacity: 0.9,
 									radius: 100
 								}).addTo(layerGroup).on('click', function(e){ selectAircraft(this.icaoHex, this.flight); });
+								ac.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
 								ac.icaoHex = icao;
 								ac.flight = flight;
 							}
@@ -527,7 +536,17 @@
 							}
 							// add selected circle if selected aircraft
 							if(selected_icao==icao){
-								var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection
+								if(!selected_lock_on){
+									var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection
+									selected_circle.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
+									selected_circle.icaoHex = icao;
+									selected_circle.flight = flight;
+								} else {
+									var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF00F2', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection									
+									selected_circle.on('dblclick', function(e){ selectAndLockAircraft(this.icaoHex, this.flight); });
+									selected_circle.icaoHex = icao;
+									selected_circle.flight = flight;
+								}
 							}
 							// add glide range, if showing enabled and selected
 							if(selected_icao==icao && selected_glide_range_enabled && altitude && track){
@@ -569,6 +588,10 @@
 								ac.bindTooltip(" " + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: tt_offset });
 							else
 								ac.bindTooltip("<span style='color: #70f072;'><b>" + flight + "</b></span> " + st_squawk + "<br/>" + st_track + "&deg; " + Math.floor(gs) + " " + st_alt + " " + st_rate, { permanent: true, direction: 'center', offset: tt_offset });
+							// if selected lock on, follow aircraft
+							if( selected_icao == icao && selected_lock_on && lat && lon){
+								mymap.flyTo(new L.LatLng(lat,lon));
+							}							
 						}
 
 
@@ -632,12 +655,21 @@
 	}
 
 	function selectAircraft(icao, flight){
+		mymap.doubleClickZoom.disable();
 		if(icao!=selected_icao){
 			selected_icao = icao; selected_flight = flight;
 		}
 		else{
 			selected_icao = ""; selected_flight = "";
 		}
+		setTimeout(function(){ mymap.doubleClickZoom.enable();}, 1000);
+	}
+
+	function selectAndLockAircraft(icao, flight){
+		selectAircraft(icao,flight);
+		if(!selected_icao){ selected_lock_on = false; return; }
+		if(!selected_lock_on) selected_lock_on = true;
+		else selected_lock_on = false;
 	}
 	
 	refreshAircrafts();
