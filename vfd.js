@@ -271,6 +271,7 @@
 			selected_icao = "";
 			selected_flight = "";			
 		}
+		updateSelectedACInfo(true);
 
 		// handle the VFD		
 		if(!document.getElementById("cb-FD-enabled").checked){
