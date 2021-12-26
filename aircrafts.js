@@ -51,6 +51,34 @@
 	// selected aircraft lock on - following the selected aircraft - double click to engage / disengage
 	var selected_lock_on = false;
 
+	// selected aircraft extra information on full screen map
+	var selected_img_src = "";
+	var selected_ac_reg = "";
+	var selected_ac_manufacturer = "";
+	var selected_ac_type = "";
+	var selected_ac_icao_type = "";
+	var selected_ac_owner = "";
+	var selected_ac_route = "";
+
+	var selected_ac_squawk = "";
+
+	var selected_ac_tas = 0;
+	var selected_ac_gs = 0;
+
+	var selected_ac_track = 0;
+	var selected_ac_rate = 0;
+
+	var selected_ac_rssi = "";
+	var selected_ac_msgs = 0;
+	var selected_ac_seen = 0;
+
+	var selected_ac_extra_info = true; // set to false, if you don't want access api.joshdouch.me
+	var ac_extra_info_url_details = "https://api.joshdouch.me/api/aircraft/";
+	var ac_extra_info_url_reg = "https://api.joshdouch.me/hex-reg.php?hex=";
+	var ac_extra_info_url_route = "https://api.joshdouch.me/callsign-route.php?callsign=";
+	var ac_extra_info_url_thumb_image = "https://api.joshdouch.me/hex-image-v2-thumb.php?hex=";
+
+
 	// table sorting variables
 	var aircrafts_table_sort_col = 8, aircrafts_table_sort_ascending = true, aircrafts_table_sort_numeric = true;
 	const aircrafts_table_column_numerics = [false,false,true,false,true,true,true,true,true,true,true,true,false,false];
@@ -534,7 +562,7 @@
 							if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
 								var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: 'yellow', weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroup);
 							}
-							// add selected circle if selected aircraft
+							// add selected circle and update additional information if selected aircraft
 							if(selected_icao==icao){
 								if(!selected_lock_on){
 									var selected_circle = L.circle([lat,lon], { radius: 1500, color: '#FF0002', weight: 2 }).addTo(layerGroup).on('click', function(e) { selected_icao = ""; selected_flight = ""; });; // add 1.5km radius circle to selected aircraft, click to remove the selection
@@ -547,6 +575,14 @@
 									selected_circle.icaoHex = icao;
 									selected_circle.flight = flight;
 								}
+								selected_ac_squawk = squawk;
+								selected_ac_tas = tas;
+								selected_ac_gs = gs;
+								selected_ac_track = track;
+								selected_ac_rate = rate;
+								selected_ac_rssi = rssi;
+								selected_ac_msgs = msgs;
+								selected_ac_seen = seen;								
 							}
 							// add glide range, if showing enabled and selected
 							if(selected_icao==icao && selected_glide_range_enabled && altitude && track){
@@ -591,10 +627,8 @@
 							// if selected lock on, follow aircraft
 							if( selected_icao == icao && selected_lock_on && lat && lon){
 								mymap.flyTo(new L.LatLng(lat,lon));
-							}							
+							}
 						}
-
-
 					}
 
 					// sort by the true distance, column 4 [icao, flight, distance, altitude difference, true_distance, bearing, lat, lon, track]
@@ -649,7 +683,6 @@
 					receiver_ok = false;
 					// document.getElementById("ecam-display").value += "  ADSB 1 FAIL"; 
 				}
-
 			}
 		);
 	}
@@ -662,6 +695,7 @@
 		else{
 			selected_icao = ""; selected_flight = "";
 		}
+		updateSelectedACInfo(true);
 		setTimeout(function(){ mymap.doubleClickZoom.enable();}, 1000);
 	}
 
@@ -672,6 +706,133 @@
 		else selected_lock_on = false;
 	}
 	
+	function updateSelectedACInfo(init = false){
+		if(selected_icao && (document.getElementById("map-ac-info"))) document.getElementById("map-ac-info").style.display = "table";
+		else {
+			document.getElementById("map-ac-info").style.display = "none";
+			selected_ac_tas = 0;
+			selected_ac_gs = 0;
+			selected_ac_track = 0;
+			selected_ac_rate = 0;
+			selected_ac_rssi = 0;
+			selected_ac_msgs = 0;
+			selected_ac_seen = 0;		
+			selected_ac_squawk = "";
+		} 
+		if(init){
+			document.getElementById("map-ac-info-flight").innerHTML = selected_flight;
+			document.getElementById("map-ac-info-hex").innerHTML = selected_icao;
+			if(selected_ac_extra_info){
+				fetchACExtraInfo();
+			} else {
+				document.getElementById("map-ac-info-img").style.display = "none";				
+				document.getElementById("map-ac-info-route").style.display = "none";				
+				document.getElementById("map-ac-info-manufacturer").style.display = "none";				
+				document.getElementById("map-ac-info-type").style.display = "none";				
+				document.getElementById("map-ac-info-owner").style.display = "none";				
+			}
+		}
+		if(selected_lat)document.getElementById("map-ac-info-lat").innerHTML = selected_lat.toFixed(4);
+		if(selected_lon)document.getElementById("map-ac-info-lon").innerHTML = selected_lon.toFixed(4);
+		if(selected_ac_track)document.getElementById("map-ac-info-track").innerHTML = selected_ac_track.toFixed(0) + "&#176;";
+		if(selected_ac_squawk)document.getElementById("map-ac-info-squawk").innerHTML = "[ " + selected_ac_squawk + " ]";
+		if(selected_altitude)document.getElementById("map-ac-info-altitude").innerHTML = selected_altitude.toFixed(0) + " ft";
+		if(selected_ac_rate)document.getElementById("map-ac-info-rate").innerHTML = selected_ac_rate.toFixed(0) + " ft/min";
+		if(selected_ac_tas)document.getElementById("map-ac-info-tas").innerHTML = "TAS: " + selected_ac_tas.toFixed(0) + " kn";
+		if(selected_ac_gs)document.getElementById("map-ac-info-gs").innerHTML = "GS: " + selected_ac_gs.toFixed(0) + " kn";
+		if(selected_ac_rssi)document.getElementById("map-ac-info-rssi").innerHTML = selected_ac_rssi + " dBi";
+		if(selected_ac_msgs)document.getElementById("map-ac-info-msgs").innerHTML = selected_ac_msgs.toFixed(0) + " msgs";
+		if(selected_ac_seen)document.getElementById("map-ac-info-seen").innerHTML = selected_ac_seen.toFixed(0) + " s ago";
+	}
+
+	function fetchACExtraInfo(){
+
+		// Image thumbnail from api.joshdouch.me
+		fetch(ac_extra_info_url_thumb_image + selected_icao)
+		.then(function(resp) { 
+			if(resp.ok){
+				return resp.text();
+			} else {
+				document.getElementById("map-ac-info-img").style.display = "none";								
+			}
+		})
+		.then(function(data) {
+			if(data){
+				selected_img_src = data;
+				document.getElementById("map-ac-info-img-src").src = selected_img_src;
+				var domain = (new URL(selected_img_src));
+				document.getElementById("map-ac-info-img-attr").innerHTML = "&copy; " + domain.hostname;
+				document.getElementById("map-ac-info-img").style.display = "table-cell";								
+			} else {
+				document.getElementById("map-ac-info-img").style.display = "none";								
+			}
+		})
+		.catch(function(error) {
+			console.error("Couldn't fetch selected ac thumb image: " + error);
+		});
+
+		// Extra information from api.joshdouch.me
+		fetch(ac_extra_info_url_details + selected_icao)
+		.then(function(resp) { return resp.json(); })
+		.then(function(data) {
+			if(data.Manufacturer)selected_ac_manufacturer = data.Manufacturer; 
+			if(data.Type)selected_ac_type = data.Type; 
+			if(data.ICAOTypeCode)selected_ac_icao_type = data.ICAOTypeCode; 
+			if(data.RegisteredOwners)selected_ac_owner = data.RegisteredOwners; 
+
+			if(selected_ac_manufacturer)document.getElementById("map-ac-info-manufacturer").innerHTML = selected_ac_manufacturer;
+			if(selected_ac_type)document.getElementById("map-ac-info-type").innerHTML = selected_ac_type;
+			if(selected_ac_owner)document.getElementById("map-ac-info-owner").innerHTML = selected_ac_owner;
+			// console.log("Selected aircraft extra data fetched.");
+		})
+		.catch(function(error) {
+			console.error("Couldn't fetch selected ac extra information: " + error);
+		});
+
+		fetch(ac_extra_info_url_reg + selected_icao)
+		.then(function(resp) { 
+			if(resp.ok){
+				return resp.text();
+			} else {
+				document.getElementById("map-ac-info-reg").innerHTML = "-";				
+			}
+		})
+		.then(function(data) {
+			if(data){
+				selected_ac_reg = data;
+			} else {
+				selected_ac_reg = "-";
+			}
+			document.getElementById("map-ac-info-reg").innerHTML = selected_ac_reg;
+		})
+		.catch(function(error) {
+			console.error("Couldn't fetch selected ac registration: " + error);
+		});
+
+		fetch(ac_extra_info_url_route + selected_flight)
+		.then(function(resp) { 
+			if(resp.ok){
+				return resp.text();
+			} else {
+				document.getElementById("map-ac-info-route").innerHTML = "-";				
+			}
+		})
+		.then(function(data) {
+				if(data){
+					selected_ac_route = data;
+				} else {
+					selected_ac_route = "-";
+				}
+				document.getElementById("map-ac-info-route").innerHTML = selected_ac_route;
+		})
+		.catch(function(error) {
+			console.error("Couldn't fetch selected ac route: " + error);
+		});
+
+	}
+
+	var refreshACInfoInterval = setInterval(updateSelectedACInfo, aircraft_refresh_rate);	
+
 	refreshAircrafts();
 	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
 

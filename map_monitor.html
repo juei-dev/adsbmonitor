@@ -23,7 +23,52 @@
 			<div class="flight-director" id="fd">
 				<canvas class="fd-canvas-style" id="fd-canvas" height="400" width="460"></canvas>
 			</div>
-			<div id="mapid"><img id="map-preview"/></div>
+			<div id="mapid">
+				<img id="map-preview"/>
+				<table id="map-ac-info" cellspacing="0" cellpadding="0">
+					<tr>
+						<td id="map-ac-info-img" colspan="2"><img id="map-ac-info-img-src" src=""/><span id="map-ac-info-img-attr"></span></td>						
+					</tr>
+					<tr>
+						<td id="map-ac-info-flight">-</td>
+						<td id="map-ac-info-hex">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-route" title="Route">-</td>
+						<td id="map-ac-info-reg" title="Registration">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-manufacturer">-</td>
+						<td id="map-ac-info-type">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-owner" colspan="2">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-lat">-</td>
+						<td id="map-ac-info-lon">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-track">-</td>
+						<td id="map-ac-info-squawk">-</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-altitude">- ft</td>
+						<td id="map-ac-info-rate">- ft/min</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-tas">TAS: - kn</td>
+						<td id="map-ac-info-gs">GS: - kn</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-rssi">- dBi</td>
+						<td id="map-ac-info-msgs">- msgs</td>
+					</tr>
+					<tr>
+						<td id="map-ac-info-seen" colspan="2">-s ago</td>
+					</tr>
+				</table>
+			</div>
 			<div id="airports" class="airports-lists">
 				<table id="runways" class="runway-list" cellspacing="0">
 					<thead id="runways-head" class="runway-list-header"></thead>

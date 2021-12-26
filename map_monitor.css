@@ -36,6 +36,46 @@
 		#mapid { height: 800px; width: 100%; display: block; text-align: center; vertical-align: top; margin: 0px; padding: 0px; border-radius: 5px; border: 2px groove #011079;  } /*  border: 2px solid #30307a; */
 		#map-preview { position: absolute; top: 10px; right: 10px; cursor: pointer; z-index: 20000; border: 2px ridge #30417F; border-radius: 5px;}
 		#map-preview:hover { border: 2px ridge #C0B1CF; border-radius: 6px; }
+		#map-ac-info {
+			position: absolute; top: 130px; right: 10px; z-index: 20000;
+			border: 1px ridge #AFAFAF; border-radius: 5px;
+			background: #000000; color: #FFFF00;
+			width: 150px; /* height: 400px; */
+			text-align: left;
+			vertical-align: top;
+			padding: 0px;
+			cursor: pointer;
+			display: none;
+		}
+		#map-ac-info-img {
+			vertical-align: top; padding: 0px;  line-height: 8px; padding-bottom: 4px;
+			min-height: 96px;			
+			min-width: 150px;
+		}
+		#map-ac-info-img-src {
+			border: 1px solid #101030; border-radius: 5px;
+		}
+		#map-ac-info-img-attr { font-size: 8px; padding: 0px; padding-left: 2px; margin: 0px; color: #909090; line-height: 8px; }
+		#map-ac-info-flight { vertical-align: top; padding-left: 3px; font-weight: bold; font-size: 1em; color: #00FF00; }
+		#map-ac-info-hex { vertical-align: top;	color: #909093; }
+		#map-ac-info-route { vertical-align: top; padding-left: 3px; }
+		#map-ac-info-reg { vertical-align: top; }
+		#map-ac-info-manufacturer { vertical-align: top; padding-left: 3px; max-width: 80px;}
+		#map-ac-info-type { vertical-align: top; }
+		#map-ac-info-owner { vertical-align: top; padding-left: 3px; }
+
+		#map-ac-info-lat { vertical-align: top; padding-left: 3px; border-top: 1px solid #AFAFAF; }
+		#map-ac-info-lon { vertical-align: top; border-top: 1px solid #AFAFAF; }
+		#map-ac-info-track { vertical-align: top; padding-left: 3px; }
+		#map-ac-info-squawk { vertical-align: top; }
+		#map-ac-info-altitude { vertical-align: top; padding-left: 3px; }
+		#map-ac-info-rate { vertical-align: top; }
+		#map-ac-info-tas { vertical-align: top; padding-left: 3px; }
+		#map-ac-info-gs { vertical-align: top; }
+
+		#map-ac-info-rssi { vertical-align: top; padding-left: 3px; border-top: 1px solid #AFAFAF; }
+		#map-ac-info-msgs { vertical-align: top; border-top: 1px solid #AFAFAF; }
+		#map-ac-info-seen { vertical-align: top; padding-left: 3px; }
 		div.airports-lists { width: 100%; border: 1px; color: #FFFFFF; display: block; text-align: left; font-size: 0.8em; }
 		.leaflet-container { background: #101011; }
 		.leaflet-tooltip { 
