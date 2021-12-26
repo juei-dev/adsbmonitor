@@ -139,6 +139,9 @@ Dec 18th, 2021:
 Dec 25th, 2021:
   - Added double click feature to the map which is locking on to the selected aircraft and keeps it always in the center ("travels" with the aircraft). Double click again to disable lock on.
 
+Dec 26th, 2021:
+  - Added information table to map, which is displaying the selected aircraft image (if found), type, airliner etc. Thanks to api.joshdouch.me to provide this information!
+
 
 
 ## Current features
