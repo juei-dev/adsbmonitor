@@ -475,19 +475,19 @@
 								var rate_prefix = " ";
 								if(rate>70) {
 									rate_prefix = "↑";
-									ctx.strokeStyle = "green";
+									ctx.fillStyle = "#10FF11";
 								} else if (rate<-70) {
 									rate_prefix = "↓";
-									ctx.strokeStyle = "red";
+									ctx.fillStyle = "#FF2021";
 								} else { 
-									ctx.strokeStyle = "blue";
+									ctx.fillStyle = "#8080FF";
 								}
 								if(selected_icao == icao)
-									ctx.strokeStyle = "magenta";
+									ctx.fillStyle = "magenta";
 								ctx.font = "small-caps normal 9px sans-serif";
 								if( seen < 20 ){
-									ctx.strokeText(rate_prefix + " " + flight,74,500-(altitude/100)+4);
-									ctx.strokeText((Math.floor(altitude/100)),31,500-(altitude/100)+4);
+									ctx.fillText(rate_prefix + " " + flight,74,500-(altitude/100)+4);
+									ctx.fillText((Math.floor(altitude/100)),31,500-(altitude/100)+4);
 								}	
 							}
 						}

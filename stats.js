@@ -41,7 +41,7 @@
 						if(msgs > receiver_msgs_1min_max) receiver_msgs_1min_max = msgs;
 						if(data.last1min.local.noise) receiver_noise = data.last1min.local.noise;
 						if(data.last1min.local.signal) receiver_signal = data.last1min.local.signal;
-						if(data.last1min.local.peak) receiver_peak = data.last1min.local.peak;
+						if(data.last1min.local.peak_signal) receiver_peak = data.last1min.local.peak_signal;
 						msgrate = (msgs / 60).toFixed(1);
 
 						if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
@@ -75,6 +75,21 @@
 						outHTML += "<td style='" + stat_style + "'>" + receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
 						outHTML += "</tr>";
+
+						// stats to full screen map
+						if(mymap.isFullscreen()){
+							document.getElementById("map-stat-info").style.display = "table";
+							var snr = -(receiver_signal-receiver_noise);
+							var peak_style = "";
+							if(receiver_peak >= -3) peak_style = " color: #FF4041;";
+							document.getElementById("map-stat-label1").innerHTML = receiver_label;
+							document.getElementById("map-stat-rate1").innerHTML = "<span style='" + rate_style + "'>" + msgrate + "</span>";
+							document.getElementById("map-stat-snr1").innerHTML = snr.toFixed(1);
+							document.getElementById("map-stat-peak1").innerHTML = "<span style='" + peak_style + "'>" + receiver_peak.toFixed(1) + "</span>";
+						} else {
+							document.getElementById("map-stat-info").style.display = "none";
+						}
+
 					}
 					// fetch secondary receiver data json, if enabled
 					if( second_receiver_enabled ){
@@ -99,7 +114,7 @@
 						if(msgs > second_receiver_msgs_1min_max) second_receiver_msgs_1min_max = msgs;
 						if(second_stat_data.last1min.local.noise) second_receiver_noise = second_stat_data.last1min.local.noise;
 						if(second_stat_data.last1min.local.signal) second_receiver_signal = second_stat_data.last1min.local.signal;
-						if(second_stat_data.last1min.local.peak) second_receiver_peak = second_stat_data.last1min.local.peak;
+						if(second_stat_data.last1min.local.peak_signal) second_receiver_peak = second_stat_data.last1min.local.peak_signal;
 
 						if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
 						if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
@@ -132,6 +147,20 @@
 						outHTML += "<td style='" + stat_style + "'>" + second_receiver_label + "</td>" + "<td style='" + stat_style + rate_style + "'>" + msgrate + "</td>" + "<td style='" + stat_style + "'>" + peak5 + "</td>" + "<td style='" + stat_style + sig5_style + "'>" + sig5 + "</td>" + "<td style='" + stat_style + "'>" + noise5 + "</td>" + "<td style='" + stat_style + "'>" + msgs5 + "</td>" + "<td style='" + stat_style + "'>" + pos5 + "</td>" + "<td style='" + stat_style + "'>" + peak15 + "</td>" + "<td style='" + stat_style + sig15_style + "'>" + sig15 + "</td>" + "<td style='" + stat_style + "'>" + noise15 + "</td>" + "<td style='" + stat_style + "'>" + msgs15 + "</td>" + "<td style='" + stat_style + "'>" + pos15 + "</td>";
 
 						outHTML += "</tr>";
+
+						// stats to full screen map
+						if(mymap.isFullscreen()){
+							var snr = -(second_receiver_signal-second_receiver_noise);
+							var peak_style = "";
+							if(second_receiver_peak >= -3) peak_style = " color: #FF4041;";
+							document.getElementById("map-stat-label2").innerHTML = second_receiver_label;
+							document.getElementById("map-stat-rate2").innerHTML = "<span style='" + rate_style + "'>" + msgrate + "</span>";
+							document.getElementById("map-stat-snr2").innerHTML = snr.toFixed(1);
+							document.getElementById("map-stat-peak2").innerHTML = "<span style='" + peak_style + "'>" + second_receiver_peak.toFixed(1) + "</span>";
+						} else {
+							// primary should always be available and map stat visibility is set there 
+						}
+
 					}
 					st.innerHTML = outHTML;
 				}
