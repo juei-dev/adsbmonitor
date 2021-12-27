@@ -142,6 +142,9 @@ Dec 25th, 2021:
 Dec 26th, 2021:
   - Added information table to map, which is displaying the selected aircraft image (if found), type, airliner etc. Thanks to api.joshdouch.me to provide this information!
 
+Dec 27th, 2021:
+  - Added the alti-bar and receiver status information to map when displayed in full screen. Also made some modifications to the styles.
+
 
 
 ## Current features
