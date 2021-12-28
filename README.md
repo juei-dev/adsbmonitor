@@ -145,6 +145,9 @@ Dec 26th, 2021:
 Dec 27th, 2021:
   - Added the alti-bar and receiver status information to map when displayed in full screen. Also made some modifications to the styles.
 
+Dec 28th, 2021:
+  - Added map click event, which will select the closest aircraft to the point of click providing it's within 10 km radius of clicked position. This fixes the previous difficulty of selecting aircraft by clicking on the map.
+
 
 
 ## Current features
