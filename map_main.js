@@ -9,6 +9,8 @@
 	var mapbox_map_id_blank = "blank";
 	var current_mapbox_map_id = mapbox_map_id;
 
+	const click_min_distance = 10; // 3 km radius for "missed" click to select aircraft 
+
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
 		set_lat = getCookie("set_lat");
@@ -80,7 +82,26 @@
 		// update preview / view setting box
 		showSmallMap();		
 	});
+	mymap.on('click', function(e) { 
+		// Handle "missed" clicks
+		// click_min_distance = 3
+		// aircrafts_positions = ["",0,0,""]; // all visible flights with callsign, lat, lon, icao
+		var clicked_pos = e.latlng;
+		var closest_ac_distance = 999999, closest_ac_icao = "", closest_ac_flight = ""; 
+		for(i=0; i<aircrafts_positions.length; i++){
+			var dist = getDistanceFromLatLonInKm(clicked_pos.lat,clicked_pos.lng,aircrafts_positions[i][1],aircrafts_positions[i][2],"km");
+			if(dist<closest_ac_distance){
+				closest_ac_distance = dist;
+				closest_ac_icao = aircrafts_positions[i][3];
+				closest_ac_flight = aircrafts_positions[i][0];
+			}
+		}
+		if(closest_ac_distance<=click_min_distance){
+			selectAircraft(closest_ac_icao, closest_ac_flight);
+		}
+	});
 	mymap.addControl(new L.Control.Fullscreen());
+
 
 	function smallMapEvent(){
 		showSmallMap();
@@ -146,40 +167,40 @@
 	}
 
 	function showRadiusCircles(){
-			var radius_circle_100km = L.circle([receiver_lat, receiver_lon], 100000, {
-					color: '#30315F',
-					weight: 1,
-					fillColor: '#005',
-					fillOpacity: 0.1,
-					radius: 100000
-			}).addTo(circleLayerGroup);
-			var radius_circle_200km = L.circle([receiver_lat, receiver_lon], 200000, {
-					color: '#30315F',
-					weight: 1,
-					fillColor: '#004',
-					fillOpacity: 0.1,
-					radius: 200000
-			}).addTo(circleLayerGroup);
-			var radius_circle_300km = L.circle([receiver_lat, receiver_lon], 300000, {
-					color: '#30315F',
-					weight: 1,
-					fillColor: '#003',
-					fillOpacity: 0.1,
-					radius: 300000
-			}).addTo(circleLayerGroup);
-			var radius_circle_400km = L.circle([receiver_lat, receiver_lon], 400000, {
-					color: '#30315F',
-					weight: 1,
-					fillColor: '#002',
-					fillOpacity: 0.1,
-					radius: 400000
-			}).addTo(circleLayerGroup);
-			if(airports_enabled) {
-				if(document.getElementById("airports-enabled")) {
-					if(document.getElementById("airports-enabled").checked){ layerGroupRunways.clearLayers(); findNearestRunways(); }
-				} else { // layerGroupRunways.clearLayers(); findNearestRunways(); 
-				}
+		var radius_circle_100km = L.circle([receiver_lat, receiver_lon], 100000, {
+				color: '#30315F',
+				weight: 1,
+				fillColor: '#005',
+				fillOpacity: 0.1,
+				radius: 100000
+		}).addTo(circleLayerGroup);
+		var radius_circle_200km = L.circle([receiver_lat, receiver_lon], 200000, {
+				color: '#30315F',
+				weight: 1,
+				fillColor: '#004',
+				fillOpacity: 0.1,
+				radius: 200000
+		}).addTo(circleLayerGroup);
+		var radius_circle_300km = L.circle([receiver_lat, receiver_lon], 300000, {
+				color: '#30315F',
+				weight: 1,
+				fillColor: '#003',
+				fillOpacity: 0.1,
+				radius: 300000
+		}).addTo(circleLayerGroup);
+		var radius_circle_400km = L.circle([receiver_lat, receiver_lon], 400000, {
+				color: '#30315F',
+				weight: 1,
+				fillColor: '#002',
+				fillOpacity: 0.1,
+				radius: 400000
+		}).addTo(circleLayerGroup);
+		if(airports_enabled) {
+			if(document.getElementById("airports-enabled")) {
+				if(document.getElementById("airports-enabled").checked){ layerGroupRunways.clearLayers(); findNearestRunways(); }
+			} else { // layerGroupRunways.clearLayers(); findNearestRunways(); 
 			}
+		}
 	}
 
 	// get previous selection from a cookie

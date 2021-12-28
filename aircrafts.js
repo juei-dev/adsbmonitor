@@ -14,7 +14,7 @@
 	var layerGroup = L.layerGroup().addTo(mymap);
 
 	const primary_icaos = []; // primary receiver icaos
-	var aircrafts_positions = ["",0,0]; // all visible flights with callsign, lat, lon
+	var aircrafts_positions = ["",0,0,""]; // all visible flights with callsign, lat, lon, icao
 	var second_ac_data = null; // supplementary / secondary receiver aircraft json - null if error
 	var second_stat_data = null; // supplementary / secondary receiver statistics json - null if error
 
@@ -301,7 +301,7 @@
 
 						// Add flight to aircrafts_positions
 						if(lat && lon)
-							aircrafts_positions.push([flight,lat,lon]);
+							aircrafts_positions.push([flight,lat,lon,icao]);
 
 						// Add emergency flights
 						// company_name, flight, last seen, squawk, lat, lon, altitude, gs, tas, rssi
@@ -745,7 +745,37 @@
 		if(selected_ac_seen)document.getElementById("map-ac-info-seen").innerHTML = selected_ac_seen.toFixed(0) + " s ago";
 	}
 
+	function clearACExtraInfo(){
+		selected_img_src = "";
+		selected_ac_reg = "-";
+		selected_ac_manufacturer = "-";
+		selected_ac_type = "-";
+		selected_ac_icao_type = "";
+		selected_ac_owner = "-";
+		selected_ac_route = "-";
+
+		selected_ac_squawk = "-";
+		selected_ac_tas = 0;
+		selected_ac_gs = 0;
+		selected_ac_track = 0;
+		selected_ac_rate = 0;
+
+		selected_ac_rssi = "";
+		selected_ac_msgs = 0;
+		selected_ac_seen = 0;
+
+		document.getElementById("map-ac-info-img-src").src = selected_img_src;
+		document.getElementById("map-ac-info-img-attr").innerHTML = "";
+		document.getElementById("map-ac-info-reg").innerHTML = "-";				
+		document.getElementById("map-ac-info-route").innerHTML = "-";				
+
+		document.getElementById("map-ac-info-manufacturer").innerHTML = selected_ac_manufacturer;
+		document.getElementById("map-ac-info-type").innerHTML = selected_ac_type;
+		document.getElementById("map-ac-info-owner").innerHTML = selected_ac_owner;		
+	}
+
 	function fetchACExtraInfo(){
+		clearACExtraInfo();
 
 		// Image thumbnail from api.joshdouch.me
 		fetch(ac_extra_info_url_thumb_image + selected_icao)
