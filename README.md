@@ -150,6 +150,7 @@ Dec 28th, 2021:
 
 Dec 29th, 2021:
   - Bugfix: deselecting aircraft didn't work correctly if clicked nearby in the map. Now, if the same aircraft is selected, selection will be removed if clicked close by of the selected aircraft. 
+  - Added strong signal percentage (during last 1 minute) to full screen map statistics box.
 
 
 
