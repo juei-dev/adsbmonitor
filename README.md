@@ -148,6 +148,9 @@ Dec 27th, 2021:
 Dec 28th, 2021:
   - Added map click event, which will select the closest aircraft to the point of click providing it's within 10 km radius of clicked position. This fixes the previous difficulty of selecting aircraft by clicking on the map.
 
+Dec 29th, 2021:
+  - Bugfix: deselecting aircraft didn't work correctly if clicked nearby in the map. Now, if the same aircraft is selected, selection will be removed if clicked close by of the selected aircraft. 
+
 
 
 ## Current features
