@@ -40,7 +40,7 @@
 			position: absolute; top: 10px; right: 80px; z-index: 20001;
 			border: 1px ridge #7F8F9F; border-radius: 5px;
 			background: #00000050; color: #FFFFFF;
-			width: 150px; height: 53px;
+			width: 190px; height: 53px;
 			text-align: left;
 			vertical-align: top;
 			padding: 0px;
@@ -60,6 +60,8 @@
 		#map-stat-snr2 { padding-left: 2px; text-align: center; }
 		#map-stat-peak1 { padding-left: 2px; text-align: center; }
 		#map-stat-peak2 { padding-left: 2px; text-align: center; }
+		#map-stat-strong1 { padding-left: 2px; text-align: center; }
+		#map-stat-strong2 { padding-left: 2px; text-align: center; }
 		#map-ac-info {
 			position: absolute; top: 80px; right: 10px; z-index: 20000;
 			border: 1px ridge #AFAFAF; border-radius: 5px;

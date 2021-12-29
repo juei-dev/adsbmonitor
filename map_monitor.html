@@ -28,22 +28,25 @@
 				<img id="map-preview"/>
 				<table id="map-stat-info" cellspacing="0" cellpadding="0">
 					<tr>
-						<th id="map-stat-head-label" class="map-stat-head">#</th>
-						<th id="map-stat-rate" class="map-stat-head">Msg Rate</th>
-						<th id="map-stat-snr" class="map-stat-head">SNR</th>
-						<th id="map-stat-snr" class="map-stat-head">Peak</th>
+						<th id="map-stat-head-label" class="map-stat-head" title="Receiver">#</th>
+						<th id="map-stat-rate" class="map-stat-head" title="Messages/second received during last 1 min">Msg Rate</th>
+						<th id="map-stat-snr" class="map-stat-head" title="Signal to Noise ratio during last 1 min">SNR</th>
+						<th id="map-stat-snr" class="map-stat-head" title="Peak signal level during last 1 min">Peak</th>
+						<th id="map-stat-strong" class="map-stat-head" title="Percentage of strong signals during last 1 min">Strong%</th>
 					</tr>
 					<tr>
 						<td id="map-stat-label1">-</th>
 						<td id="map-stat-rate1">-</td>
 						<td id="map-stat-snr1">-</td>
 						<td id="map-stat-peak1">-</td>
+						<td id="map-stat-strong1">-</td>
 					</tr>
 					<tr>
 						<td id="map-stat-label2">-</th>
 						<td id="map-stat-rate2">-</td>
 						<td id="map-stat-snr2">-</td>
 						<td id="map-stat-peak2">-</td>
+						<td id="map-stat-strong2">-</td>
 					</tr>
 				</table>
 				<table id="map-ac-info" cellspacing="0" cellpadding="0">
@@ -51,8 +54,8 @@
 						<td id="map-ac-info-img" colspan="2"><img id="map-ac-info-img-src" src=""/><span id="map-ac-info-img-attr"></span></td>						
 					</tr>
 					<tr>
-						<td id="map-ac-info-flight">-</td>
-						<td id="map-ac-info-hex">-</td>
+						<td id="map-ac-info-flight" title="Flight / callsign">-</td>
+						<td id="map-ac-info-hex" title="ICAO hex">-</td>
 					</tr>
 					<tr>
 						<td id="map-ac-info-route" title="Route">-</td>
@@ -63,15 +66,15 @@
 						<td id="map-ac-info-type">-</td>
 					</tr>
 					<tr>
-						<td id="map-ac-info-owner" colspan="2">-</td>
+						<td id="map-ac-info-owner" colspan="2" title="Owner">-</td>
 					</tr>
 					<tr>
-						<td id="map-ac-info-lat">-</td>
-						<td id="map-ac-info-lon">-</td>
+						<td id="map-ac-info-lat" title="Latitude">-</td>
+						<td id="map-ac-info-lon" title="Longitude">-</td>
 					</tr>
 					<tr>
-						<td id="map-ac-info-track">-</td>
-						<td id="map-ac-info-squawk">-</td>
+						<td id="map-ac-info-track" title="Track">-</td>
+						<td id="map-ac-info-squawk" title="Squawk">-</td>
 					</tr>
 					<tr>
 						<td id="map-ac-info-altitude">- ft</td>
@@ -86,7 +89,7 @@
 						<td id="map-ac-info-msgs">- msgs</td>
 					</tr>
 					<tr>
-						<td id="map-ac-info-seen" colspan="2">-s ago</td>
+						<td id="map-ac-info-seen" colspan="2" title="Seen">-s ago</td>
 					</tr>
 				</table>
 			</div>

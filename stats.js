@@ -6,6 +6,10 @@
 	var receiver_msgs_1min = 0, receiver_msgs_1min_max = 0;
 	var second_receiver_msgs_1min = 0, second_receiver_msgs_1min_max = 0;
 
+	var receiver_signals_accepted = 0, receiver_signals_strong = 0;
+	var second_receiver_signals_accepted = 0, second_receiver_signals_strong = 0;
+	var receiver_signals_strong_percentage = 0, second_receiver_signals_strong_percentage = 0;
+
 	var stats_display_page = 1;
 	const max_stats_display_page = 5;
 
@@ -43,6 +47,9 @@
 						if(data.last1min.local.signal) receiver_signal = data.last1min.local.signal;
 						if(data.last1min.local.peak_signal) receiver_peak = data.last1min.local.peak_signal;
 						msgrate = (msgs / 60).toFixed(1);
+						if(data.last1min.local.accepted[0]) receiver_signals_accepted = data.last1min.local.accepted[0];
+						if(data.last1min.local.strong_signals) receiver_signals_strong = data.last1min.local.strong_signals;
+						if(receiver_signals_accepted>0) receiver_signals_strong_percentage = ((receiver_signals_strong / receiver_signals_accepted)*100);
 
 						if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
 						if(data.last5min.local.signal) sig5 = data.last5min.local.signal;
@@ -82,10 +89,15 @@
 							var snr = -(receiver_signal-receiver_noise);
 							var peak_style = "";
 							if(receiver_peak >= -3) peak_style = " color: #FF4041;";
+							var strong_style = "";
+							if(receiver_signals_strong_percentage <= 5) strong_style = " color: #40FF41;";
+							if(receiver_signals_strong_percentage >= 10) strong_style = " color: #FFFF41;";
+							if(receiver_signals_strong_percentage >= 20) strong_style = " color: #FF4041;";
 							document.getElementById("map-stat-label1").innerHTML = receiver_label;
 							document.getElementById("map-stat-rate1").innerHTML = "<span style='" + rate_style + "'>" + msgrate + "</span>";
 							document.getElementById("map-stat-snr1").innerHTML = snr.toFixed(1);
 							document.getElementById("map-stat-peak1").innerHTML = "<span style='" + peak_style + "'>" + receiver_peak.toFixed(1) + "</span>";
+							document.getElementById("map-stat-strong1").innerHTML = "<span style='" + strong_style + "'>" + receiver_signals_strong_percentage.toFixed(1) + "</span>";
 						} else {
 							document.getElementById("map-stat-info").style.display = "none";
 						}
@@ -115,6 +127,10 @@
 						if(second_stat_data.last1min.local.noise) second_receiver_noise = second_stat_data.last1min.local.noise;
 						if(second_stat_data.last1min.local.signal) second_receiver_signal = second_stat_data.last1min.local.signal;
 						if(second_stat_data.last1min.local.peak_signal) second_receiver_peak = second_stat_data.last1min.local.peak_signal;
+
+						if(second_stat_data.last1min.local.accepted[0]) second_receiver_signals_accepted = second_stat_data.last1min.local.accepted[0];
+						if(second_stat_data.last1min.local.strong_signals) second_receiver_signals_strong = second_stat_data.last1min.local.strong_signals;
+						if(receiver_signals_accepted>0) second_receiver_signals_strong_percentage = ((second_receiver_signals_strong / second_receiver_signals_accepted)*100);
 
 						if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
 						if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
@@ -153,10 +169,15 @@
 							var snr = -(second_receiver_signal-second_receiver_noise);
 							var peak_style = "";
 							if(second_receiver_peak >= -3) peak_style = " color: #FF4041;";
+							var strong_style = "";
+							if(second_receiver_signals_strong_percentage <= 5) strong_style = " color: #40FF41;";
+							if(second_receiver_signals_strong_percentage >= 10) strong_style = " color: #FFFF41;";
+							if(second_receiver_signals_strong_percentage >= 20) strong_style = " color: #FF4041;";
 							document.getElementById("map-stat-label2").innerHTML = second_receiver_label;
 							document.getElementById("map-stat-rate2").innerHTML = "<span style='" + rate_style + "'>" + msgrate + "</span>";
 							document.getElementById("map-stat-snr2").innerHTML = snr.toFixed(1);
 							document.getElementById("map-stat-peak2").innerHTML = "<span style='" + peak_style + "'>" + second_receiver_peak.toFixed(1) + "</span>";
+							document.getElementById("map-stat-strong2").innerHTML = "<span style='" + strong_style + "'>" + second_receiver_signals_strong_percentage.toFixed(1) + "</span>";
 						} else {
 							// primary should always be available and map stat visibility is set there 
 						}
@@ -853,7 +874,6 @@
 			}
 		}
 
-
 	}
 
 	function refreshStatsDisplay(){
@@ -888,7 +908,6 @@
 			link.click();
 			link.remove();			
 		}
-
 
 		refreshStatsDisplay();
 	}
