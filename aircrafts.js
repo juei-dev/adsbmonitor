@@ -51,6 +51,9 @@
 	// selected aircraft lock on - following the selected aircraft - double click to engage / disengage
 	var selected_lock_on = false;
 
+	// to prevent mouse click bubling effect on map
+	var selected_clicked = false;
+
 	// selected aircraft extra information on full screen map
 	var selected_img_src = "";
 	var selected_ac_reg = "";
@@ -689,6 +692,7 @@
 
 	function selectAircraft(icao, flight){
 		mymap.doubleClickZoom.disable();
+		selected_clicked = true;
 		if(icao!=selected_icao){
 			selected_icao = icao; selected_flight = flight;
 		}

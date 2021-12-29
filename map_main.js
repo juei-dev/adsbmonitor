@@ -95,14 +95,21 @@
 			}
 		}
 		if(closest_ac_distance<=click_min_distance){
-			if(selected_icao == closest_ac_icao){
-				selected_icao = ""; selected_flight = "";
+			if(!selected_clicked){
+				if(selected_icao == closest_ac_icao){
+					selected_icao = ""; selected_flight = "";
+				} else {
+					selectAircraft(closest_ac_icao, closest_ac_flight);
+				}
 			} else
-				selectAircraft(closest_ac_icao, closest_ac_flight);
+			// remove the click selection - that was to prevent deselection after marker on click handled
+			selected_clicked = false;
 		}
 	});
 	mymap.addControl(new L.Control.Fullscreen());
-
+	mymap.zoomSnap = 0.25;
+	mymap.zoomDelta = 0.5;
+	mymap.wheelPxPerZoomLevel = 240;
 
 	function smallMapEvent(){
 		showSmallMap();
