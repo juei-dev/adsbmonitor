@@ -9,7 +9,7 @@
 	var mapbox_map_id_blank = "blank";
 	var current_mapbox_map_id = mapbox_map_id;
 
-	const click_min_distance = 10; // 3 km radius for "missed" click to select aircraft 
+	const click_min_distance = 10; // 10 km radius for "missed" click to select aircraft 
 
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
@@ -83,9 +83,7 @@
 		showSmallMap();		
 	});
 	mymap.on('click', function(e) { 
-		// Handle "missed" clicks
-		// click_min_distance = 3
-		// aircrafts_positions = ["",0,0,""]; // all visible flights with callsign, lat, lon, icao
+		// Handle "missed" clicks to select aircraft
 		var clicked_pos = e.latlng;
 		var closest_ac_distance = 999999, closest_ac_icao = "", closest_ac_flight = ""; 
 		for(i=0; i<aircrafts_positions.length; i++){
@@ -97,7 +95,10 @@
 			}
 		}
 		if(closest_ac_distance<=click_min_distance){
-			selectAircraft(closest_ac_icao, closest_ac_flight);
+			if(selected_icao == closest_ac_icao){
+				selected_icao = ""; selected_flight = "";
+			} else
+				selectAircraft(closest_ac_icao, closest_ac_flight);
 		}
 	});
 	mymap.addControl(new L.Control.Fullscreen());
