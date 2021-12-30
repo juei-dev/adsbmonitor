@@ -155,6 +155,7 @@ Dec 29th, 2021:
 Dec 30th, 2021:
   - Bugfix: full screen map receiver stats strong signals didn't count all the accepted messages. Now the strong signal percentage is calculated against all the accepted messages.
   - Added count of aircraft with and without position to the full screen map statistics.
+  - Selected aircraft now leaves a blue trace (30s ago bright blue, 30-60s ago darker blue).
 
 
 
