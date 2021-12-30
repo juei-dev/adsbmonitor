@@ -101,6 +101,8 @@
 							document.getElementById("map-stat-snr1").innerHTML = snr.toFixed(1);
 							document.getElementById("map-stat-peak1").innerHTML = "<span style='" + peak_style + "'>" + receiver_peak.toFixed(1) + "</span>";
 							document.getElementById("map-stat-strong1").innerHTML = "<span style='" + strong_style + "'>" + receiver_signals_strong_percentage.toFixed(1) + "</span>";
+							document.getElementById("map-stat-ac-with-pos1").innerHTML = ac_with_pos_count;
+							document.getElementById("map-stat-ac-no-pos1").innerHTML = ac_count - ac_with_pos_count;
 						} else {
 							document.getElementById("map-stat-info").style.display = "none";
 						}
@@ -184,6 +186,8 @@
 							document.getElementById("map-stat-snr2").innerHTML = snr.toFixed(1);
 							document.getElementById("map-stat-peak2").innerHTML = "<span style='" + peak_style + "'>" + second_receiver_peak.toFixed(1) + "</span>";
 							document.getElementById("map-stat-strong2").innerHTML = "<span style='" + strong_style + "'>" + second_receiver_signals_strong_percentage.toFixed(1) + "</span>";
+							document.getElementById("map-stat-ac-with-pos2").innerHTML = second_ac_with_pos_count;
+							document.getElementById("map-stat-ac-no-pos2").innerHTML = second_ac_count - second_ac_with_pos_count;
 						} else {
 							// primary should always be available and map stat visibility is set there 
 						}
