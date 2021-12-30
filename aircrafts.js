@@ -20,7 +20,14 @@
 
 	var all_icao_flights = []; // icao, flight
 
+	var ac_trace_all = false; // true to trace all aircarfts, false to trace selected only
+	var ac_traces = []; // store of ac track traces for map: icao, flight, timestamp, lat, lon, altitude, gs, tas, track, rssi
+	const ac_traces_max_time = 2*60; // seconds to trace each ac (cleanTraces -function to clear older away) 
+	const ac_traces_decay_time = 1*60; // seconds to trace each ac with brighter line 
+	var layerGroupTraces = L.layerGroup().addTo(mymap);
+
 	var ac_count = 0, ac_with_pos_count = 0, ac_msgs = 0, ac_max_distance = 0, ac_max_distance_all_time = 0;
+	var second_ac_count = 0, second_ac_with_pos_count = 0;
 
 	// session maximums [value, flight, timestamp, heading, bearing, distance]
 	var session_max_distance = [0,"","",0,0,0], session_max_altitude = [0,"","",0,0,0], session_max_gs = [0,"","",0,0,0], session_max_tas = [0,"","",0,0,0];
@@ -167,12 +174,15 @@
 						zoom_correction_lon = 0.02 * (36/Math.pow(zoom_level,2));
 					}					
 
-					// grawl through the secondary receiver data for circular graphs
+					// grawl through the secondary receiver data for circular graphs and stats
+					second_ac_count=0; second_ac_with_pos_count=0;
 					if( second_ac_data )
 						for( var k2 in second_ac_data.aircraft ){
 							var tmp_aci = second_ac_data.aircraft[k2];
+							second_ac_count++;
 							if(tmp_aci){ 
 								if(tmp_aci.lat && tmp_aci.lon){
+									second_ac_with_pos_count++;
 									var angle = Math.floor(getAngleBetweenTwoLatLon(second_receiver_lat,second_receiver_lon,tmp_aci.lat,tmp_aci.lon));
 									var second_distance = getDistanceFromLatLonInKm(second_receiver_lat,second_receiver_lon,tmp_aci.lat,tmp_aci.lon,'km');								
 									for(i=360;i<receiver_circular_stats.length;i++){
@@ -302,9 +312,17 @@
 							}
 						}
 
-						// Add flight to aircrafts_positions
-						if(lat && lon)
+						// Add flight to aircrafts_positions and "leave" traces
+						if(lat && lon) {
 							aircrafts_positions.push([flight,lat,lon,icao]);
+							// var trace_timestamp_now = new Date();
+							if(ac_trace_all) { 
+								addTrace(icao, flight, Date.now(), lat, lon, altitude, gs, tas, track, rssi);
+							}
+							else if(selected_icao==icao) {
+								addTrace(icao, flight, Date.now(), lat, lon, altitude, gs, tas, track, rssi);								
+							}
+						}
 
 						// Add emergency flights
 						// company_name, flight, last seen, squawk, lat, lon, altitude, gs, tas, rssi
@@ -658,7 +676,7 @@
 						var distance_to_runway = getDistanceFromLatLonInKm(selected_lat,selected_lon,selectedAirportRunway_lat,selectedAirportRunway_lon,'km');
 					 	var distance_to_runway_nm = distance_to_runway * 0.539957; // in nautical miles
 						selected_runway_line.bindTooltip(distance_to_runway.toFixed(1) + " km<br>" + distance_to_runway_nm.toFixed(1) + " nm", { permanent: true, direction: 'center', offset: [0,0] });
-					 } 
+					} 
 
 					al.innerHTML = outHTML; // populate aircraft table
 					sortTable("aircrafts",aircrafts_table_sort_col,aircrafts_table_sort_ascending,aircrafts_table_sort_numeric); // sort by column 8 = distance, ascending, numeric information
@@ -869,6 +887,66 @@
 
 	refreshAircrafts();
 	var refreshACInterval = setInterval(refreshAircrafts, aircraft_refresh_rate);
+
+	function addTrace(icao, flight, timestamp, lat, lon, altitude, gs, tas, track, rssi){
+		cleanTraces(icao);
+		var position = 0, found_pos = false;
+		for(i=ac_traces.length-1; i>=0; i--){
+			if(ac_traces[i][0]!=icao && found_pos) break;
+			if(ac_traces[i][0]==icao) { position = i; found_pos = true; }
+		}
+		if(position==0){
+			ac_traces.push([icao,flight,timestamp,lat,lon,altitude,gs,tas,track,rssi]);
+		} else {
+			ac_traces.splice(position,0,[icao,flight,timestamp,lat,lon,altitude,gs,tas,track,rssi]);			
+		}
+	}
+
+	function cleanTraces(icao){ // use icao as empty to handle all the traces for those aircraft which doesn't show up anymore
+		var position = -1;
+		for(i=0; i<ac_traces.length; i++){
+			if(icao){
+				if(ac_traces[i][0]==icao && ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000))){
+					ac_traces.splice(i,1);
+					if(position==-1)position=i;
+				}
+			} else { // clean all the aircrafts
+				if(ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000))){
+					ac_traces.splice(i,1);				
+				}
+			}
+		}
+		return position;
+	}
+
+	function showTraces(){
+		const color_sooner = "#50A0FF";
+		const color_later = "#2070CF";
+		var trace_color = color_sooner;
+		var current_icao = "";
+		var currentpoint_lat = 0, currentpoint_lon = 0;	
+		var prevpoint_lat = 0, prevpoint_lon = 0;
+
+		cleanTraces(""); // clean all old before showing
+		layerGroupTraces.clearLayers();
+
+		for(i=0; i<ac_traces.length; i++){
+			currentpoint_lat = ac_traces[i][3]; currentpoint_lon = ac_traces[i][4];
+			if(ac_traces[i][0]!=current_icao){
+				current_icao = ac_traces[i][0]; 
+				prevpoint_lat = 0; prevpoint_lon = 0;
+			}
+			if(prevpoint_lat != 0 && prevpoint_lon != 0){
+				if((Date.now()-ac_traces[i][2])>(ac_traces_decay_time*1000)) trace_color = color_later; else trace_color = color_sooner;
+				var traceline = L.polyline([ [currentpoint_lat,currentpoint_lon],[prevpoint_lat,prevpoint_lon] ], { color: trace_color, weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupTraces);		
+			}
+			prevpoint_lat = currentpoint_lat; prevpoint_lon = currentpoint_lon;
+		}
+	}
+
+	var refreshACTraceInterval = setInterval(showTraces, aircraft_refresh_rate);
+
+
 
 	// NOT STARTED YET - Pending approval from OpenSky Network (Sep 23rd 2021)
 	//
