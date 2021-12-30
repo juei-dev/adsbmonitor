@@ -152,6 +152,9 @@ Dec 29th, 2021:
   - Bugfix: deselecting aircraft didn't work correctly if clicked nearby in the map. Now, if the same aircraft is selected, selection will be removed if clicked close by of the selected aircraft. 
   - Added strong signal percentage (during last 1 minute) to full screen map statistics box.
 
+Dec 30th, 2021:
+  - Bugfix: full screen map receiver stats strong signals didn't count all the accepted messages. Now the strong signal percentage is calculated against all the accepted messages.
+
 
 
 ## Current features
