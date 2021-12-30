@@ -47,9 +47,12 @@
 						if(data.last1min.local.signal) receiver_signal = data.last1min.local.signal;
 						if(data.last1min.local.peak_signal) receiver_peak = data.last1min.local.peak_signal;
 						msgrate = (msgs / 60).toFixed(1);
-						if(data.last1min.local.accepted[0]) receiver_signals_accepted = data.last1min.local.accepted[0];
+						receiver_signals_accepted = 0;
+						if(data.last1min.local.accepted) for(a=0;a<data.last1min.local.accepted.length; a++) { receiver_signals_accepted += data.last1min.local.accepted[a]; }
 						if(data.last1min.local.strong_signals) receiver_signals_strong = data.last1min.local.strong_signals;
-						if(receiver_signals_accepted>0) receiver_signals_strong_percentage = ((receiver_signals_strong / receiver_signals_accepted)*100);
+						if(receiver_signals_accepted>0) receiver_signals_strong_percentage = ((receiver_signals_strong / receiver_signals_accepted)*100); else receiver_signals_strong_percentage = 0;
+
+						//if(mymap.isFullscreen()) console.log("Main - Accepted: " + receiver_signals_accepted + " Strong: " + receiver_signals_strong + " Percent: " + receiver_signals_strong_percentage.toFixed(1));
 
 						if(data.last5min.local.noise) noise5 = data.last5min.local.noise;
 						if(data.last5min.local.signal) sig5 = data.last5min.local.signal;
@@ -128,9 +131,12 @@
 						if(second_stat_data.last1min.local.signal) second_receiver_signal = second_stat_data.last1min.local.signal;
 						if(second_stat_data.last1min.local.peak_signal) second_receiver_peak = second_stat_data.last1min.local.peak_signal;
 
-						if(second_stat_data.last1min.local.accepted[0]) second_receiver_signals_accepted = second_stat_data.last1min.local.accepted[0];
+						second_receiver_signals_accepted = 0;
+						if(second_stat_data.last1min.local.accepted) for(a=0;a<second_stat_data.last1min.local.accepted.length; a++) { second_receiver_signals_accepted += second_stat_data.last1min.local.accepted[a]; }
 						if(second_stat_data.last1min.local.strong_signals) second_receiver_signals_strong = second_stat_data.last1min.local.strong_signals;
-						if(receiver_signals_accepted>0) second_receiver_signals_strong_percentage = ((second_receiver_signals_strong / second_receiver_signals_accepted)*100);
+						if(second_receiver_signals_accepted>0) second_receiver_signals_strong_percentage = ((second_receiver_signals_strong / second_receiver_signals_accepted)*100); else second_receiver_signals_strong_percentage = 0;
+
+						// if(mymap.isFullscreen()) console.log("Supplementary - Accepted: " + second_receiver_signals_accepted + " Strong: " + second_receiver_signals_strong + " Percent: " + second_receiver_signals_strong_percentage.toFixed(1));
 
 						if(second_stat_data.last5min.local.noise) noise5 = second_stat_data.last5min.local.noise;
 						if(second_stat_data.last5min.local.signal) sig5 = second_stat_data.last5min.local.signal;
