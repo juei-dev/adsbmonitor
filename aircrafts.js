@@ -746,9 +746,16 @@
 			document.getElementById("map-ac-info-flight").innerHTML = selected_flight;
 			document.getElementById("map-ac-info-hex").innerHTML = selected_icao;
 			if(selected_ac_extra_info){
+				document.getElementById("map-ac-info-img").style.display = "table-cell";				
+				document.getElementById("map-ac-info-reg").style.display = "table-cell";				
+				document.getElementById("map-ac-info-route").style.display = "table-cell";				
+				document.getElementById("map-ac-info-manufacturer").style.display = "table-cell";				
+				document.getElementById("map-ac-info-type").style.display = "table-cell";				
+				document.getElementById("map-ac-info-owner").style.display = "table-cell";				
 				fetchACExtraInfo();
 			} else {
 				document.getElementById("map-ac-info-img").style.display = "none";				
+				document.getElementById("map-ac-info-reg").style.display = "none";				
 				document.getElementById("map-ac-info-route").style.display = "none";				
 				document.getElementById("map-ac-info-manufacturer").style.display = "none";				
 				document.getElementById("map-ac-info-type").style.display = "none";				
