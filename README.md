@@ -157,6 +157,9 @@ Dec 30th, 2021:
   - Added count of aircraft with and without position to the full screen map statistics.
   - Selected aircraft now leaves a blue trace (1min ago bright blue, 1-2min ago darker blue).
 
+Dec 31st, 2021:
+  - Added buttons to map bottom right to toggle trace all aircraft, trace selected aircraft and fetch extra information for selected aircraft.
+
 
 
 ## Current features
@@ -292,3 +295,6 @@ Example (Dec 26th 2021) selected aircraft extra information:
 
 Example (Dec 27th 2021) full screen map alti-bar and receiver status information:
 ![Example_fullscreen_altibar_and_receiver_stats](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_fullscreen_altibar_and_receiver_stats.jpg?raw=true)
+
+Example (Dec 31st 2021) full screen map trace aircraft and new toggle buttons at bottom right:
+![Example_map_traces_and_buttons](https://github.com/juei-dev/adsbmonitor/blob/main/screenshots/example_map_traces_and_buttons.jpg?raw=true)
