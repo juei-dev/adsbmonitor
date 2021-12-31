@@ -20,7 +20,8 @@
 
 	var all_icao_flights = []; // icao, flight
 
-	var ac_trace_all = false; // true to trace all aircarfts, false to trace selected only
+	var ac_trace_all = false; // true to trace all aircarfts
+	var ac_trace_selected = true; // true to trace selected aircarft
 	var ac_traces = []; // store of ac track traces for map: icao, flight, timestamp, lat, lon, altitude, gs, tas, track, rssi
 	const ac_traces_max_time = 2*60; // seconds to trace each ac (cleanTraces -function to clear older away) 
 	const ac_traces_decay_time = 1*60; // seconds to trace each ac with brighter line 
@@ -319,7 +320,7 @@
 							if(ac_trace_all) { 
 								addTrace(icao, flight, Date.now(), lat, lon, altitude, gs, tas, track, rssi);
 							}
-							else if(selected_icao==icao) {
+							else if(selected_icao==icao && ac_trace_selected) {
 								addTrace(icao, flight, Date.now(), lat, lon, altitude, gs, tas, track, rssi);								
 							}
 						}

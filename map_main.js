@@ -110,6 +110,7 @@
 	mymap.zoomSnap = 0.25;
 	mymap.zoomDelta = 0.5;
 	mymap.wheelPxPerZoomLevel = 240;
+	//mymap.preferCanvas = true;
 
 	function smallMapEvent(){
 		showSmallMap();
@@ -275,4 +276,120 @@
 			radius: 2002
 		}).addTo(mymap);
 	}
+
+
+	// Custom buttons to map
+	//var button_background_color = "202023";
+	//var button_background_color_hover = "404043";
+	//var button_background_color_enabled = "202043";
+	var mapButton_TraceAll = L.Control.extend({
+		options: {
+			position: "bottomright"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-trace-all";
+			cont.title = "Leave trace after all aircarfts";
+			cont.value = "TRC";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(!ac_trace_all){
+					ac_trace_all = true;
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					ac_trace_all = false;	
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+			}
+
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_TraceAll());
+
+	var mapButton_TraceSelected = L.Control.extend({
+		options: {
+			position: "bottomright"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-trace-selected";
+			cont.style.fillOpacity = 0.5;
+			cont.title = "Leave trace after selected aircarft";
+			cont.value = "TRCS";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+			cont.checked = true;
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(cont.checked){
+					ac_trace_selected = true;
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					ac_trace_selected = false;	
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+			}
+
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_TraceSelected());
+
+	var mapButton_SelectExtraInfo = L.Control.extend({
+		options: {
+			position: "bottomright"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-select-extra-info";
+			cont.title = "Fetch extra information when selecting an aircraft";
+			cont.value = "INFO";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+			cont.checked = true;
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(cont.checked){
+					selected_ac_extra_info = true;
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					selected_ac_extra_info = false;	
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+			}
+
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_SelectExtraInfo());
 

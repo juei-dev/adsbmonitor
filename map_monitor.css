@@ -259,6 +259,7 @@
 			-webkit-appearance: none;
 			appearance: none;
 			background-color: #000;
+			// color: #fff;
 			margin: 0;
 			vertical-align: middle;
 			font: inherit;
@@ -501,5 +502,37 @@
 			/* clip-path: polygon(90% 90% 90%); */
 		}
 
+		input[type="checkbox"].map-btn-trace-all:checked:after {
+			content: "TRCA";
+			position: relative;
+			top: 5px;
+			left: 1px;
+			transform: scale(1);
+			color: #50A0FF;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+
+		input[type="checkbox"].map-btn-trace-selected:checked:after {
+			content: "TRCS";
+			position: relative;
+			top: 5px;
+			left: 1px;
+			transform: scale(1);
+			color: #50A0FF;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+
+		input[type="checkbox"].map-btn-select-extra-info:checked:after {
+			content: "INFO";
+			position: relative;
+			top: 5px;
+			left: 1px;
+			transform: scale(1);
+			color: #50F05F;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
 
 
