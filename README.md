@@ -160,6 +160,9 @@ Dec 30th, 2021:
 Dec 31st, 2021:
   - Added buttons to map bottom right to toggle trace all aircraft, trace selected aircraft and fetch extra information for selected aircraft.
 
+Jan 1st, 2022:
+  - Added a button to the bottom left of map which is toggling the distance radius circles from the main receiver (each circle 100km away).
+
 
 
 ## Current features
