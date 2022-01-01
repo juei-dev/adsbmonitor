@@ -535,4 +535,15 @@
 			/* clip-path: polygon(90% 90% 90%); */
 		}
 
+		input[type="checkbox"].map-btn-show-radius-circle:checked:after {
+			content: "RADS";
+			position: relative;
+			top: 5px;
+			left: 1px;
+			transform: scale(1);
+			color: #5050FF;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+
 

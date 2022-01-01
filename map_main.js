@@ -11,6 +11,8 @@
 
 	const click_min_distance = 10; // 10 km radius for "missed" click to select aircraft 
 
+	var show_radius_circle = false; // show radius circles
+
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
 		set_lat = getCookie("set_lat");
@@ -164,10 +166,10 @@
 		} else if (current_mapbox_map_id == mapbox_map_id_nav){
 			mymap.removeLayer(tileLayer_nav);
 			current_mapbox_map_id = mapbox_map_id_blank;
-			// add radius circles for blank map
-			showRadiusCircles();
+			// add radius circles for blank map - deprecated on Jan 1st 2022 - added a separate button for that to map for all maps
+			// showRadiusCircles(); 
 		} else if (current_mapbox_map_id == mapbox_map_id_blank){
-			circleLayerGroup.clearLayers();
+			// if(!show_radius_circle) circleLayerGroup.clearLayers();
 			mymap.addLayer(tileLayer_normal);
 			current_mapbox_map_id = mapbox_map_id;
 		}
@@ -373,17 +375,18 @@
 			cont.checked = true;
 
 			cont.onmouseover = function(){
+				selected_ac_extra_info = true;
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
 			} 
 			cont.onmouseout = function(){
+				selected_ac_extra_info = false;	
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
 			}
 			cont.onclick = function(){
 				if(cont.checked){
-					selected_ac_extra_info = true;
 					//cont.style.backgroundColor = button_background_color_enabled;
 				} else {
-					selected_ac_extra_info = false;	
+
 					//cont.style.backgroundColor = button_background_color_hover;
 				} 
 			}
@@ -392,4 +395,42 @@
 		}
 	});
 	mymap.addControl(new mapButton_SelectExtraInfo());
+
+	var mapButton_ShowRadiusCircle = L.Control.extend({
+		options: {
+			position: "bottomleft"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-show-radius-circle";
+			cont.title = "Show radius circles from main receiver (each circle per 100km)";
+			cont.value = "RADS";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(cont.checked){
+					showRadiusCircles();
+					show_radius_circle = true;
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					circleLayerGroup.clearLayers();
+					show_radius_circle = false;
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+			}
+
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_ShowRadiusCircle());
 
