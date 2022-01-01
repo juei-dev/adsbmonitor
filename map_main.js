@@ -375,18 +375,17 @@
 			cont.checked = true;
 
 			cont.onmouseover = function(){
-				selected_ac_extra_info = true;
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
 			} 
 			cont.onmouseout = function(){
-				selected_ac_extra_info = false;	
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
 			}
 			cont.onclick = function(){
 				if(cont.checked){
+					selected_ac_extra_info = true;
 					//cont.style.backgroundColor = button_background_color_enabled;
 				} else {
-
+					selected_ac_extra_info = false;	
 					//cont.style.backgroundColor = button_background_color_hover;
 				} 
 			}
