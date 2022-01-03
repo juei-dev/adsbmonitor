@@ -163,6 +163,10 @@ Dec 31st, 2021:
 Jan 1st, 2022:
   - Added a button to the bottom left of map which is toggling the distance radius circles from the main receiver (each circle 100km away).
 
+Jan 3rd, 2022:
+  - Changed button positions a bit on the map.
+  - Added also a COVR button to the map (bottom left) which will toggle receiver coverage lines on and off. This differes slightly to the receivers / antenna circular distance / direction graph, because that is on a flat plane base and the map coverage is in spheroid base.
+
 
 
 ## Current features
