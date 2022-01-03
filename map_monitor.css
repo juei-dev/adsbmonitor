@@ -140,6 +140,9 @@
 			border: 2px groove #30415F;
 			border-radius: 7px;
 			margin-bottom: 5px;
+			margin-left: 5px;
+			display: block;
+			float: left;			
 		}
 		.leaflet-touch .leaflet-bar a:nth-child(n):hover {
 			background-color: #9090B2;
@@ -535,11 +538,33 @@
 			/* clip-path: polygon(90% 90% 90%); */
 		}
 
+		.leaflet-left .leaflet-control {
+			display: inline-block;
+			float: none;
+		}
+
+		.leaftlet-right .leaftlet-control {
+			display: block;
+			float: right;
+		}
+
 		input[type="checkbox"].map-btn-show-radius-circle:checked:after {
 			content: "RADS";
 			position: relative;
 			top: 5px;
 			left: 1px;
+			transform: scale(1);
+			color: #5050FF;
+			transform-origin: bottom left;
+			/* clip-path: polygon(90% 90% 90%); */
+		}
+
+		input[type="checkbox"].map-btn-show-main-coverage:checked:after {
+			content: "COVR";
+			position: relative;
+			display: inline-block;
+			top: 5px;
+			left: 0px;
 			transform: scale(1);
 			color: #5050FF;
 			transform-origin: bottom left;

@@ -20,8 +20,6 @@
 
 	var all_icao_flights = []; // icao, flight
 
-	var ac_trace_all = false; // true to trace all aircarfts
-	var ac_trace_selected = true; // true to trace selected aircarft
 	var ac_traces = []; // store of ac track traces for map: icao, flight, timestamp, lat, lon, altitude, gs, tas, track, rssi
 	const ac_traces_max_time = 2*60; // seconds to trace each ac (cleanTraces -function to clear older away) 
 	const ac_traces_decay_time = 1*60; // seconds to trace each ac with brighter line 
@@ -35,10 +33,10 @@
 	var session_max_climb_rate = [0,"","",0,0,0], session_max_descent_rate = [0,"","",0,0,0];
 
 	// circular and altitude reception statistics
-	// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
+	// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt, max_lat, max_lon]
 	var receiver_circular_stats = [];
-	for(i=0;i<360;i++)receiver_circular_stats.push([receiver_label,i,999,0,99,99999,0]);
-	for(i=0;i<360;i++)receiver_circular_stats.push([second_receiver_label,i,999,0,99,99999,0]);
+	for(i=0;i<360;i++)receiver_circular_stats.push([receiver_label,i,999,0,99,99999,0,0,0]);
+	for(i=0;i<360;i++)receiver_circular_stats.push([second_receiver_label,i,999,0,99,99999,0,0,0]);
 
 	// company data
 	var companies = []; // company_name, last seen (not used for now), flights seen
@@ -83,7 +81,6 @@
 	var selected_ac_msgs = 0;
 	var selected_ac_seen = 0;
 
-	var selected_ac_extra_info = true; // set to false, if you don't want access api.joshdouch.me
 	var ac_extra_info_url_details = "https://api.joshdouch.me/api/aircraft/";
 	var ac_extra_info_url_reg = "https://api.joshdouch.me/hex-reg.php?hex=";
 	var ac_extra_info_url_route = "https://api.joshdouch.me/callsign-route.php?callsign=";
@@ -189,7 +186,7 @@
 									for(i=360;i<receiver_circular_stats.length;i++){
 										if(receiver_circular_stats[i][0] == second_receiver_label && receiver_circular_stats[i][1] == angle){
 											if(second_distance < receiver_circular_stats[i][2] && tmp_aci.altitude){ receiver_circular_stats[i][2]=second_distance; receiver_circular_stats[i][5]=tmp_aci.altitude; }
-											if(second_distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=second_distance; receiver_circular_stats[i][4]=tmp_aci.rssi; receiver_circular_stats[i][6]=tmp_aci.altitude; }
+											if(second_distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=second_distance; receiver_circular_stats[i][4]=tmp_aci.rssi; receiver_circular_stats[i][6]=tmp_aci.altitude; receiver_circular_stats[i][7]=tmp_aci.lat; receiver_circular_stats[i][8]=tmp_aci.lon; }
 											break;
 										} 
 									}
@@ -470,11 +467,11 @@
 						if( lat && lon ){
 							if(position_received==receiver_label){ 
 								var angle = Math.floor(getAngleBetweenTwoLatLon(receiver_lat,receiver_lon,lat,lon));
-								// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt]
+								// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt, max_lat, max_lon]
 								for(i=0;i<360;i++){
 									if(receiver_circular_stats[i][0] == receiver_label && receiver_circular_stats[i][1] == angle){
 										if(distance < receiver_circular_stats[i][2]){ receiver_circular_stats[i][2]=distance; receiver_circular_stats[i][5]=altitude; }
-										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; receiver_circular_stats[i][6]=altitude; }
+										if(distance > receiver_circular_stats[i][3]){ receiver_circular_stats[i][3]=distance; receiver_circular_stats[i][4]=rssi; receiver_circular_stats[i][6]=altitude; receiver_circular_stats[i][7]=lat; receiver_circular_stats[i][8]=lon; }
 										break;
 									} 
 								}

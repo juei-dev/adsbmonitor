@@ -50,9 +50,23 @@
 
 	// Calculate angle between two positions - return (true) degrees  
 	function getAngleBetweenTwoLatLon(alat,alon,blat,blon){ 
+		 
 		var angle = (Math.atan2((blon-alon),(blat-alat))*180/Math.PI);
 		if( angle < 0 ) angle = 360 + angle;
 		return angle; 
+		
+		/*
+		var dLon = (blon - alon);
+		var y = Math.sin(dLon) * Math.cos(blat);
+		var x = Math.cos(alat) * Math.sin(blat) - Math.sin(alat) * Math.cos(blat) * Math.cos(dLon);
+		var angle = Math.atan2(y,x);
+		angle = toDeg(angle);
+		angle = (angle+360) % 360;
+		angle = 360-angle;
+		//angle+=180;
+		console.log(angle);
+		return angle;
+		*/
 	}
 
 	function getAngleEndpoint(x,y,r,angle){  // in degrees
@@ -204,3 +218,9 @@
 		*/
 		return (a[4] - b[4]);
 	}
+
+	function sort_circular_by_angle(a,b){
+		return (a[1] - b[1]);
+	}
+
+

@@ -11,7 +11,11 @@
 
 	const click_min_distance = 10; // 10 km radius for "missed" click to select aircraft 
 
+	var ac_trace_all = false; // true to trace all aircarfts
+	var ac_trace_selected = true; // true to trace selected aircarft
+	var selected_ac_extra_info = true; // set to false, if you don't want access api.joshdouch.me
 	var show_radius_circle = false; // show radius circles
+	var receiver_coverage_shown = false;
 
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
@@ -284,6 +288,7 @@
 	//var button_background_color = "202023";
 	//var button_background_color_hover = "404043";
 	//var button_background_color_enabled = "202043";
+	if(getCookie("ac_trace_all")=="on") ac_trace_all = true; else if(getCookie("ac_trace_all")=="off") ac_trace_all = false;
 	var mapButton_TraceAll = L.Control.extend({
 		options: {
 			position: "bottomright"
@@ -298,6 +303,7 @@
 			//cont.style.backgroundColor = button_background_color;
 			cont.style.width = "30px";
 			cont.style.height = "30px";
+			if(ac_trace_all)cont.checked = true; else cont.checked = false;
 
 			cont.onmouseover = function(){
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
@@ -308,18 +314,20 @@
 			cont.onclick = function(){
 				if(!ac_trace_all){
 					ac_trace_all = true;
+					setCookie("ac_trace_all", "on", 365);
 					//cont.style.backgroundColor = button_background_color_enabled;
 				} else {
-					ac_trace_all = false;	
+					ac_trace_all = false;
+					setCookie("ac_trace_all", "off", 365);	
 					//cont.style.backgroundColor = button_background_color_hover;
 				} 
 			}
-
 			return cont;
 		}
 	});
 	mymap.addControl(new mapButton_TraceAll());
 
+	if(getCookie("ac_trace_selected")=="on") ac_trace_selected = true; else if(getCookie("ac_trace_selected")=="off") ac_trace_selected = false;
 	var mapButton_TraceSelected = L.Control.extend({
 		options: {
 			position: "bottomright"
@@ -335,7 +343,8 @@
 			//cont.style.backgroundColor = button_background_color;
 			cont.style.width = "30px";
 			cont.style.height = "30px";
-			cont.checked = true;
+			if(ac_trace_selected)cont.checked = true; else cont.checked = false;
+			//cont.checked = true;
 
 			cont.onmouseover = function(){
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
@@ -351,6 +360,7 @@
 					ac_trace_selected = false;	
 					//cont.style.backgroundColor = button_background_color_hover;
 				} 
+				if(ac_trace_selected)setCookie("ac_trace_selected", "on", 365); else setCookie("ac_trace_selected", "off", 365);
 			}
 
 			return cont;
@@ -358,6 +368,7 @@
 	});
 	mymap.addControl(new mapButton_TraceSelected());
 
+	if(getCookie("selected_ac_extra_info")=="on") selected_ac_extra_info = true; else if(getCookie("selected_ac_extra_info")=="off") selected_ac_extra_info = false;
 	var mapButton_SelectExtraInfo = L.Control.extend({
 		options: {
 			position: "bottomright"
@@ -372,7 +383,8 @@
 			//cont.style.backgroundColor = button_background_color;
 			cont.style.width = "30px";
 			cont.style.height = "30px";
-			cont.checked = true;
+			if(selected_ac_extra_info)cont.checked = true; else cont.checked = false;
+			//cont.checked = true;
 
 			cont.onmouseover = function(){
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
@@ -388,13 +400,14 @@
 					selected_ac_extra_info = false;	
 					//cont.style.backgroundColor = button_background_color_hover;
 				} 
+				if(selected_ac_extra_info)setCookie("selected_ac_extra_info", "on", 365); else setCookie("selected_ac_extra_info", "off", 365);
 			}
-
 			return cont;
 		}
 	});
 	mymap.addControl(new mapButton_SelectExtraInfo());
 
+	if(getCookie("show_radius_circle")=="on") show_radius_circle = true; else if(getCookie("show_radius_circle")=="off") show_radius_circle = false;
 	var mapButton_ShowRadiusCircle = L.Control.extend({
 		options: {
 			position: "bottomleft"
@@ -409,6 +422,7 @@
 			//cont.style.backgroundColor = button_background_color;
 			cont.style.width = "30px";
 			cont.style.height = "30px";
+			if(show_radius_circle)cont.checked = true; else cont.checked = false;
 
 			cont.onmouseover = function(){
 				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
@@ -425,11 +439,52 @@
 					circleLayerGroup.clearLayers();
 					show_radius_circle = false;
 					//cont.style.backgroundColor = button_background_color_hover;
-				} 
+				}
+				if(show_radius_circle)setCookie("show_radius_circle", "on", 365); else setCookie("show_radius_circle", "off", 365);
 			}
-
 			return cont;
 		}
 	});
 	mymap.addControl(new mapButton_ShowRadiusCircle());
+	if(show_radius_circle)showRadiusCircles();
+
+	if(getCookie("receiver_coverage_shown")=="on") receiver_coverage_shown = true; else if(getCookie("receiver_coverage_shown")=="off") receiver_coverage_shown = false;
+	var mapButton_ShowMainCoverageMap = L.Control.extend({
+		options: {
+			position: "bottomleft"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-show-main-coverage";
+			cont.title = "Show coverage of main and secondary receiver";
+			cont.value = "COVR";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+			if(receiver_coverage_shown)cont.checked = true; else cont.checked = false;
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(cont.checked){
+					receiver_coverage_shown = true;
+					drawCircularStatsToMap();
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					receiver_coverage_shown = false;
+					layerGroupCoverage.clearLayers();
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+				if(receiver_coverage_shown)setCookie("receiver_coverage_shown", "on", 365); else setCookie("receiver_coverage_shown", "off", 365);
+			}
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_ShowMainCoverageMap());
 
