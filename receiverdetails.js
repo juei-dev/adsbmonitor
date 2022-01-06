@@ -480,20 +480,22 @@
 		if(!receiver_coverage_shown)return;
 
 		var main_circular_stats = [];
-		for(i=0; i<360; i++){ if(receiver_circular_stats[i][0]==receiver_label) main_circular_stats.push(receiver_circular_stats[i]) };
-		main_circular_stats.sort(function (a,b){return (a[1] - b[1])});
+		for(i=0; i<360; i++){ if(receiver_circular_stats[i][0]==receiver_label) if(receiver_circular_stats[i][4]!=99) main_circular_stats.push(receiver_circular_stats[i]) };
+
+		main_circular_stats.sort(function (a,b){return (a[1] - b[1])}); // sort by degree
 
 		var second_circular_stats = [];
-		for(i=360; i<receiver_circular_stats.length; i++){ if(receiver_circular_stats[i][0]==second_receiver_label) second_circular_stats.push(receiver_circular_stats[i]) };
-		second_circular_stats.sort(function (a,b){return (a[1] - b[1])});
-
+		for(i=360; i<receiver_circular_stats.length; i++){ if(receiver_circular_stats[i][0]==second_receiver_label) if(receiver_circular_stats[i][4]!=99) second_circular_stats.push(receiver_circular_stats[i]) };
+		second_circular_stats.sort(function (a,b){return (a[1] - b[1])}); // sort by degree
+	
 		for(c=0; c<receiver_coverage_points.length; c++) receiver_coverage_points.pop(); // clear polygon first
 		//receiver_coverage_points.push([receiver_lat, receiver_lon]);
 		var first_lat = 0, first_lon = 0;
 		var last_lat = 0, last_lon = 0;
+		//var tmp_point_count = 0;
 		layerGroupCoverage.clearLayers();
 		receiver_coverage_points.push([receiver_lat, receiver_lon]);					
-		for(i=0; i<360; i++){ // 360 for main only
+		for(i=0; i<main_circular_stats.length; i++){ // main only
 			// [receiver_label, angle (in int 0-359), min_distance, max_distance, max_distance_rssi, min_alt, max_alt, max_lat, max_lon]
 			if(main_circular_stats[i][0]==receiver_label){
 				if(main_circular_stats[i][7]!=0 && main_circular_stats[i][8]!=0){
@@ -505,23 +507,26 @@
 						receiver_coverage_points.push([receiver_lat, receiver_lon]);					
 					}
 					if(first_lat==0 && first_lon==0){ first_lat = next_lat; first_lon = next_lon; }
-					//if(last_lat != 0 && last_lon != 0)
-					//	var coverageLine = L.polyline([ [last_lat,last_lon],[next_lat,next_lon] ], { color: "#3F9F9F", weight: 2, opacity: 0.7, smoothfactor: 1 }).addTo(layerGroupCoverage);					
+					if(last_lat != 0 && last_lon != 0){
+						var coverageLine = L.polyline([ [last_lat,last_lon],[next_lat,next_lon] ], { color: "#3F9F9F", weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupCoverage);					
+						//coverageLine.bindTooltip("#:" + tmp_point_count++, { permanent: true, direction: 'center', offset: [0,0] });
+					}
 					last_lat = next_lat; last_lon = next_lon;
 				} else {
-					receiver_coverage_points.push([receiver_lat, receiver_lon]);					
+					//receiver_coverage_points.push([receiver_lat, receiver_lon]);					
 				}
 			}
 		}
-		//var coverageLine = L.polyline([ [last_lat,last_lon],[first_lat,first_lon] ], { color: "#3F9F9F", weight: 2, opacity: 0.7, smoothfactor: 1 }).addTo(layerGroupCoverage);					
-		receiver_coverage_points.push([receiver_lat, receiver_lon]);
-		//if(first_lat!=0 && first_lon!=0)receiver_coverage_points.push([first_lat, first_lon]);
+		if(first_lat!=0 && first_lon!=0) var coverageLine = L.polyline([ [last_lat,last_lon],[first_lat,first_lon] ], { color: "#3F9F9F", weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupCoverage);					
+		//coverageLine.bindTooltip("#:" + tmp_point_count++, { permanent: true, direction: 'center', offset: [0,0] });
+		//receiver_coverage_points.push([receiver_lat, receiver_lon]);
+		if(first_lat!=0 && first_lon!=0)receiver_coverage_points.push([first_lat, first_lon]);
 
 		if(second_receiver_enabled){
 			for(c=0; c<second_receiver_coverage_points.length; c++) second_receiver_coverage_points.pop(); // clear polygon first
 			first_lat = 0; first_lon = 0;
 			last_lat = 0, last_lon = 0;
-			second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);
+			//second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);
 			for(i=0; i<second_circular_stats.length; i++){
 				if(second_circular_stats[i][0]==second_receiver_label){
 					if(second_circular_stats[i][7]!=0 && second_circular_stats[i][8]!=0){
@@ -534,17 +539,17 @@
 							second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);
 						}					
 						if(first_lat==0 && first_lon==0){ first_lat = next_lat; first_lon = next_lon; }
-						//if(last_lat != 0 && last_lon != 0)
-						//	var coverageLineSecond = L.polyline([ [last_lat,last_lon],[next_lat,next_lon] ], { color: "#5F5F9F", weight: 2, opacity: 0.7, smoothfactor: 1 }).addTo(layerGroupCoverage);					
+						if(last_lat != 0 && last_lon != 0)
+							var coverageLineSecond = L.polyline([ [last_lat,last_lon],[next_lat,next_lon] ], { color: "#5F5F9F", weight: 1, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupCoverage);					
 						last_lat = next_lat; last_lon = next_lon;
 					} else {
-						second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);					
+						//second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);					
 					}
 				}
 			}
-			//var coverageLineSecond = L.polyline([ [last_lat,last_lon],[first_lat,first_lon] ], { color: "#5F5F9F", weight: 2, opacity: 0.7, smoothfactor: 1 }).addTo(layerGroupCoverage);					
-			second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);
-			//if(first_lat!=0 && first_lon!=0)receiver_coverage_points.push([first_lat, first_lon]);
+			if(first_lat!=0 && first_lon!=0) var coverageLineSecond = L.polyline([ [last_lat,last_lon],[first_lat,first_lon] ], { color: "#5F5F9F", weight: 2, opacity: 0.7, smoothfactor: 1 }).addTo(layerGroupCoverage);					
+			//second_receiver_coverage_points.push([second_receiver_lat, second_receiver_lon]);
+			if(first_lat!=0 && first_lon!=0)receiver_coverage_points.push([first_lat, first_lon]);
 			// Draw seconday coverage
 			var coveragePolygonOptionsSecond = { color: "#3F9F9F", weight: 0.5, opacity: 0.5, smoothfactor: 1 }; // { color: 'red', weight: 1, opacity: 0.5, smoothfactor: 1 }
 			var coveragePolygonSecond = L.polygon(second_receiver_coverage_points, coveragePolygonOptionsSecond).addTo(layerGroupCoverage);
