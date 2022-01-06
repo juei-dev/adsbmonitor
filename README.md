@@ -167,6 +167,9 @@ Jan 3rd, 2022:
   - Changed button positions a bit on the map.
   - Added also a COVR button to the map (bottom left) which will toggle receiver coverage lines on and off. This differes slightly to the receivers / antenna circular distance / direction graph, because that is on a flat plane base and the map coverage is in spheroid base.
 
+Jan 6th, 2022:
+  - Slight change to presentation of receiver coverage on the map.
+
 
 
 ## Current features
