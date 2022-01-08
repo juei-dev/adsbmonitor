@@ -170,6 +170,9 @@ Jan 3rd, 2022:
 Jan 6th, 2022:
   - Slight change to presentation of receiver coverage on the map.
 
+Jan 8th, 2022:
+  - Since there was no answer from the OpenSky Network (question if this is ok to be done sent on September), I'll take that as usage approved. Please note that any kind of commercial usage of OpenSky Network data cannot be done. That is only for personal and research purposes.
+  - So added OpenSky Network call to fetch ALL the other aircraft than the dump1090-fa received and a button called SOSN, which will toggle showing those aircraft on the map. The data fetch is done every 15 seconds in order to throttle the API calls to OSN.
 
 
 ## Current features
@@ -257,6 +260,13 @@ Jan 6th, 2022:
 	- If aircraft is selected, the true distance (vector distance) to closest aircraft is shown. Also +-45 degree gray guidelines are shown to approximate the glide distance of the aircraft (just 15:1 glide ratio and ac altitude used, so only as a reference)  
 	- If runway (threshold) is selected, weather information is fethced from OpenWeatherMap
 	- If both aircraft and runway is selected, the lateral distance is shown from the runway threshold to the selected aircraft
+
+- Open Sky Network data for other aircraft than received ones
+	Bringing up OpenSky: A large-scale ADS-B sensor network for research
+	Matthias Schäfer, Martin Strohmeier, Vincent Lenders, Ivan Martinovic, Matthias Wilhelm
+	ACM/IEEE International Conference on Information Processing in Sensor Networks, April 2014
+	The OpenSky Network, http://www.opensky-network.org
+
 
 
 ---
