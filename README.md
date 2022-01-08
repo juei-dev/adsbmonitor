@@ -173,7 +173,7 @@ Jan 6th, 2022:
 Jan 8th, 2022:
   - Since there was no answer from the OpenSky Network (question if this is ok to be done sent on September), I'll take that as usage approved. Please note that any kind of commercial usage of OpenSky Network data cannot be done. That is only for personal and research purposes.
   - So added OpenSky Network call to fetch ALL the other aircraft than the dump1090-fa received and a button called SOSN, which will toggle showing those aircraft on the map. The data fetch is done every 15 seconds in order to throttle the API calls to OSN.
-
+  - Bugfix: if OpenSky Network icao has been found from the list of primary receiver icaos it was OSN position was not shown. However, the icao didn't necessarily have position information. Now if the OSN icao is found in primary, but it does'nt have position information, the OSN marker is not deleted, but colored a bit more green color. This will indicate that the aircraft could possibly either enter soon the receiver range or is exiting the range.  
 
 ## Current features
 
