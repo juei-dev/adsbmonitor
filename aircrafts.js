@@ -1058,9 +1058,19 @@
 		}					
 		for(i=0; i<OS_aircrafts.length; i++){
 			// all_icao_flights[] = icao, flight
+			var icao_found_with_pos = false;
+			for(ap=0; ap < aircrafts_positions.length; ap++){
+				if(aircrafts_positions[ap][3]==OS_aircrafts[i][0]){ // if icao found
+					icao_found_with_pos = true; break;
+				}
+			}
+/*
 			if(primary_icaos.includes(OS_aircrafts[i][0])){
 				OS_aircrafts[i][10] = false;
-			} else {
+			} 
+*/
+			if(!icao_found_with_pos)
+			{
 				var lat = OS_aircrafts[i][4], lon = OS_aircrafts[i][5];
 				var flight = OS_aircrafts[i][1];
 				var track = OS_aircrafts[i][6];
@@ -1068,6 +1078,7 @@
 				var gs = OS_aircrafts[i][7];
 				var on_ground = OS_aircrafts[i][11];
 				var ac_color = "#808080";
+				if(primary_icaos.includes(OS_aircrafts[i][0])) ac_color = "#70B070"; // if icao has been received, but no position, color the marker a bit more
 				//console.log(i + " : " + lat + "," + lon + " | " + OS_aircrafts[i]); 
 				if(lat && lon){
 					if(!on_ground)
