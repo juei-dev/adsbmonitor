@@ -953,24 +953,175 @@
 
 
 
-	// NOT STARTED YET - Pending approval from OpenSky Network (Sep 23rd 2021)
+	// Since there's no answer from OpenSky Network (question sent Sep 23rd 2021), it's assumed that it's ok to use.
 	//
 	// Predictive map entries to be fetched from OpenSky public API
-	// Fetching every 30 seconds - there's an internal limit in their API of 10 seconds, but
+	// Fetching every 15 seconds - there's an internal limit in their API of 10 seconds, but
 	// limiting the call frequency won't hurt this and definitely will be better for OpenSky Network point of view.
 	//
 	// ATTN! This is sort of a silent feature since OpenSky prohibits all the commerical usage of their API usage
-	// so please do not enable this for other than just own personal research use!
+	// so please do not enable this for other than just own personal / research use!
 	//
 	// It can be enabled by adding the OpenSky REST API url to config.js
 	// var openSkyRestAPIUrl = "https://opensky-network.org/api/states/all";
 	//
 	// Please read more from The OpenSky Network, https://www.opensky-network.org
 	// and https://opensky-network.org/about/terms-of-use
-/*
-	var openSkyRestAPIUrl = "";
-	if(openSkyRestAPIUrl){
+	/*
+		Bringing up OpenSky: A large-scale ADS-B sensor network for research
+		Matthias Schäfer, Martin Strohmeier, Vincent Lenders, Ivan Martinovic, Matthias Wilhelm
+		ACM/IEEE International Conference on Information Processing in Sensor Networks, April 2014
+	*/
 
+	var openSkyRestAPIUrl = "https://opensky-network.org/api/states/all";
+	var OS_fetch_rate = 15 * 1000; // refresh from OS in 15 seconds = 30000 milliseconds
+
+	var OS_aircrafts = []; // icao, flight, timestamp, squawk, lat, lon, (true) track, gs, (baro) altitude, rate, to_be_shown
+	var OS_last_fetch = 0;
+
+	var layerGroupOS = L.layerGroup().addTo(mymap);
+
+	function getOSData(){
+		if(!show_open_sky){
+			layerGroupOS.clearLayers();
+			return;
+		}
+		if(openSkyRestAPIUrl && (OS_last_fetch < (Date.now() - OS_fetch_rate))){
+			var map_bounds = mymap.getBounds();
+			var map_bounds_sw = map_bounds.getSouthWest();
+			var map_bounds_ne = map_bounds.getNorthEast();
+
+			var openSkyRestAPIRequest = openSkyRestAPIUrl + "?"; 
+			openSkyRestAPIRequest += "lamin=" + map_bounds_sw.lat;
+			openSkyRestAPIRequest += "&lomin=" + map_bounds_sw.lng;
+			openSkyRestAPIRequest += "&lamax=" + map_bounds_ne.lat;
+			openSkyRestAPIRequest += "&lomax=" + map_bounds_ne.lng;
+			fetch(openSkyRestAPIRequest)
+			.then(function(resp) { 
+				if(resp.ok){
+					return resp.json();
+				} else {
+				}
+			})
+			.then(function(data) {
+				if(data){
+					OS_last_fetch = Date.now();
+					if(!data.states)return;
+					var oss = data.states;
+					var aci = [];
+					//console.log(aci);
+					// clear the OS_aircrafts first
+					while( OS_aircrafts.length > 0 ) OS_aircrafts.pop();
+
+					// populate OS_aircrafts
+					for(i=0; i<oss.length; i++) {
+						aci = oss[i];
+						if(!aci)continue;
+						var os_icao = "", os_flight = "", os_timestamp = 0, os_squawk = "", os_lat = 0, os_lon = 0;
+						var os_track = 0, os_gs = 0, os_altitude = 0, os_rate = 0;
+						var os_on_ground = false;
+						os_icao = aci[0];
+						os_flight = aci[1]; 
+						os_timestamp = aci[3]; // time position
+						os_squawk = aci[14];
+						os_lat = aci[6];
+						os_lon = aci[5];
+						os_track = aci[10]; // true track
+						os_gs = aci[9]; // originally in m/s
+						os_altitude = aci[7]; // baro altitude, originally in meters
+						os_rate = aci[11]; // vertical rate, originally in meters per second
+						os_on_ground = aci[8];
+
+						if(os_gs) os_gs *= 1.94384; // convert to knots
+						if(os_altitude) os_altitude *= 3.28084; // convert to feet
+						if(os_rate) os_rate *= 196.85; // convert from m/s to feet per minute
+
+						OS_aircrafts.push([os_icao, os_flight, os_timestamp, os_squawk, os_lat, os_lon, os_track, os_gs, os_altitude, os_rate, true, os_on_ground]);	
+
+					}
+					console.log("Fetched " + aci.length + " ac information from OpenSky Network");
+				} else {
+				}
+			})
+			.catch(function(error) {
+				console.error("Couldn't fetch OpenSky Network predicted aircraft locations: " + error);
+			});
+		}
+		// draw the OpenSky Network flights on the map,
+		// do not show the already seen aircraft by the receivers
+		layerGroupOS.clearLayers();
+		var zoom_correction_lat = 0.01, zoom_correction_lon = 0.02;
+		var zoom_level = mymap.getZoom();
+		if(zoom_level){
+			zoom_correction_lat = 0.01 * (36/Math.pow(zoom_level,2));
+			zoom_correction_lon = 0.02 * (36/Math.pow(zoom_level,2));
+		}					
+		for(i=0; i<OS_aircrafts.length; i++){
+			// all_icao_flights[] = icao, flight
+			if(primary_icaos.includes(OS_aircrafts[i][0])){
+				OS_aircrafts[i][10] = false;
+			} else {
+				var lat = OS_aircrafts[i][4], lon = OS_aircrafts[i][5];
+				var flight = OS_aircrafts[i][1];
+				var track = OS_aircrafts[i][6];
+				var altitude = OS_aircrafts[i][8];
+				var gs = OS_aircrafts[i][7];
+				var on_ground = OS_aircrafts[i][11];
+				var ac_color = "#808080";
+				//console.log(i + " : " + lat + "," + lon + " | " + OS_aircrafts[i]); 
+				if(lat && lon){
+					if(!on_ground)
+						var ac = L.rectangle([[lat-(zoom_correction_lat*1.5), lon-(zoom_correction_lon*1.5)], [lat+(zoom_correction_lat*1.5),lon+(zoom_correction_lon*1.5)]], {
+							color: ac_color,
+							fillColor: '#000',
+							fillOpacity: 0.9,
+							radius: 2300
+						}).addTo(layerGroupOS).on('click', function(e){  });
+					else
+						var ac = L.rectangle([[lat-(zoom_correction_lat*0.2), lon-(zoom_correction_lon*0.2)], [lat+(zoom_correction_lat*0.2),lon+(zoom_correction_lon*0.2)]], {
+							color: ac_color,
+							fillColor: '#000',
+							fillOpacity: 0.9,
+							radius: 300
+						}).addTo(layerGroupOS).on('click', function(e){  });
+						
+					if(track){ 
+						nextpoint_lat = 0; nextpoint_lon = 0;
+						var speed_km = gs *1.852;
+						var headline_len = speed_km / 60;                           
+						calcNextPoint(lat,lon,track,headline_len); // indicator with km distance calculated from gs
+						if( nextpoint_lat != 0 && nextpoint_lon != 0 ) {
+							var headline = L.polyline([ [lat,lon],[nextpoint_lat,nextpoint_lon] ], { color: "#808020", weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupOS);
+							}
+					}
+					if(flight){
+						
+						var tt_offset = [10,-13];
+						var ground_offset_correction = 0; // if on ground
+						if(on_ground) ground_offset_correction = -17;
+						if( mymap.getZoom() == 9 ) tt_offset = [10,-17-ground_offset_correction];
+						if( mymap.getZoom() == 10 ) tt_offset = [10,-20-ground_offset_correction];
+						if( mymap.getZoom() == 11 ) tt_offset = [10,-23-ground_offset_correction];
+						if( mymap.getZoom() == 12 ) tt_offset = [10,-29-ground_offset_correction];
+						if( mymap.getZoom() == 13 ) tt_offset = [10,-34-ground_offset_correction];
+						if( mymap.getZoom() >= 14 ) tt_offset = [10,-52-ground_offset_correction];
+						
+						//var tt_offset = [0,10];
+						var details = "<br/>"
+						if(gs) details += "<span style='color: #909092;'>" + gs.toFixed(0) + "</span>";
+						if(altitude){
+							if(altitude > 3000)
+								details += " <span style='color: #909092;'>FL" + (altitude/100).toFixed(0) + "</span>";
+							else
+								details += " <span style='color: #909092;'>" + (altitude).toFixed(0) + "</span>";
+						}						 
+						ac.bindTooltip("<span style='color: #90A092;'><b>" + flight + "</b></span>" + details, { permanent: false, direction: 'center', offset: tt_offset });
+					}
+				}
+			}
+		}
 
 	}
-*/
+	var refreshOSInterval = setInterval(getOSData, stats_refresh_rate);
+	getOSData();
+

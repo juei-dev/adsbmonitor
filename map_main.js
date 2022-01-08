@@ -16,6 +16,7 @@
 	var selected_ac_extra_info = true; // set to false, if you don't want access api.joshdouch.me
 	var show_radius_circle = false; // show radius circles
 	var receiver_coverage_shown = false;
+	var show_open_sky = false;
 
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
@@ -406,6 +407,48 @@
 		}
 	});
 	mymap.addControl(new mapButton_SelectExtraInfo());
+
+
+	if(getCookie("show_open_sky")=="on") show_open_sky = true; else if(getCookie("show_open_sky")=="off") show_open_sky = false;
+	var mapButton_ShowOpenSky = L.Control.extend({
+		options: {
+			position: "bottomright"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-show-open-sky";
+			cont.title = "Show ALL the aircraft using OpenSky Network, also those which are not received";
+			cont.value = "SOSN";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+			if(show_open_sky)cont.checked = true; else cont.checked = false;
+			//cont.checked = true;
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(cont.checked){
+					show_open_sky = true;
+					getOSData();
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					show_open_sky = false;
+					getOSData();
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+				if(show_open_sky)setCookie("show_open_sky", "on", 365); else setCookie("show_open_sky", "off", 365);
+			}
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_ShowOpenSky());
 
 	if(getCookie("show_radius_circle")=="on") show_radius_circle = true; else if(getCookie("show_radius_circle")=="off") show_radius_circle = false;
 	var mapButton_ShowRadiusCircle = L.Control.extend({
