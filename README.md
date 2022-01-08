@@ -261,11 +261,15 @@ Jan 8th, 2022:
 	- If runway (threshold) is selected, weather information is fethced from OpenWeatherMap
 	- If both aircraft and runway is selected, the lateral distance is shown from the runway threshold to the selected aircraft
 
-- Open Sky Network data for other aircraft than received ones
-	Bringing up OpenSky: A large-scale ADS-B sensor network for research
-	Matthias Schäfer, Martin Strohmeier, Vincent Lenders, Ivan Martinovic, Matthias Wilhelm
-	ACM/IEEE International Conference on Information Processing in Sensor Networks, April 2014
-	The OpenSky Network, http://www.opensky-network.org
+- Open Sky Network data for other aircraft than received ones.
+
+> Bringing up OpenSky: A large-scale ADS-B sensor network for research
+>
+> Matthias Schäfer, Martin Strohmeier, Vincent Lenders, Ivan Martinovic, Matthias Wilhelm
+>
+> ACM/IEEE International Conference on Information Processing in Sensor Networks, April 2014
+>
+> The OpenSky Network, http://www.opensky-network.org
 
 
 
