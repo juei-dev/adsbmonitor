@@ -21,8 +21,6 @@
 	var all_icao_flights = []; // icao, flight
 
 	var ac_traces = []; // store of ac track traces for map: icao, flight, timestamp, lat, lon, altitude, gs, tas, track, rssi
-	const ac_traces_max_time = 2*60; // seconds to trace each ac (cleanTraces -function to clear older away) 
-	const ac_traces_decay_time = 1*60; // seconds to trace each ac with brighter line 
 	var layerGroupTraces = L.layerGroup().addTo(mymap);
 
 	var ac_count = 0, ac_with_pos_count = 0, ac_msgs = 0, ac_max_distance = 0, ac_max_distance_all_time = 0;
@@ -911,12 +909,12 @@
 		var position = -1;
 		for(i=0; i<ac_traces.length; i++){
 			if(icao){
-				if(ac_traces[i][0]==icao && ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000))){
+				if(ac_traces[i][0]==icao && ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000*ac_traces_time_multiplier))){
 					ac_traces.splice(i,1);
 					if(position==-1)position=i;
 				}
 			} else { // clean all the aircrafts
-				if(ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000))){
+				if(ac_traces[i][2]<=(Date.now()-(ac_traces_max_time*1000*ac_traces_time_multiplier))){
 					ac_traces.splice(i,1);				
 				}
 			}
@@ -942,7 +940,7 @@
 				prevpoint_lat = 0; prevpoint_lon = 0;
 			}
 			if(prevpoint_lat != 0 && prevpoint_lon != 0){
-				if((Date.now()-ac_traces[i][2])>(ac_traces_decay_time*1000)) trace_color = color_later; else trace_color = color_sooner;
+				if((Date.now()-ac_traces[i][2])>(ac_traces_decay_time*1000*ac_traces_time_multiplier)) trace_color = color_later; else trace_color = color_sooner;
 				var traceline = L.polyline([ [currentpoint_lat,currentpoint_lon],[prevpoint_lat,prevpoint_lon] ], { color: trace_color, weight: 2, opacity: 0.5, smoothfactor: 1 }).addTo(layerGroupTraces);		
 			}
 			prevpoint_lat = currentpoint_lat; prevpoint_lon = currentpoint_lon;

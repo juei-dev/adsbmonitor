@@ -18,6 +18,12 @@
 	var receiver_coverage_shown = false;
 	var show_open_sky = false;
 
+	const ac_traces_max_time = 2*60; // seconds to trace each ac (cleanTraces -function to clear older away) 
+	const ac_traces_decay_time = 1*60; // seconds to trace each ac with brighter line
+	var ac_trace_longer = false;
+	var ac_traces_time_multiplier = 1; // for longer traces, using multiplier for max and decay times
+	const ac_traces_time_multiplier_max = 5;
+
 	// get map position and zoom from the cookies, if those are set
 	if(getCookie("set_lat")){
 		set_lat = getCookie("set_lat");
@@ -286,9 +292,54 @@
 
 
 	// Custom buttons to map
-	//var button_background_color = "202023";
-	//var button_background_color_hover = "404043";
-	//var button_background_color_enabled = "202043";
+
+	if(getCookie("ac_trace_longer")=="on") ac_trace_longer = true; else if(getCookie("ac_trace_longer")=="off") ac_trace_longer = false;
+	var mapButton_TraceLonger = L.Control.extend({
+		options: {
+			position: "bottomright"
+		},
+
+		onAdd: function (map){
+			var cont = L.DomUtil.create("input");
+			cont.type = "checkbox";
+			cont.className = "map-btn-trace-longer";
+			cont.title = "Leave longer trace after aircarfts (5x the normal = " + (ac_traces_max_time * ac_traces_time_multiplier_max) + " s)";
+			cont.value = "TRCL";
+			//cont.style.backgroundColor = button_background_color;
+			cont.style.width = "30px";
+			cont.style.height = "30px";
+			if(ac_trace_longer){ 
+				cont.checked = true;
+				ac_traces_time_multiplier = ac_traces_time_multiplier_max;
+			} else { 
+				cont.checked = false;
+				ac_traces_time_multiplier = 1;
+			}
+
+			cont.onmouseover = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color_hover;
+			} 
+			cont.onmouseout = function(){
+				// if(cont.style.backgroundColor!=button_background_color_enabled) cont.style.backgroundColor = button_background_color;
+			}
+			cont.onclick = function(){
+				if(!ac_trace_longer){
+					ac_trace_longer = true;
+					setCookie("ac_trace_longer", "on", 365);
+					ac_traces_time_multiplier = ac_traces_time_multiplier_max;
+					//cont.style.backgroundColor = button_background_color_enabled;
+				} else {
+					ac_trace_longer = false;
+					setCookie("ac_trace_longer", "off", 365);
+					ac_traces_time_multiplier = 1;	
+					//cont.style.backgroundColor = button_background_color_hover;
+				} 
+			}
+			return cont;
+		}
+	});
+	mymap.addControl(new mapButton_TraceLonger());
+
 	if(getCookie("ac_trace_all")=="on") ac_trace_all = true; else if(getCookie("ac_trace_all")=="off") ac_trace_all = false;
 	var mapButton_TraceAll = L.Control.extend({
 		options: {
@@ -300,7 +351,7 @@
 			cont.type = "checkbox";
 			cont.className = "map-btn-trace-all";
 			cont.title = "Leave trace after all aircarfts";
-			cont.value = "TRC";
+			cont.value = "TRCA";
 			//cont.style.backgroundColor = button_background_color;
 			cont.style.width = "30px";
 			cont.style.height = "30px";
