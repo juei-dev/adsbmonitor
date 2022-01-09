@@ -175,6 +175,11 @@ Jan 8th, 2022:
   - So added OpenSky Network call to fetch ALL the other aircraft than the dump1090-fa received and a button called SOSN, which will toggle showing those aircraft on the map. The data fetch is done every 15 seconds in order to throttle the API calls to OSN.
   - Bugfix: if OpenSky Network icao has been found from the list of primary receiver icaos it was OSN position was not shown. However, the icao didn't necessarily have position information. Now if the OSN icao is found in primary, but it does'nt have position information, the OSN marker is not deleted, but colored a bit more green color. This will indicate that the aircraft could possibly either enter soon the receiver range or is exiting the range.  
 
+Jan 9th, 2022:
+  - Added TRCL -button to the map which is toggling the 5-times (10 min) longer trace line time for aircraft.
+
+
+
 ## Current features
 
 - OpenStreetMap (using Leaflet) displaying:
