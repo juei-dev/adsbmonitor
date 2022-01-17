@@ -178,6 +178,9 @@ Jan 8th, 2022:
 Jan 9th, 2022:
   - Added TRCL -button to the map which is toggling the 5-times (10 min) longer trace line time for aircraft.
 
+Jan 17th, 2022:
+  - Very small change: map zoom is now slower for better accuracy. Mouse wheel is zooming a bit faster than + and - buttons, but still 2 times slower than before.
+
 
 
 ## Current features
