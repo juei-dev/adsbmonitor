@@ -31,7 +31,7 @@
 		set_zoom = getCookie("set_zoom");
 	}
 
-	var mymap = L.map('mapid').setView([set_lat, set_lon], set_zoom);
+	var mymap = L.map('mapid', { zoomSnap: 0.25, zoomDelta: 0.25, wheelPxPerZoomLevel: 120 }).setView([set_lat, set_lon], set_zoom);
 	var tileLayer_normal = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
 			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 			maxZoom: 18,
@@ -120,9 +120,6 @@
 		}
 	});
 	mymap.addControl(new L.Control.Fullscreen());
-	mymap.zoomSnap = 0.25;
-	mymap.zoomDelta = 0.5;
-	mymap.wheelPxPerZoomLevel = 240;
 	//mymap.preferCanvas = true;
 
 	function smallMapEvent(){
