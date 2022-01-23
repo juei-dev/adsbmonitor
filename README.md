@@ -27,6 +27,7 @@ Just add your information to config.js -file:
 
 *Please note, that after creating an account at OpenWeatherMap, the API key might take over an hour to be in effect / enabled there.*
 
+- The OpenSky Network API addresses are embedded into aircraft.json -file. Please note that their API and terms can change at any time without a notice. In order to have the information at OSN as covered as possible, please consider to also feed to OpenSky Network: https://opensky-network.org/community/projects/30-dump1090-feeder
 
 
 ## History
@@ -180,6 +181,9 @@ Jan 9th, 2022:
 
 Jan 17th, 2022:
   - Very small change: map zoom is now slower for better accuracy. Mouse wheel is zooming a bit faster than + and - buttons, but still 2 times slower than before.
+
+Jan 23rd, 2022:
+  - No changes to the code, but received a confirmation from OpenSky Network that's it's ok to use their API. However, please note that their API and terms can change at any time without a notice. In order to have the information at OSN as covered as possible, please consider to also feed to OpenSky Network: https://opensky-network.org/community/projects/30-dump1090-feeder
 
 
 
