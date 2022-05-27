@@ -1,5 +1,5 @@
 	var receiver_domain = "192.168.11.9"; // change to primary ADS-B receiver host IP or domainname
-	var receiver_url_path = "/dump1090-fa/data/aircraft.json"; // change this if having skyaware or other kind of setup
+	var receiver_url_path = "/dump1090-fa/data/aircraft.json"; // change this if having skyaware or other kind of setup - e.g. for PiAware 7.2 ":8080/skyaware/data/aircraft.json" might work better 
 	var receiver_lat = 61.0, receiver_lon = 26.0; // change to primary ADS-B receiver location
 	var receiver_label = "W"; // change to primary ADS-B receiver label (one character works best)
 	var second_receiver_enabled = true; // change this to false, if only one receiver is used
